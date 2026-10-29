@@ -1,46 +1,118 @@
 # Color scheme proposals
 
-**Status: awaiting selection.** Pick one (or ask for a blend) and it becomes `colors/<name>.toml`,
-the single source of truth for every generated app theme.
+**Status: decided — Quasar** (owner, 2026-10-29; D10 in [decisions.md](../decisions.md)).
+The blend dial stays available for fine-tuning.
 
-- Visual comparison: open [`preview.html`](preview.html) in a browser (desktop mockups, swatches,
-  contrast numbers, copy-ready kitty colors). Regenerate with
-  `python3 tools/preview.py --standalone colors/proposals/*.toml > docs/colors/preview.html`.
-- Validate: `python3 tools/palette.py check colors/proposals/*.toml` (all four pass today).
+- Visual comparison + live blend dial: open [`preview.html`](preview.html) in a browser.
+- Validate: `python3 tools/palette.py check colors/proposals/round2/*.toml`
+- Regenerate the page: `python3 tools/preview.py --standalone colors/proposals/round2/*.toml colors/proposals/round1/*.toml > docs/colors/preview.html`
 
-## Brief
+## History
 
-"Soft dark mode": comfortable for long sessions, readable, no glare. Monokai-like accents, space
-theme, decent contrast.
+| Round | Outcome |
+| --- | --- |
+| 1 (2026-10-29) | Four palettes: Nebula, Deep Field, Event Horizon, Pulsar ([round1/](../../colors/proposals/round1/)). Owner: "somewhere between Pulsar and Event Horizon; Event Horizon is more readable, Pulsar more comfortable; worried about Pulsar's readability." |
+| 2 (2026-10-29) | Added APCA to the rules (below), built `tools/blend.py`, proposed **Quasar** and the dial. Owner accepted Quasar. |
 
-Translated into measurable requirements:
+## Why the feedback contradicted the round-1 numbers, and what changed
 
-| Requirement | Rule (WCAG 2.x contrast vs. the palette's `base`) | Rationale |
+Round 1 used only WCAG 2 contrast ratios, which rank Pulsar as *more* readable (text 15.4:1 vs
+11.5:1). The perception was the reverse. Two effects that WCAG 2 doesn't model explain it:
+
+1. **Halation.** Very bright text on a very dark background glows and smears, worst for
+   astigmatic eyes. APCA puts Pulsar's body text at Lc 95, past the comfortable range;
+   Event Horizon sits at Lc 82.
+2. **Uneven accent lightness.** Pulsar's accents span Lc 47 (red, purple) to Lc 82 (yellow):
+   yellow strings shout, red keywords recede, and the eye has to keep re-adapting. Event
+   Horizon's spread is 24; Quasar's is 16.
+
+Pulsar's *comfort* comes from its darker background: less total light from two 4K panels.
+Quasar keeps that and fixes the other two:
+
+| Group | Quasar takes | Effect |
 | --- | --- | --- |
-| Not blinding | background is never pure black; body text **11–15.5:1** | 21:1 white-on-black causes halation (glowing text edges), worst for astigmatic eyes. Most comfortable dark themes sit at 11–15. |
-| Readable | secondary text ≥ 7:1 (AAA) | |
-| Comments readable | comments / ANSI 8 ≥ 4.5:1 (AA) | Classic Monokai's comment `#75715E` on `#272822` is **3.0:1**, below AA. zsh-autosuggestions also renders in ANSI 8. |
-| Accents readable as text | every accent ≥ 6:1, bright variants ≥ 7:1 | Classic Monokai pink `#F92672` on `#272822` is **3.9:1**: punchy but fails AA. |
-| Selection usable | text on `surface1` ≥ 9:1, accents on `surface1` ≥ 4.5:1 | Code stays readable when highlighted. |
-| Borders visible | `surface2` vs `base` ≥ 1.4:1 | Inactive window borders, separators. |
-| Space theme | blue-violet hue bias in all neutrals; starfield/nebula-hued border gradients | The theme lives in hue, not in decoration that costs readability. |
+| Background ramp | 30% toward Event Horizon | nearly as dark as Pulsar (`#191820` vs `#16151D`) |
+| Text ramp | 55% toward Event Horizon | body text Lc 88: no halation, still crisp |
+| Accents | 40% toward Event Horizon in chroma/hue, then lightness clamped to Lc 58–74 | Monokai hues and most of Pulsar's saturation, evenly bright |
+| Comments | lifted to Lc 47 | comments are readable, not faint (classic Monokai comments are ~Lc 36) |
 
-## Shared design across all proposals
+Trade-offs to check on your screens:
+- **Red is lighter and pinker** (`#FD8DA8`) than Pulsar's `#FF5E95`: lifting it to Lc 58 at the
+  same chroma moves it toward salmon. Red (keywords) and pink (escapes, specials) are closer
+  than in Pulsar. If keywords feel weak, the fix is a more magenta pink rather than a darker red.
+- **Yellow is dimmer** than Monokai's (`#DCCD77` vs `#E6DB74`): capped at Lc 74 so strings don't glare.
+- **Comments are more visible** than in classic Monokai. Deliberate; easy to lower if they distract.
+
+## Contrast rules
+
+Measured against the palette's `base`. Enforced by `tools/palette.py check` (42 rules).
+
+| Rule | WCAG 2 ratio | APCA Lc | Why |
+| --- | --- | --- | --- |
+| Body text | 11 – 15.5 | 75 – 92 | readable; upper bound prevents halation |
+| Secondary text | ≥ 7 | ≥ 60 | |
+| Comments / ANSI 8 / zsh autosuggestions | ≥ 4.5 | ≥ 45 | |
+| Text on selection (`surface1`) | ≥ 9 | | |
+| Inactive borders (`surface2`) | ≥ 1.4 | | |
+| Each accent on base | ≥ 6 | 55 – 82 | |
+| Accent spread (max − min) | | ≤ 18 | no token glares, none recedes |
+| Accents inside a selection | ≥ 4.5 | | |
+| Bright accents | ≥ 7 | | |
+| Dark text on cyan pill | ≥ 7 | | |
+
+APCA is the perceptual contrast model in the WCAG 3 drafts (APCA-W3 0.0.98G constants). It is
+not yet a standard, so the WCAG 2 rules stay in force. `tools/palette.py` implements it and
+checks it against the published reference values (`#888` on `#fff` = Lc 63.06).
+
+## Quasar vs its endpoints
+
+Cells: hex, WCAG ratio / APCA Lc on that palette's base.
+
+| role | Quasar | Pulsar | Event Horizon |
+| --- | --- | --- | --- |
+| crust | `#0F0E14` | `#0C0B11` | `#17161B` |
+| mantle | `#14131A` | `#110F17` | `#1C1B21` |
+| base | `#191820` | `#16151D` | `#212026` |
+| surface0 | `#23212C` | `#201E2A` | `#2A2930` |
+| surface1 | `#2C2B38` | `#2A2837` | `#323139` |
+| surface2 | `#3F3D50` | `#3C3950` | `#47454F` |
+| overlay | `#9D99AD` 6.4 / 47 | `#85819C` 4.8 / 36 | `#8E8A98` 4.8 / 38 |
+| subtext | `#BAB6C6` 8.9 / 63 | `#BDB9CD` 9.5 / 65 | `#B8B4C0` 7.9 / 61 |
+| text | `#E4E0E9` 13.5 / 88 | `#EEEBF4` 15.4 / 95 | `#DCD8E1` 11.5 / 82 |
+| bright | `#F3F1F6` 15.7 / 98 | `#FBFAFD` 17.4 / 104 | `#ECE9F0` 13.5 / 92 |
+| red | `#FD8DA8` 8.0 / 58 | `#FF5E95` 6.3 / 47 | `#EC8597` 6.4 / 51 |
+| orange | `#F69C56` 8.2 / 59 | `#FD971F` 8.3 / 59 | `#E6A684` 7.8 / 60 |
+| yellow | `#DCCD77` 10.9 / 74 | `#E6DB74` 12.7 / 82 | `#E0CD90` 10.2 / 75 |
+| green | `#A6DA64` 10.8 / 74 | `#A6E22E` 11.7 / 77 | `#AACC90` 9.0 / 67 |
+| cyan | `#78D3E3` 10.2 / 71 | `#66D9EF` 11.0 / 74 | `#8DC9D2` 8.8 / 66 |
+| blue | `#88AFFD` 8.0 / 58 | `#6FA3FF` 7.2 / 52 | `#98B0E4` 7.4 / 57 |
+| purple | `#BEA0FE` 8.1 / 58 | `#AE81FF` 6.4 / 47 | `#B8A6E0` 7.4 / 57 |
+| pink | `#FB89CD` 8.0 / 58 | `#FF6AC1` 7.0 / 51 | `#DE9EC6` 7.6 / 58 |
+| red (bright) | `#FFA7BA` 9.6 / 67 | `#FF7AA6` 7.4 / 54 | `#F2A0AE` 8.0 / 61 |
+| orange (bright) | `#FEB076` 9.8 / 68 | `#FFAE52` 9.9 / 67 | `#EDBBA0` 9.4 / 70 |
+| yellow (bright) | `#EBDC85` 12.7 / 83 | `#EEE59A` 14.1 / 89 | `#E9DBAD` 11.7 / 83 |
+| green (bright) | `#B5EA73` 12.6 / 83 | `#BCEB63` 13.1 / 84 | `#BFD9AB` 10.6 / 76 |
+| cyan (bright) | `#87E3F3` 12.0 / 80 | `#8DE3F3` 12.4 / 81 | `#A9D7DE` 10.4 / 75 |
+| blue (bright) | `#A0C0FD` 9.6 / 67 | `#96BBFF` 9.4 / 64 | `#B1C3EB` 9.1 / 68 |
+| purple (bright) | `#CBB5FE` 9.7 / 68 | `#C4A3FF` 8.7 / 60 | `#CBBDE9` 9.2 / 69 |
+| pink (bright) | `#FDA4D7` 9.6 / 67 | `#FF8FD0` 8.7 / 61 | `#E7B7D5` 9.3 / 69 |
+
+## Shared design (all rounds)
 
 ### Roles
 
 | Role | Used for |
 | --- | --- |
 | `crust` | bar background, outermost chrome, dark text on accent pills |
-| `mantle` | secondary panels, inactive tabs, notification background |
+| `mantle` | secondary panels, inactive tabs, launcher body, notifications |
 | `base` | terminal and editor background (all contrast is measured here) |
 | `surface0` | cursorline, hover |
 | `surface1` | selection, inactive window border, ANSI 0 |
 | `surface2` | separators, kitty inactive border |
-| `overlay` | comments, disabled text, autosuggestions (ANSI 8) |
+| `overlay` | comments, placeholders, generic names in the launcher, autosuggestions (ANSI 8) |
 | `subtext` | secondary text (ANSI 7) |
 | `text` | body text |
-| `bright` | headings, emphasis (ANSI 15) |
+| `bright` | headings, emphasis, selected rows (ANSI 15) |
 | 8 accents | red, orange, yellow, green, cyan, blue, purple, pink, plus a bright variant of each |
 
 ### Syntax mapping (Monokai-derived)
@@ -70,90 +142,9 @@ Translated into measurable requirements:
 | 6 cyan | cyan | 14 | cyan (bright) |
 | 7 white | `subtext` | 15 bright white | `bright` |
 
-Orange and pink have no ANSI slot; apps that support truecolor get them by hex.
+Orange and pink have no ANSI slot; truecolor apps get them by hex.
 
-## The four proposals
+### Window border gradient
 
-### 1. Nebula (recommended)
-
-Monokai Pro's accent set, slightly desaturated, on a violet-tinted deep-space base (`#1C1B26`).
-Window border gradient cyan → purple.
-
-- **Pros:** closest to the brief as written. Monokai character intact, background visibly
-  "space" without being navy. Text at 13.2:1 sits mid-range of the comfort band.
-- **Cons:** red is the weakest accent (6.4:1); keywords are the most frequent token, so red
-  carries a lot of weight. If it feels dim, nudge it toward `#FF7A93`.
-
-### 2. Deep Field
-
-Cool navy-black (`#131727`), cooler green and cyan, highest contrast of the set (text 14.4:1,
-all accents ≥ 7:1). Border gradient blue → cyan; yellow cursor.
-
-- **Pros:** best on low-quality or high-glare panels, and at small font sizes. Strongest "space"
-  read.
-- **Cons:** navy bases drift toward Tokyo Night / Nord territory; less Monokai-like. More blue
-  light. Slightly harsher in a dark room.
-
-### 3. Event Horizon
-
-Warm graphite with a faint violet bias (`#212026`), desaturated accents, lowest contrast that
-still passes every rule (text 11.5:1).
-
-- **Pros:** the "softest" option. Lowest glare; suits dim rooms and long sessions.
-- **Cons:** accents are muted enough that diffs and error states stand out less. On a cheap
-  panel or in daylight it can look washed out. Least "space".
-
-### 4. Pulsar
-
-Near-black (`#16151D`) with near-original Monokai accent saturation (orange `#FD971F`, green
-`#A6E22E`, cyan `#66D9EF`, purple `#AE81FF` unchanged; pink lightened for contrast).
-
-- **Pros:** the most recognizably Monokai. Punchy, high energy.
-- **Cons:** least "soft". Fully saturated green and orange on near-black vibrate for some
-  people over long sessions. Text at 15.4:1 is at the top of the allowed band.
-
-## Side-by-side
-
-Numbers after each hex are contrast against that palette's `base` (the darkest five roles are
-backgrounds; their contrast is omitted).
-
-| role | Nebula | Deep Field | Event Horizon | Pulsar |
-| --- | --- | --- | --- | --- |
-| crust | `#121119` | `#0A0D18` | `#17161B` | `#0C0B11` |
-| mantle | `#17161F` | `#0E1220` | `#1C1B21` | `#110F17` |
-| base | `#1C1B26` | `#131727` | `#212026` | `#16151D` |
-| surface0 | `#252433` | `#1B2036` | `#2A2930` | `#201E2A` |
-| surface1 | `#302E42` | `#262C47` | `#323139` | `#2A2837` |
-| surface2 | `#423F59` 1.7 | `#38405F` 1.8 | `#47454F` 1.7 | `#3C3950` 1.6 |
-| overlay | `#8A86A6` 4.9 | `#8189AC` 5.2 | `#8E8A98` 4.8 | `#85819C` 4.8 |
-| subtext | `#B8B4CC` 8.5 | `#B2BAD8` 9.2 | `#B8B4C0` 7.9 | `#BDB9CD` 9.5 |
-| text | `#E4E1EE` 13.2 | `#E2E7F5` 14.4 | `#DCD8E1` 11.5 | `#EEEBF4` 15.4 |
-| bright | `#F4F2F9` 15.3 | `#F4F6FC` 16.5 | `#ECE9F0` 13.5 | `#FBFAFD` 17.4 |
-| red | `#FF6E8A` 6.4 | `#FF7891` 7.1 | `#EC8597` 6.4 | `#FF5E95` 6.3 |
-| orange | `#FA9D6B` 8.2 | `#FFA46E` 9.1 | `#E6A684` 7.8 | `#FD971F` 8.3 |
-| yellow | `#F2D57E` 11.8 | `#F5D67B` 12.5 | `#E0CD90` 10.2 | `#E6DB74` 12.7 |
-| green | `#A9DC7A` 10.7 | `#8EDB95` 10.8 | `#AACC90` 9.0 | `#A6E22E` 11.7 |
-| cyan | `#7FD7E6` 10.3 | `#6FD9E4` 10.8 | `#8DC9D2` 8.8 | `#66D9EF` 11.0 |
-| blue | `#86ACFF` 7.6 | `#7DABFF` 7.7 | `#98B0E4` 7.4 | `#6FA3FF` 7.2 |
-| purple | `#B79CF7` 7.4 | `#A99CFF` 7.5 | `#B8A6E0` 7.4 | `#AE81FF` 6.4 |
-| pink | `#F590CF` 7.9 | `#F28FCB` 8.1 | `#DE9EC6` 7.6 | `#FF6AC1` 7.0 |
-| red (bright) | `#FF8DA3` 7.8 | `#FF97AA` 8.7 | `#F2A0AE` 8.0 | `#FF7AA6` 7.4 |
-| orange (bright) | `#FFB38A` 9.8 | `#FFBA90` 10.7 | `#EDBBA0` 9.4 | `#FFAE52` 9.9 |
-| yellow (bright) | `#F8E3A2` 13.4 | `#F9E4A3` 14.1 | `#E9DBAD` 11.7 | `#EEE59A` 14.1 |
-| green (bright) | `#BFE899` 12.3 | `#ABE6B0` 12.4 | `#BFD9AB` 10.6 | `#BCEB63` 13.1 |
-| cyan (bright) | `#A0E4EF` 12.0 | `#97E5EC` 12.5 | `#A9D7DE` 10.4 | `#8DE3F3` 12.4 |
-| blue (bright) | `#A5C1FF` 9.5 | `#A0C2FF` 9.9 | `#B1C3EB` 9.1 | `#96BBFF` 9.4 |
-| purple (bright) | `#CAB6FA` 9.4 | `#C1B7FF` 9.7 | `#CBBDE9` 9.2 | `#C4A3FF` 8.7 |
-| pink (bright) | `#F8AEDC` 9.8 | `#F6AED9` 10.2 | `#E7B7D5` 9.3 | `#FF8FD0` 8.7 |
-
-## Choosing
-
-| If you value most… | Pick |
-| --- | --- |
-| Monokai feel + comfort, balanced | **Nebula** |
-| Legibility on any screen, strongest space mood | Deep Field |
-| Minimum eye strain, dim rooms | Event Horizon |
-| Original Monokai punch | Pulsar |
-
-Blends are cheap: e.g. Nebula's base ramp with Deep Field's accents, or Nebula with Event
-Horizon's softer red/orange. Every change re-runs through `tools/palette.py check`.
+Quasar: red → purple (Monokai's signature pink-red into nebula violet). Round 1 palettes each
+defined their own.

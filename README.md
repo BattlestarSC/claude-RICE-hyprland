@@ -12,7 +12,7 @@ A complete, soft-dark, space-themed Hyprland desktop for **vanilla Arch Linux**,
 
 | Phase | Scope | State |
 | --- | --- | --- |
-| 0. Foundation | knowledge base, `CLAUDE.md`, README, palette proposals + contrast tooling | **done** |
+| 0. Foundation | knowledge base, `CLAUDE.md`, README, palette proposals + contrast tooling, launcher concepts | **in review** (launcher concept; palette decided: Quasar) |
 | 1. Core | `install.sh` (preflight, packages, backup, deploy), Hyprland Lua config, kitty, zsh, theme generator | next; blocked on [open decisions](docs/decisions.md#open) |
 | 2. Desktop | bar, launcher, notifications, hyprlock, hypridle, hyprpaper, screenshots, clipboard | planned |
 | 3. Polish | GTK/Qt theming, cursor, theme switcher, uninstaller, CI in an Arch container | planned |
@@ -34,7 +34,8 @@ What the installer will do, in order:
 3. **Install packages** from official repositories only, in a single `pacman -Syu --needed` transaction.
 4. **Back up** any existing config it would replace to `~/.local/state/<rice>/backups/<timestamp>/`.
 5. **Deploy** dotfiles and the selected theme.
-6. **Optional, each prompted:** set zsh as login shell, auto-start Hyprland on TTY1, display manager, NVIDIA notes.
+6. **Optional, each prompted:** set zsh as login shell, enable SDDM, capture your monitors' EDID
+   descriptions into the monitor config, Blender GPU rendering (ROCm/HIP, several GB), NVIDIA notes.
 7. Log everything to `~/.local/state/<rice>/install-<timestamp>.log`.
 
 Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.lua`,
@@ -44,9 +45,12 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 
 - Arch Linux (vanilla install), x86_64, systemd.
 - A regular user with `sudo`.
-- A GPU with working DRM/KMS. AMD and Intel work out of the box. **NVIDIA** needs extra setup
-  (the installer will detect and point you to it). **VMs** need 3D acceleration enabled, or
-  Hyprland will not start.
+- A GPU with working DRM/KMS. Developed and tested on **AMD**; Intel should work. **NVIDIA**
+  needs extra setup (the installer will detect and point you to it). **VMs** need 3D
+  acceleration enabled, or Hyprland will not start.
+- Multi-monitor setups behind a KVM are a first-class case: monitors are matched by EDID
+  description and workspaces return to their monitor after a switch
+  ([details](docs/knowledge-base/hardware.md#kvm-hot-unplug-what-hyprland-057-does)).
 - Hyprland **0.57 or newer**. This rice uses the Lua config format, which is the only format
   0.57 supports. Configs written for older Hyprland (`hyprland.conf`) do not work here and vice versa.
 
@@ -59,41 +63,45 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 | Shell | zsh + starship | no framework; autosuggestions, syntax highlighting, fzf, zoxide |
 | Lock / idle | hyprlock, hypridle | |
 | Wallpaper | hyprpaper | |
-| Bar | waybar (proposed) | [O3](docs/decisions.md#o3-status-bar) |
-| Launcher | hyprlauncher and/or fuzzel (proposed) | [O4](docs/decisions.md#o4-launcher) |
+| Login | SDDM | X11 greeter in v1; themed later |
+| Bar | Quickshell or waybar (next decision) | [O3](docs/decisions.md#o3-status-bar-quickshell-vs-waybar-next-topic) |
+| Launcher + menus | rofi 2.x (native Wayland), `rofi -dmenu` scripts | [concepts](docs/launcher/concepts.html), [O4](docs/decisions.md#o4-launcher-rofi-proposed-concept-pending) |
 | Notifications | mako (proposed) | [O5](docs/decisions.md#o5-notifications) |
+| Blender GPU | ROCm / HIP (`hip-runtime-amd`, `hiprt`) | opt-in |
 | Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing, file picker |
 | Polkit | hyprpolkitagent | |
 | Audio | PipeWire + WirePlumber | |
 
 ## Color scheme
 
-Four proposals, all Monokai-derived, all on a blue-violet "space" base, all validated against
-the same contrast rules (body text 11–15.5:1, comments ≥ 4.5:1, every accent ≥ 6:1).
+Soft dark, space-tinted, Monokai-derived. Chosen palette: **Quasar**, a blend of round 1's
+Pulsar (dark, saturated) and Event Horizon (soft), checked with two contrast models:
 
-| Proposal | Character |
-| --- | --- |
-| **Nebula** (recommended) | Monokai Pro accents on violet-tinted deep space. Balanced. |
-| Deep Field | Cool navy, highest contrast, strongest space mood. |
-| Event Horizon | Desaturated, lowest glare, for dim rooms. |
-| Pulsar | Original Monokai saturation on near-black. Punchiest. |
+- WCAG 2 ratios (accessibility baseline): body text 13.5:1, comments 6.4:1, every accent ≥ 8:1.
+- APCA (perceptual, catches dark-mode glare): body text Lc 88 (glare starts above ~92), accents
+  held within Lc 58–74 so no token glares or recedes.
 
-- Rationale, roles, ANSI and syntax mappings: [docs/colors/proposals.md](docs/colors/proposals.md)
-- Visual comparison with mockups: open [docs/colors/preview.html](docs/colors/preview.html) in a browser.
-- Try one in your current kitty now: the preview page has a copy-ready `kitty.conf` block per palette.
+- Rationale, rules, roles, ANSI and syntax mappings: [docs/colors/proposals.md](docs/colors/proposals.md)
+- Visual comparison with a **live blend dial**: open [docs/colors/preview.html](docs/colors/preview.html) in a browser.
+- Try a palette in your current kitty now: each palette on the preview page has a copy-ready `kitty.conf` block.
 
 ## Repository layout
 
 ```text
 CLAUDE.md                 guidance for AI-assisted development (rules, conventions, commands)
-colors/proposals/*.toml   palette sources (one per proposal)
+colors/proposals/
+├── round1/*.toml         first four palettes (reference; blend endpoints)
+└── round2/quasar.toml    current proposal
 docs/
-├── colors/               proposals.md, preview.html (generated)
+├── colors/               proposals.md, preview.html (generated, includes the blend dial)
+├── launcher/             concepts.html (generated rofi launcher concepts)
 ├── decisions.md          decided architecture + open questions
-└── knowledge-base/       verified notes on Hyprland 0.57 Lua, hypr tools, Arch, kitty, zsh, theming
-tools/
-├── palette.py            contrast validator / report (dev only)
-└── preview.py            renders docs/colors/preview.html from the palettes (dev only)
+└── knowledge-base/       verified notes: Hyprland 0.57 Lua, hypr tools, Arch, hardware/KVM, rofi, kitty, zsh, theming
+tools/                    dev only (Python 3.11+); the installer never uses these
+├── palette.py            color math, WCAG + APCA contrast rules, reports
+├── blend.py              OKLCH blend of two palettes, normalized to the rules
+├── preview.py            renders docs/colors/preview.html
+└── launcher_preview.py   renders docs/launcher/concepts.html
 ```
 
 The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout-target-create-directories-as-phases-need-them).
@@ -106,14 +114,17 @@ The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout
 | [docs/knowledge-base/hyprland.md](docs/knowledge-base/hyprland.md) | Hyprland 0.57 Lua config, pitfalls, hyprctl changes |
 | [docs/decisions.md](docs/decisions.md) | why things are the way they are; what is still open |
 | [docs/colors/proposals.md](docs/colors/proposals.md) | palette design and selection |
+| [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) | dual 4K via KVM, AMD + ROCm, SDDM |
+| [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) | rofi on Wayland: capabilities and limits |
 
 ## Development
 
 Dev tools need Python 3.11+ (for `tomllib`). The installer itself will need only bash and git.
 
 ```sh
-python3 tools/palette.py check colors/proposals/*.toml
-python3 tools/preview.py --standalone colors/proposals/*.toml > docs/colors/preview.html
+python3 tools/palette.py check colors/proposals/round2/*.toml
+python3 tools/preview.py --standalone colors/proposals/round2/*.toml colors/proposals/round1/*.toml > docs/colors/preview.html
+python3 tools/launcher_preview.py --standalone colors/proposals/round2/quasar.toml > docs/launcher/concepts.html
 ```
 
 ## License

@@ -16,10 +16,15 @@ Visual goal: a soft dark, space-themed palette with Monokai-style accents and me
 
 ## Current state
 
-Phase 0 (foundation). Present: knowledge base, palette proposals and tooling, README, this file.
-**Not yet present:** `install.sh`, dotfiles, generated themes. Open questions blocking Phase 1
-are in [docs/decisions.md](docs/decisions.md) (`O1`–`O10`). Do not guess answers to open
-decisions in code; ask the owner or implement behind an obvious, documented default.
+Phase 0 (foundation), design round 2. Present: knowledge base, palette proposals + tooling
+(contrast checker, OKLCH blender, preview generators), launcher concepts, README, this file.
+**Not yet present:** `install.sh`, dotfiles, generated themes. Decided and open questions are in
+[docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
+owner or implement behind an obvious, documented default.
+
+Primary target machine (D8): AMD GPU, two 27" 4K ASUS ProArt panels through a KVM that
+**removes the outputs when switched away**, Blender with HIP/ROCm, SDDM login. Every
+monitor-related change must consider hot-unplug; see [hardware.md](docs/knowledge-base/hardware.md).
 
 ## Read before changing anything
 
@@ -30,6 +35,8 @@ decisions in code; ask the owner or implement behind an obvious, documented defa
 | Installer, packages, session startup | [docs/knowledge-base/arch-install.md](docs/knowledge-base/arch-install.md) |
 | Colors, any app theme | [docs/knowledge-base/theming.md](docs/knowledge-base/theming.md), [docs/colors/proposals.md](docs/colors/proposals.md) |
 | kitty / zsh | [docs/knowledge-base/kitty.md](docs/knowledge-base/kitty.md), [docs/knowledge-base/zsh.md](docs/knowledge-base/zsh.md) |
+| Monitors, GPU, ROCm, SDDM | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
+| rofi, launcher, scripted menus | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) |
 
 ## Hard rules
 
@@ -72,15 +79,24 @@ docs/                       knowledge-base/, colors/, decisions.md
 ## Commands
 
 ```sh
-python3 tools/palette.py check  colors/proposals/*.toml     # contrast rules; must pass
-python3 tools/palette.py report colors/proposals/*.toml     # per-role contrast table
-python3 tools/preview.py --standalone colors/proposals/*.toml > docs/colors/preview.html
+python3 tools/palette.py check  colors/proposals/round2/*.toml   # 42 WCAG + APCA rules; must pass
+python3 tools/palette.py report colors/proposals/round2/*.toml   # per-role WCAG / APCA table
+python3 tools/blend.py colors/proposals/round1/pulsar.toml colors/proposals/round1/event-horizon.toml \
+    --bg 0.3 --fg 0.55 --accent 0.4 --name Quasar --gradient red purple --cursor yellow   # regenerates quasar.toml
+python3 tools/preview.py --standalone colors/proposals/round2/*.toml colors/proposals/round1/*.toml > docs/colors/preview.html
+python3 tools/launcher_preview.py --standalone colors/proposals/round2/quasar.toml > docs/launcher/concepts.html
 ```
+
+Round-1 palettes fail the APCA rules by design (they predate them); only round 2 and later must pass.
+`tools/preview.py` embeds a JavaScript port of `palette.py`/`blend.py` for the blend dial. If you change
+the color math or blend constants, change both and confirm the dial's default output still equals
+`quasar.toml` (same hex values).
 
 Planned (add here when they exist): `shellcheck -x install.sh lib/*.sh`, Lua syntax check with a
 Lua 5.5 `luac -p`, `Hyprland --verify-config -c <file>`, package resolution in `archlinux:latest`.
 
-Regenerate `docs/colors/preview.html` whenever a file in `colors/proposals/` changes, in the same commit.
+Regenerate `docs/colors/preview.html` and `docs/launcher/concepts.html` whenever a palette or a
+generator changes, in the same commit.
 
 ## Conventions
 
@@ -118,3 +134,9 @@ in an `archlinux:latest` container or on hardware.
 - hyprlock with no config exits with an error and leaves the session **unlocked**.
 - `pacman --noconfirm` picks default providers silently; name providers explicitly.
 - `lspci` is not in `base`; detect GPUs via `/sys/bus/pci/devices/*/{class,vendor}`.
+- Monitors: match by `desc:` (includes serial), never by port alone. Hyprland's automatic
+  "return workspaces home" after a KVM switch is keyed by connector name and in memory only.
+- rofi's Wayland surface covers the whole output (namespace `rofi`): a blur layer rule without
+  `ignore_alpha` blurs the entire screen.
+- rofi cannot combine a gradient frame with a translucent body; see launcher.md.
+- SDDM's default greeter needs `xorg-server` even on a Wayland desktop.

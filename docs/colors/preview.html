@@ -82,14 +82,26 @@ code,kbd{font-family:var(--f-mono);font-size:.88em}
 
 .ramps{display:grid;gap:18px}
 .ramp h3{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--p-subtext);margin:0 0 8px}
-.sws{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.sws{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:8px}
 .sw{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto auto;column-gap:8px;align-items:center;
   padding:6px;border-radius:8px;background:var(--p-mantle);border:1px solid var(--p-surface0);min-width:0}
 .sw-chip{grid-row:1 / span 3;width:28px;height:28px;border-radius:6px;background:var(--sw);outline:1px solid color-mix(in srgb,var(--p-text) 12%,transparent)}
 .sw-name{font-size:12px;color:var(--p-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sw-hex{font-size:11px;color:var(--p-subtext)}
-.sw-cr{font-family:var(--f-mono);font-size:10.5px;color:var(--p-overlay);font-variant-numeric:tabular-nums}
-.sw-cr::after{content:":1"}
+.sw-cr{font-family:var(--f-mono);font-size:10.5px;color:var(--p-overlay);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ok{color:#8FD18F} .bad{color:#F0A0A0}
+.round{font-size:12px;text-transform:uppercase;letter-spacing:.08em;padding:5px 9px;border-radius:999px;border:1px solid var(--p-surface2);color:var(--p-subtext)}
+.dial{display:grid;gap:10px;padding:16px;border-radius:10px;background:var(--p-mantle);border:1px solid var(--p-surface1)}
+.dial-row{display:grid;grid-template-columns:minmax(120px,160px) auto minmax(0,1fr) auto 3.5em;gap:10px;align-items:center}
+.dial-row label{font-weight:500;color:var(--p-text)}
+.dial-row .end{font-size:12px;color:var(--p-subtext)}
+.dial-row input{width:100%;accent-color:var(--p-g0)}
+.dial-row output{font-family:var(--f-mono);font-size:12px;text-align:right;color:var(--p-text);font-variant-numeric:tabular-nums}
+.dial-foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.verdict{font-size:13px}
+.rules{margin:0;padding-left:18px;font-size:12.5px;color:var(--p-subtext);font-family:var(--f-mono)}
+.rules:empty{display:none}
+@media (max-width:620px){.dial-row{grid-template-columns:1fr auto;}.dial-row .end{display:none}.dial-row input{grid-column:1 / -1;grid-row:2}}
 .cr-note{margin:0;font-size:13px;color:var(--p-subtext)}
 .cr-note code{color:var(--p-text)}
 .kitty{border:1px solid var(--p-surface1);border-radius:8px;background:var(--p-mantle)}
@@ -107,30 +119,31 @@ kbd{padding:1px 5px;border-radius:4px;border:1px solid var(--p-surface2);backgro
 </style>
 <div class="wrap">
   <h1>Rice Palette Proposals</h1>
-  <p class="lede">Four candidate color schemes for the Hyprland + Kitty + Zsh rice. All share Monokai's
-  role mapping (keywords red, functions green, strings yellow, numbers purple, builtins cyan,
-  parameters orange) on a dark, blue-violet "space" base. <strong>They differ in base hue, accent
-  saturation, and contrast.</strong> Every palette passes the same contrast rules
-  (<code>tools/palette.py check</code>); the mockups below use the real hex values.</p>
+  <p class="lede">Color schemes for the Hyprland + Kitty + Zsh rice. All share Monokai's role mapping
+  (keywords red, functions green, strings yellow, numbers purple, builtins cyan, parameters orange) on a
+  dark, blue-violet "space" base. <strong>Round 2 is Quasar, a blend between round 1's Pulsar and Event
+  Horizon,</strong> plus a dial to pick your own point on that axis. The mockups use the real hex values.</p>
   
 <div class="tbl-wrap"><table class="sum">
-<thead><tr><th>Proposal</th><th>Background</th><th>Accents</th>
-<th class="num">Text</th><th class="num">Comments</th><th class="num">Weakest accent</th></tr></thead>
-<tbody><tr><td><a href="#nebula">Nebula</a> ★</td><td><span class="mini mini-bg" style="background:#1C1B26"></span><code>#1C1B26</code></td><td><span class="chips"><span class="mini" style="background:#FF6E8A"></span><span class="mini" style="background:#FA9D6B"></span><span class="mini" style="background:#F2D57E"></span><span class="mini" style="background:#A9DC7A"></span><span class="mini" style="background:#7FD7E6"></span><span class="mini" style="background:#86ACFF"></span><span class="mini" style="background:#B79CF7"></span><span class="mini" style="background:#F590CF"></span></span></td><td class="num">13.2</td><td class="num">4.9</td><td class="num">6.4 <span class="dim">red</span></td></tr><tr><td><a href="#deep-field">Deep Field</a></td><td><span class="mini mini-bg" style="background:#131727"></span><code>#131727</code></td><td><span class="chips"><span class="mini" style="background:#FF7891"></span><span class="mini" style="background:#FFA46E"></span><span class="mini" style="background:#F5D67B"></span><span class="mini" style="background:#8EDB95"></span><span class="mini" style="background:#6FD9E4"></span><span class="mini" style="background:#7DABFF"></span><span class="mini" style="background:#A99CFF"></span><span class="mini" style="background:#F28FCB"></span></span></td><td class="num">14.4</td><td class="num">5.2</td><td class="num">7.1 <span class="dim">red</span></td></tr><tr><td><a href="#event-horizon">Event Horizon</a></td><td><span class="mini mini-bg" style="background:#212026"></span><code>#212026</code></td><td><span class="chips"><span class="mini" style="background:#EC8597"></span><span class="mini" style="background:#E6A684"></span><span class="mini" style="background:#E0CD90"></span><span class="mini" style="background:#AACC90"></span><span class="mini" style="background:#8DC9D2"></span><span class="mini" style="background:#98B0E4"></span><span class="mini" style="background:#B8A6E0"></span><span class="mini" style="background:#DE9EC6"></span></span></td><td class="num">11.5</td><td class="num">4.8</td><td class="num">6.4 <span class="dim">red</span></td></tr><tr><td><a href="#pulsar">Pulsar</a></td><td><span class="mini mini-bg" style="background:#16151D"></span><code>#16151D</code></td><td><span class="chips"><span class="mini" style="background:#FF5E95"></span><span class="mini" style="background:#FD971F"></span><span class="mini" style="background:#E6DB74"></span><span class="mini" style="background:#A6E22E"></span><span class="mini" style="background:#66D9EF"></span><span class="mini" style="background:#6FA3FF"></span><span class="mini" style="background:#AE81FF"></span><span class="mini" style="background:#FF6AC1"></span></span></td><td class="num">15.4</td><td class="num">4.8</td><td class="num">6.3 <span class="dim">red</span></td></tr></tbody></table></div>
-  <p class="legend">Contrast is the WCAG ratio against each palette's own background. Body text is capped
-  near 15:1 on purpose: pure white on black (21:1) causes halation on dark themes. Comments sit at
-  4.5:1 or above, where classic Monokai's comment color is about 3:1.</p>
+<thead><tr><th>Proposal</th><th>Round</th><th>Background</th><th>Accents</th>
+<th class="num">Text WCAG / Lc</th><th class="num">Comments WCAG / Lc</th><th class="num">Accent spread</th><th>Rules</th></tr></thead>
+<tbody><tr><td><a href="#quasar">Quasar</a> ★</td><td class="dim">round2</td><td><span class="mini mini-bg" style="background:#191820"></span><code>#191820</code></td><td><span class="chips"><span class="mini" style="background:#FD8DA8"></span><span class="mini" style="background:#F69C56"></span><span class="mini" style="background:#DCCD77"></span><span class="mini" style="background:#A6DA64"></span><span class="mini" style="background:#78D3E3"></span><span class="mini" style="background:#88AFFD"></span><span class="mini" style="background:#BEA0FE"></span><span class="mini" style="background:#FB89CD"></span></span></td><td class="num">13.5 <span class="dim">/ 88</span></td><td class="num">6.4 <span class="dim">/ 47</span></td><td class="num">16</td><td><span class="ok">all pass</span></td></tr><tr><td><a href="#deep-field">Deep Field</a></td><td class="dim">round1</td><td><span class="mini mini-bg" style="background:#131727"></span><code>#131727</code></td><td><span class="chips"><span class="mini" style="background:#FF7891"></span><span class="mini" style="background:#FFA46E"></span><span class="mini" style="background:#F5D67B"></span><span class="mini" style="background:#8EDB95"></span><span class="mini" style="background:#6FD9E4"></span><span class="mini" style="background:#7DABFF"></span><span class="mini" style="background:#A99CFF"></span><span class="mini" style="background:#F28FCB"></span></span></td><td class="num">14.4 <span class="dim">/ 91</span></td><td class="num">5.2 <span class="dim">/ 39</span></td><td class="num">30</td><td><span class="bad">5 fail</span></td></tr><tr><td><a href="#event-horizon">Event Horizon</a></td><td class="dim">round1</td><td><span class="mini mini-bg" style="background:#212026"></span><code>#212026</code></td><td><span class="chips"><span class="mini" style="background:#EC8597"></span><span class="mini" style="background:#E6A684"></span><span class="mini" style="background:#E0CD90"></span><span class="mini" style="background:#AACC90"></span><span class="mini" style="background:#8DC9D2"></span><span class="mini" style="background:#98B0E4"></span><span class="mini" style="background:#B8A6E0"></span><span class="mini" style="background:#DE9EC6"></span></span></td><td class="num">11.5 <span class="dim">/ 82</span></td><td class="num">4.8 <span class="dim">/ 38</span></td><td class="num">24</td><td><span class="bad">3 fail</span></td></tr><tr><td><a href="#nebula">Nebula</a></td><td class="dim">round1</td><td><span class="mini mini-bg" style="background:#1C1B26"></span><code>#1C1B26</code></td><td><span class="chips"><span class="mini" style="background:#FF6E8A"></span><span class="mini" style="background:#FA9D6B"></span><span class="mini" style="background:#F2D57E"></span><span class="mini" style="background:#A9DC7A"></span><span class="mini" style="background:#7FD7E6"></span><span class="mini" style="background:#86ACFF"></span><span class="mini" style="background:#B79CF7"></span><span class="mini" style="background:#F590CF"></span></span></td><td class="num">13.2 <span class="dim">/ 88</span></td><td class="num">4.9 <span class="dim">/ 38</span></td><td class="num">32</td><td><span class="bad">3 fail</span></td></tr><tr><td><a href="#pulsar">Pulsar</a></td><td class="dim">round1</td><td><span class="mini mini-bg" style="background:#16151D"></span><code>#16151D</code></td><td><span class="chips"><span class="mini" style="background:#FF5E95"></span><span class="mini" style="background:#FD971F"></span><span class="mini" style="background:#E6DB74"></span><span class="mini" style="background:#A6E22E"></span><span class="mini" style="background:#66D9EF"></span><span class="mini" style="background:#6FA3FF"></span><span class="mini" style="background:#AE81FF"></span><span class="mini" style="background:#FF6AC1"></span></span></td><td class="num">15.4 <span class="dim">/ 95</span></td><td class="num">4.8 <span class="dim">/ 36</span></td><td class="num">36</td><td><span class="bad">8 fail</span></td></tr></tbody></table></div>
+  <p class="legend">Two contrast measures. <strong>WCAG</strong> ratio (x:1) is the accessibility baseline.
+  <strong>APCA Lc</strong> is perceptual and polarity-aware, so it catches what WCAG misses on dark themes:
+  glare from text that is too bright (Lc above ~92) and uneven accents. Accent spread is the gap in Lc between
+  the brightest and dimmest accent. Pulsar's 36 is why its yellow glares while its red and purple recede.</p>
 </div>
 
-<section class="prop" id="nebula" style="--p-crust:#121119;--p-mantle:#17161F;--p-base:#1C1B26;--p-surface0:#252433;--p-surface1:#302E42;--p-surface2:#423F59;--p-overlay:#8A86A6;--p-subtext:#B8B4CC;--p-text:#E4E1EE;--p-bright:#F4F2F9;--p-red:#FF6E8A;--p-orange:#FA9D6B;--p-yellow:#F2D57E;--p-green:#A9DC7A;--p-cyan:#7FD7E6;--p-blue:#86ACFF;--p-purple:#B79CF7;--p-pink:#F590CF;--pb-red:#FF8DA3;--pb-orange:#FFB38A;--pb-yellow:#F8E3A2;--pb-green:#BFE899;--pb-cyan:#A0E4EF;--pb-blue:#A5C1FF;--pb-purple:#CAB6FA;--pb-pink:#F8AEDC;--p-g0:#7FD7E6;--p-g1:#B79CF7;--p-cursor:#7FD7E6">
+<section class="prop" id="quasar" style="--p-crust:#0F0E14;--p-mantle:#14131A;--p-base:#191820;--p-surface0:#23212C;--p-surface1:#2C2B38;--p-surface2:#3F3D50;--p-overlay:#9D99AD;--p-subtext:#BAB6C6;--p-text:#E4E0E9;--p-bright:#F3F1F6;--p-red:#FD8DA8;--p-orange:#F69C56;--p-yellow:#DCCD77;--p-green:#A6DA64;--p-cyan:#78D3E3;--p-blue:#88AFFD;--p-purple:#BEA0FE;--p-pink:#FB89CD;--pb-red:#FFA7BA;--pb-orange:#FEB076;--pb-yellow:#EBDC85;--pb-green:#B5EA73;--pb-cyan:#87E3F3;--pb-blue:#A0C0FD;--pb-purple:#CBB5FE;--pb-pink:#FDA4D7;--p-g0:#FD8DA8;--p-g1:#BEA0FE;--p-cursor:#DCCD77">
   <div class="prop-in">
     <header class="prop-head">
       <div>
-        <h2>Nebula</h2>
-        <p class="tag">Monokai Pro accents on a violet-tinted deep-space base. Balanced default.</p>
+        <h2>Quasar</h2>
+        <p class="tag">Pulsar&#x27;s dark base and Monokai hues, Event Horizon&#x27;s softer text, accents evened out in perceived lightness.</p>
       </div>
-      <span class="rec">Recommended starting point</span>
+      <span class="rec">Recommended</span>
     </header>
+    
     <div class="desk">
       
 <div class="bar">
@@ -155,7 +168,7 @@ kbd{padding:1px 5px;border-radius:4px;border:1px solid var(--p-surface2);backgro
 <span class="c-green">❯</span> sudo pacman -S kitty
 <span class="c-red">error:</span> target not found: kity  <span class="c-orange">warning:</span> 2 packages held
 <span class="c-green">❯</span> hyprctl ver<span class="c-sugg">sion | head -n1</span><span class="cur"> </span>
-<span class="ansi"><span class="ab" style="background:#302E42" title="color0 #302E42"></span><span class="ab" style="background:#FF6E8A" title="color1 #FF6E8A"></span><span class="ab" style="background:#A9DC7A" title="color2 #A9DC7A"></span><span class="ab" style="background:#F2D57E" title="color3 #F2D57E"></span><span class="ab" style="background:#86ACFF" title="color4 #86ACFF"></span><span class="ab" style="background:#B79CF7" title="color5 #B79CF7"></span><span class="ab" style="background:#7FD7E6" title="color6 #7FD7E6"></span><span class="ab" style="background:#B8B4CC" title="color7 #B8B4CC"></span><span class="ab" style="background:#8A86A6" title="color8 #8A86A6"></span><span class="ab" style="background:#FF8DA3" title="color9 #FF8DA3"></span><span class="ab" style="background:#BFE899" title="color10 #BFE899"></span><span class="ab" style="background:#F8E3A2" title="color11 #F8E3A2"></span><span class="ab" style="background:#A5C1FF" title="color12 #A5C1FF"></span><span class="ab" style="background:#CAB6FA" title="color13 #CAB6FA"></span><span class="ab" style="background:#A0E4EF" title="color14 #A0E4EF"></span><span class="ab" style="background:#F4F2F9" title="color15 #F4F2F9"></span></span></pre>
+<span class="ansi"><span class="ab" style="background:#2C2B38" title="color0 #2C2B38"></span><span class="ab" style="background:#FD8DA8" title="color1 #FD8DA8"></span><span class="ab" style="background:#A6DA64" title="color2 #A6DA64"></span><span class="ab" style="background:#DCCD77" title="color3 #DCCD77"></span><span class="ab" style="background:#88AFFD" title="color4 #88AFFD"></span><span class="ab" style="background:#BEA0FE" title="color5 #BEA0FE"></span><span class="ab" style="background:#78D3E3" title="color6 #78D3E3"></span><span class="ab" style="background:#BAB6C6" title="color7 #BAB6C6"></span><span class="ab" style="background:#9D99AD" title="color8 #9D99AD"></span><span class="ab" style="background:#FFA7BA" title="color9 #FFA7BA"></span><span class="ab" style="background:#B5EA73" title="color10 #B5EA73"></span><span class="ab" style="background:#EBDC85" title="color11 #EBDC85"></span><span class="ab" style="background:#A0C0FD" title="color12 #A0C0FD"></span><span class="ab" style="background:#CBB5FE" title="color13 #CBB5FE"></span><span class="ab" style="background:#87E3F3" title="color14 #87E3F3"></span><span class="ab" style="background:#F3F1F6" title="color15 #F3F1F6"></span></span></pre>
 </div>
 <div class="win win-inactive">
   <div class="win-title">nvim — hyprland.lua</div>
@@ -180,49 +193,132 @@ kbd{padding:1px 5px;border-radius:4px;border:1px solid var(--p-surface2);backgro
 </div></div>
     </div>
     <div class="ramps">
-      <div class="ramp"><h3>Base ramp</h3><div class="sws"><div class="sw" style="--sw:#121119"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#121119</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#17161F"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#17161F</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#1C1B26"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#1C1B26</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#252433"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#252433</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#302E42"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#302E42</code><span class="sw-cr">1.3</span></div><div class="sw" style="--sw:#423F59"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#423F59</code><span class="sw-cr">1.7</span></div><div class="sw" style="--sw:#8A86A6"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8A86A6</code><span class="sw-cr">4.9</span></div><div class="sw" style="--sw:#B8B4CC"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B8B4CC</code><span class="sw-cr">8.5</span></div><div class="sw" style="--sw:#E4E1EE"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#E4E1EE</code><span class="sw-cr">13.2</span></div><div class="sw" style="--sw:#F4F2F9"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#F4F2F9</code><span class="sw-cr">15.3</span></div></div></div>
-      <div class="ramp"><h3>Accents</h3><div class="sws"><div class="sw" style="--sw:#FF6E8A"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF6E8A</code><span class="sw-cr">6.4</span></div><div class="sw" style="--sw:#FA9D6B"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FA9D6B</code><span class="sw-cr">8.2</span></div><div class="sw" style="--sw:#F2D57E"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F2D57E</code><span class="sw-cr">11.8</span></div><div class="sw" style="--sw:#A9DC7A"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#A9DC7A</code><span class="sw-cr">10.7</span></div><div class="sw" style="--sw:#7FD7E6"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#7FD7E6</code><span class="sw-cr">10.3</span></div><div class="sw" style="--sw:#86ACFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#86ACFF</code><span class="sw-cr">7.6</span></div><div class="sw" style="--sw:#B79CF7"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#B79CF7</code><span class="sw-cr">7.4</span></div><div class="sw" style="--sw:#F590CF"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F590CF</code><span class="sw-cr">7.9</span></div></div></div>
-      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws"><div class="sw" style="--sw:#FF8DA3"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF8DA3</code><span class="sw-cr">7.8</span></div><div class="sw" style="--sw:#FFB38A"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFB38A</code><span class="sw-cr">9.8</span></div><div class="sw" style="--sw:#F8E3A2"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F8E3A2</code><span class="sw-cr">13.4</span></div><div class="sw" style="--sw:#BFE899"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BFE899</code><span class="sw-cr">12.3</span></div><div class="sw" style="--sw:#A0E4EF"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#A0E4EF</code><span class="sw-cr">12.0</span></div><div class="sw" style="--sw:#A5C1FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#A5C1FF</code><span class="sw-cr">9.5</span></div><div class="sw" style="--sw:#CAB6FA"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#CAB6FA</code><span class="sw-cr">9.4</span></div><div class="sw" style="--sw:#F8AEDC"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F8AEDC</code><span class="sw-cr">9.8</span></div></div></div>
+      <div class="ramp"><h3>Base ramp</h3><div class="sws" data-group="base"><div class="sw" style="--sw:#0F0E14"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#0F0E14</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#14131A"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#14131A</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#191820"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#191820</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#23212C"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#23212C</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#2C2B38"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#2C2B38</code><span class="sw-cr">1.3:1 · Lc 0</span></div><div class="sw" style="--sw:#3F3D50"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#3F3D50</code><span class="sw-cr">1.7:1 · Lc 0</span></div><div class="sw" style="--sw:#9D99AD"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#9D99AD</code><span class="sw-cr">6.4:1 · Lc 47</span></div><div class="sw" style="--sw:#BAB6C6"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#BAB6C6</code><span class="sw-cr">8.9:1 · Lc 63</span></div><div class="sw" style="--sw:#E4E0E9"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#E4E0E9</code><span class="sw-cr">13.5:1 · Lc 88</span></div><div class="sw" style="--sw:#F3F1F6"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#F3F1F6</code><span class="sw-cr">15.7:1 · Lc 98</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws" data-group="accent"><div class="sw" style="--sw:#FD8DA8"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FD8DA8</code><span class="sw-cr">8.0:1 · Lc 58</span></div><div class="sw" style="--sw:#F69C56"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#F69C56</code><span class="sw-cr">8.2:1 · Lc 59</span></div><div class="sw" style="--sw:#DCCD77"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#DCCD77</code><span class="sw-cr">10.9:1 · Lc 74</span></div><div class="sw" style="--sw:#A6DA64"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#A6DA64</code><span class="sw-cr">10.8:1 · Lc 74</span></div><div class="sw" style="--sw:#78D3E3"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#78D3E3</code><span class="sw-cr">10.2:1 · Lc 71</span></div><div class="sw" style="--sw:#88AFFD"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#88AFFD</code><span class="sw-cr">8.0:1 · Lc 58</span></div><div class="sw" style="--sw:#BEA0FE"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#BEA0FE</code><span class="sw-cr">8.1:1 · Lc 58</span></div><div class="sw" style="--sw:#FB89CD"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FB89CD</code><span class="sw-cr">8.0:1 · Lc 58</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws" data-group="accent_bright"><div class="sw" style="--sw:#FFA7BA"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FFA7BA</code><span class="sw-cr">9.6:1 · Lc 67</span></div><div class="sw" style="--sw:#FEB076"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FEB076</code><span class="sw-cr">9.8:1 · Lc 68</span></div><div class="sw" style="--sw:#EBDC85"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#EBDC85</code><span class="sw-cr">12.7:1 · Lc 83</span></div><div class="sw" style="--sw:#B5EA73"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#B5EA73</code><span class="sw-cr">12.6:1 · Lc 83</span></div><div class="sw" style="--sw:#87E3F3"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#87E3F3</code><span class="sw-cr">12.0:1 · Lc 80</span></div><div class="sw" style="--sw:#A0C0FD"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#A0C0FD</code><span class="sw-cr">9.6:1 · Lc 67</span></div><div class="sw" style="--sw:#CBB5FE"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#CBB5FE</code><span class="sw-cr">9.7:1 · Lc 68</span></div><div class="sw" style="--sw:#FDA4D7"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FDA4D7</code><span class="sw-cr">9.6:1 · Lc 67</span></div></div></div>
     </div>
-    <p class="cr-note">Numbers are WCAG contrast against <code>base</code> #1C1B26.
-      Body text 13.2:1 · comments 4.9:1 · weakest accent
-      <code>red</code> 6.4:1.</p>
+    <p class="cr-note">Contrast against <code>base</code> #191820: body text 13.5:1 / Lc 88 · comments 6.4:1 / Lc 47 · accent lightness spread Lc 16. This palette passes all rules.</p>
     <details class="kitty">
       <summary>Try it in kitty now</summary>
       <div class="kitty-body">
-        <p>Append to <code>~/.config/kitty/kitty.conf</code>, then press <kbd>Ctrl+Shift+F5</kbd> to reload.</p>
-        <pre id="kitty-nebula"># Nebula (proposal) - paste into kitty.conf to try it
-foreground #E4E1EE
-background #1C1B26
-selection_foreground #E4E1EE
-selection_background #302E42
-cursor #7FD7E6
-cursor_text_color #1C1B26
-url_color #86ACFF
-active_border_color #7FD7E6
-inactive_border_color #423F59
-active_tab_foreground #121119
-active_tab_background #7FD7E6
-inactive_tab_foreground #B8B4CC
-inactive_tab_background #17161F
-tab_bar_background #121119
-color0 #302E42
-color1 #FF6E8A
-color2 #A9DC7A
-color3 #F2D57E
-color4 #86ACFF
-color5 #B79CF7
-color6 #7FD7E6
-color7 #B8B4CC
-color8 #8A86A6
-color9 #FF8DA3
-color10 #BFE899
-color11 #F8E3A2
-color12 #A5C1FF
-color13 #CAB6FA
-color14 #A0E4EF
-color15 #F4F2F9</pre>
-        <button type="button" class="copy" id="copy-nebula" data-target="kitty-nebula">Copy kitty colors</button>
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>; kitty reloads it automatically.</p>
+        <pre id="kitty-quasar"># Quasar (proposal) - paste into kitty.conf to try it
+foreground #E4E0E9
+background #191820
+selection_foreground #E4E0E9
+selection_background #2C2B38
+cursor #DCCD77
+cursor_text_color #191820
+url_color #88AFFD
+active_border_color #FD8DA8
+inactive_border_color #3F3D50
+active_tab_foreground #0F0E14
+active_tab_background #FD8DA8
+inactive_tab_foreground #BAB6C6
+inactive_tab_background #14131A
+tab_bar_background #0F0E14
+color0 #2C2B38
+color1 #FD8DA8
+color2 #A6DA64
+color3 #DCCD77
+color4 #88AFFD
+color5 #BEA0FE
+color6 #78D3E3
+color7 #BAB6C6
+color8 #9D99AD
+color9 #FFA7BA
+color10 #B5EA73
+color11 #EBDC85
+color12 #A0C0FD
+color13 #CBB5FE
+color14 #87E3F3
+color15 #F3F1F6</pre>
+        <button type="button" class="copy" id="copy-quasar" data-target="kitty-quasar">Copy kitty colors</button>
+      </div>
+    </details>
+  </div>
+</section>
+<section class="prop" id="dial" style="--p-crust:#0F0E14;--p-mantle:#14131A;--p-base:#191820;--p-surface0:#23212C;--p-surface1:#2C2B38;--p-surface2:#3F3D50;--p-overlay:#9D99AD;--p-subtext:#BAB6C6;--p-text:#E4E0E9;--p-bright:#F3F1F6;--p-red:#FD8DA8;--p-orange:#F69C56;--p-yellow:#DCCD77;--p-green:#A6DA64;--p-cyan:#78D3E3;--p-blue:#88AFFD;--p-purple:#BEA0FE;--p-pink:#FB89CD;--pb-red:#FFA7BA;--pb-orange:#FEB076;--pb-yellow:#EBDC85;--pb-green:#B5EA73;--pb-cyan:#87E3F3;--pb-blue:#A0C0FD;--pb-purple:#CBB5FE;--pb-pink:#FDA4D7;--p-g0:#FD8DA8;--p-g1:#BEA0FE;--p-cursor:#DCCD77">
+  <div class="prop-in">
+    <header class="prop-head">
+      <div>
+        <h2>Blend dial</h2>
+        <p class="tag">Drag each group between Pulsar (0%) and Event Horizon (100%). Starts at Quasar. Accents are clamped to an even perceived lightness and comments lifted, exactly as tools/blend.py does.</p>
+      </div>
+      
+    </header>
+    
+<div class="dial" role="group" aria-label="Blend between Pulsar and Event Horizon">
+  <div class="dial-row"><label for="d-bg">Background</label><span class="end">Pulsar</span>
+    <input type="range" id="d-bg" min="0" max="100" step="5"><span class="end">Event&nbsp;Horizon</span><output id="o-bg" for="d-bg"></output></div>
+  <div class="dial-row"><label for="d-fg">Text brightness</label><span class="end">Pulsar</span>
+    <input type="range" id="d-fg" min="0" max="100" step="5"><span class="end">Event&nbsp;Horizon</span><output id="o-fg" for="d-fg"></output></div>
+  <div class="dial-row"><label for="d-acc">Accent saturation</label><span class="end">Pulsar</span>
+    <input type="range" id="d-acc" min="0" max="100" step="5"><span class="end">Event&nbsp;Horizon</span><output id="o-acc" for="d-acc"></output></div>
+  <div class="dial-foot"><button type="button" class="copy" id="d-reset">Reset to Quasar</button>
+    <span id="dial-verdict" class="verdict"></span></div>
+  <ul class="rules" id="dial-rules"></ul>
+</div>
+    <div class="desk">
+      
+<div class="bar">
+  <div class="bar-l"><span class="ws">1</span><span class="ws ws-on">2</span><span class="ws">3</span><span class="ws">4</span><span class="ws">5</span></div>
+  <div class="bar-c">kitty — ~/claude-RICE-hyprland</div>
+  <div class="bar-r">
+    <span class="c-cyan">CPU 12%</span><span class="c-purple">MEM 3.1G</span>
+    <span class="c-green">VOL 45%</span><span class="c-yellow">BAT 82%</span>
+    <span class="clock">23:41</span>
+  </div>
+</div>
+      <div class="wins">
+<div class="win win-active">
+  <div class="win-title">kitty — ~/claude-RICE-hyprland</div>
+  <pre class="term"><span class="c-blue">~/claude-RICE-hyprland</span> <span class="c-purple">on  main</span> <span class="c-green">✓</span>
+<span class="c-green">❯</span> ls
+<span class="c-blue">colors</span>  <span class="c-blue">docs</span>  <span class="c-blue">tools</span>  CLAUDE.md  README.md  <span class="c-green">install.sh</span>
+<span class="c-green">❯</span> git log --oneline -3
+<span class="c-yellow">3f9c2e1</span> (<span class="c-cyan">HEAD -&gt; main</span>) colors: add palette proposals
+<span class="c-yellow">a07d4b8</span> docs: knowledge base for Hyprland 0.57 Lua config
+<span class="c-yellow">0c11e92</span> Initial commit
+<span class="c-green">❯</span> sudo pacman -S kitty
+<span class="c-red">error:</span> target not found: kity  <span class="c-orange">warning:</span> 2 packages held
+<span class="c-green">❯</span> hyprctl ver<span class="c-sugg">sion | head -n1</span><span class="cur"> </span>
+<span class="ansi"><span class="ab" style="background:#2C2B38" title="color0 #2C2B38"></span><span class="ab" style="background:#FD8DA8" title="color1 #FD8DA8"></span><span class="ab" style="background:#A6DA64" title="color2 #A6DA64"></span><span class="ab" style="background:#DCCD77" title="color3 #DCCD77"></span><span class="ab" style="background:#88AFFD" title="color4 #88AFFD"></span><span class="ab" style="background:#BEA0FE" title="color5 #BEA0FE"></span><span class="ab" style="background:#78D3E3" title="color6 #78D3E3"></span><span class="ab" style="background:#BAB6C6" title="color7 #BAB6C6"></span><span class="ab" style="background:#9D99AD" title="color8 #9D99AD"></span><span class="ab" style="background:#FFA7BA" title="color9 #FFA7BA"></span><span class="ab" style="background:#B5EA73" title="color10 #B5EA73"></span><span class="ab" style="background:#EBDC85" title="color11 #EBDC85"></span><span class="ab" style="background:#A0C0FD" title="color12 #A0C0FD"></span><span class="ab" style="background:#CBB5FE" title="color13 #CBB5FE"></span><span class="ab" style="background:#87E3F3" title="color14 #87E3F3"></span><span class="ab" style="background:#F3F1F6" title="color15 #F3F1F6"></span></span></pre>
+</div>
+<div class="win win-inactive">
+  <div class="win-title">nvim — hyprland.lua</div>
+  <pre class="code"><span class="cl"></span><span class="t-com">-- ~/.config/hypr/theme/colors.lua is generated from the palette</span>
+<span class="t-kw">local</span> <span class="t-field">c</span> <span class="t-op">=</span> <span class="t-bi">require</span>(<span class="t-str">&quot;theme.colors&quot;</span>)
+
+<span class="t-bi">hl</span>.<span class="t-bi">config</span>({
+    <span class="t-field">general</span> <span class="t-op">=</span> {
+        <span class="t-field">gaps_in</span>     <span class="t-op">=</span> <span class="t-num">6</span>,
+        <span class="t-field">border_size</span> <span class="t-op">=</span> <span class="t-num">2</span>,
+        <span class="t-field">col</span> <span class="t-op">=</span> {
+            <span class="t-field">active_border</span>   <span class="t-op">=</span> { <span class="t-field">colors</span> <span class="t-op">=</span> { c.cyan, c.purple }, <span class="t-field">angle</span> <span class="t-op">=</span> <span class="t-num">45</span> },
+            <span class="t-field">inactive_border</span> <span class="t-op">=</span> c.surface1,
+        },
+    },
+    <span class="t-field">decoration</span> <span class="t-op">=</span> { <span class="t-field">rounding</span> <span class="t-op">=</span> <span class="t-num">10</span>, <span class="t-field">active_opacity</span> <span class="t-op">=</span> <span class="t-num">1.0</span> },
+})
+
+<span class="t-kw">for</span> <span class="t-field">i</span> <span class="t-op">=</span> <span class="t-num">1</span>, <span class="t-num">9</span> <span class="t-kw">do</span>
+    <span class="t-bi">hl</span>.<span class="t-bi">bind</span>(<span class="t-str">&quot;SUPER + &quot;</span> <span class="t-op">..</span> i, <span class="t-bi">hl</span>.<span class="t-bi">dsp</span>.<span class="t-fn">focus</span>({ <span class="t-field">workspace</span> <span class="t-op">=</span> i }))
+<span class="t-kw">end</span></pre>
+</div></div>
+    </div>
+    <div class="ramps">
+      <div class="ramp"><h3>Base ramp</h3><div class="sws" data-group="base"><div class="sw" style="--sw:#0F0E14"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#0F0E14</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#14131A"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#14131A</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#191820"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#191820</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#23212C"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#23212C</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#2C2B38"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#2C2B38</code><span class="sw-cr">1.3:1 · Lc 0</span></div><div class="sw" style="--sw:#3F3D50"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#3F3D50</code><span class="sw-cr">1.7:1 · Lc 0</span></div><div class="sw" style="--sw:#9D99AD"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#9D99AD</code><span class="sw-cr">6.4:1 · Lc 47</span></div><div class="sw" style="--sw:#BAB6C6"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#BAB6C6</code><span class="sw-cr">8.9:1 · Lc 63</span></div><div class="sw" style="--sw:#E4E0E9"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#E4E0E9</code><span class="sw-cr">13.5:1 · Lc 88</span></div><div class="sw" style="--sw:#F3F1F6"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#F3F1F6</code><span class="sw-cr">15.7:1 · Lc 98</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws" data-group="accent"><div class="sw" style="--sw:#FD8DA8"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FD8DA8</code><span class="sw-cr">8.0:1 · Lc 58</span></div><div class="sw" style="--sw:#F69C56"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#F69C56</code><span class="sw-cr">8.2:1 · Lc 59</span></div><div class="sw" style="--sw:#DCCD77"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#DCCD77</code><span class="sw-cr">10.9:1 · Lc 74</span></div><div class="sw" style="--sw:#A6DA64"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#A6DA64</code><span class="sw-cr">10.8:1 · Lc 74</span></div><div class="sw" style="--sw:#78D3E3"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#78D3E3</code><span class="sw-cr">10.2:1 · Lc 71</span></div><div class="sw" style="--sw:#88AFFD"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#88AFFD</code><span class="sw-cr">8.0:1 · Lc 58</span></div><div class="sw" style="--sw:#BEA0FE"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#BEA0FE</code><span class="sw-cr">8.1:1 · Lc 58</span></div><div class="sw" style="--sw:#FB89CD"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FB89CD</code><span class="sw-cr">8.0:1 · Lc 58</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws" data-group="accent_bright"><div class="sw" style="--sw:#FFA7BA"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FFA7BA</code><span class="sw-cr">9.6:1 · Lc 67</span></div><div class="sw" style="--sw:#FEB076"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FEB076</code><span class="sw-cr">9.8:1 · Lc 68</span></div><div class="sw" style="--sw:#EBDC85"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#EBDC85</code><span class="sw-cr">12.7:1 · Lc 83</span></div><div class="sw" style="--sw:#B5EA73"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#B5EA73</code><span class="sw-cr">12.6:1 · Lc 83</span></div><div class="sw" style="--sw:#87E3F3"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#87E3F3</code><span class="sw-cr">12.0:1 · Lc 80</span></div><div class="sw" style="--sw:#A0C0FD"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#A0C0FD</code><span class="sw-cr">9.6:1 · Lc 67</span></div><div class="sw" style="--sw:#CBB5FE"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#CBB5FE</code><span class="sw-cr">9.7:1 · Lc 68</span></div><div class="sw" style="--sw:#FDA4D7"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FDA4D7</code><span class="sw-cr">9.6:1 · Lc 67</span></div></div></div>
+    </div>
+    <p class="cr-note">Contrast against <code>base</code> #191820: body text 13.5:1 / Lc 88 · comments 6.4:1 / Lc 47 · accent lightness spread Lc 16. This palette passes all rules.</p>
+    <details class="kitty">
+      <summary>Copy this blend as a palette file</summary>
+      <div class="kitty-body">
+        <p>Send me the command line, or save the TOML as <code>colors/proposals/round2/&lt;name&gt;.toml</code>.</p>
+        <pre id="toml-dial"></pre>
+        <button type="button" class="copy" id="copy-toml-dial" data-target="toml-dial">Copy TOML + command</button>
       </div>
     </details>
   </div>
@@ -234,8 +330,9 @@ color15 #F4F2F9</pre>
         <h2>Deep Field</h2>
         <p class="tag">Cool navy-black, cooler accents, highest contrast of the set. Hubble deep field.</p>
       </div>
-      
+      <span class="round">round1</span>
     </header>
+    
     <div class="desk">
       
 <div class="bar">
@@ -285,17 +382,15 @@ color15 #F4F2F9</pre>
 </div></div>
     </div>
     <div class="ramps">
-      <div class="ramp"><h3>Base ramp</h3><div class="sws"><div class="sw" style="--sw:#0A0D18"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#0A0D18</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#0E1220"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#0E1220</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#131727"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#131727</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#1B2036"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#1B2036</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#262C47"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#262C47</code><span class="sw-cr">1.3</span></div><div class="sw" style="--sw:#38405F"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#38405F</code><span class="sw-cr">1.8</span></div><div class="sw" style="--sw:#8189AC"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8189AC</code><span class="sw-cr">5.2</span></div><div class="sw" style="--sw:#B2BAD8"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B2BAD8</code><span class="sw-cr">9.2</span></div><div class="sw" style="--sw:#E2E7F5"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#E2E7F5</code><span class="sw-cr">14.4</span></div><div class="sw" style="--sw:#F4F6FC"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#F4F6FC</code><span class="sw-cr">16.5</span></div></div></div>
-      <div class="ramp"><h3>Accents</h3><div class="sws"><div class="sw" style="--sw:#FF7891"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF7891</code><span class="sw-cr">7.1</span></div><div class="sw" style="--sw:#FFA46E"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFA46E</code><span class="sw-cr">9.1</span></div><div class="sw" style="--sw:#F5D67B"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F5D67B</code><span class="sw-cr">12.5</span></div><div class="sw" style="--sw:#8EDB95"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#8EDB95</code><span class="sw-cr">10.8</span></div><div class="sw" style="--sw:#6FD9E4"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#6FD9E4</code><span class="sw-cr">10.8</span></div><div class="sw" style="--sw:#7DABFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#7DABFF</code><span class="sw-cr">7.7</span></div><div class="sw" style="--sw:#A99CFF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#A99CFF</code><span class="sw-cr">7.5</span></div><div class="sw" style="--sw:#F28FCB"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F28FCB</code><span class="sw-cr">8.1</span></div></div></div>
-      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws"><div class="sw" style="--sw:#FF97AA"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF97AA</code><span class="sw-cr">8.7</span></div><div class="sw" style="--sw:#FFBA90"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFBA90</code><span class="sw-cr">10.7</span></div><div class="sw" style="--sw:#F9E4A3"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F9E4A3</code><span class="sw-cr">14.1</span></div><div class="sw" style="--sw:#ABE6B0"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#ABE6B0</code><span class="sw-cr">12.4</span></div><div class="sw" style="--sw:#97E5EC"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#97E5EC</code><span class="sw-cr">12.5</span></div><div class="sw" style="--sw:#A0C2FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#A0C2FF</code><span class="sw-cr">9.9</span></div><div class="sw" style="--sw:#C1B7FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#C1B7FF</code><span class="sw-cr">9.7</span></div><div class="sw" style="--sw:#F6AED9"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F6AED9</code><span class="sw-cr">10.2</span></div></div></div>
+      <div class="ramp"><h3>Base ramp</h3><div class="sws" data-group="base"><div class="sw" style="--sw:#0A0D18"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#0A0D18</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#0E1220"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#0E1220</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#131727"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#131727</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#1B2036"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#1B2036</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#262C47"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#262C47</code><span class="sw-cr">1.3:1 · Lc 0</span></div><div class="sw" style="--sw:#38405F"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#38405F</code><span class="sw-cr">1.8:1 · Lc 8</span></div><div class="sw" style="--sw:#8189AC"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8189AC</code><span class="sw-cr">5.2:1 · Lc 39</span></div><div class="sw" style="--sw:#B2BAD8"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B2BAD8</code><span class="sw-cr">9.2:1 · Lc 64</span></div><div class="sw" style="--sw:#E2E7F5"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#E2E7F5</code><span class="sw-cr">14.4:1 · Lc 91</span></div><div class="sw" style="--sw:#F4F6FC"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#F4F6FC</code><span class="sw-cr">16.5:1 · Lc 101</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws" data-group="accent"><div class="sw" style="--sw:#FF7891"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF7891</code><span class="sw-cr">7.1:1 · Lc 52</span></div><div class="sw" style="--sw:#FFA46E"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFA46E</code><span class="sw-cr">9.1:1 · Lc 64</span></div><div class="sw" style="--sw:#F5D67B"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F5D67B</code><span class="sw-cr">12.5:1 · Lc 82</span></div><div class="sw" style="--sw:#8EDB95"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#8EDB95</code><span class="sw-cr">10.8:1 · Lc 73</span></div><div class="sw" style="--sw:#6FD9E4"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#6FD9E4</code><span class="sw-cr">10.8:1 · Lc 73</span></div><div class="sw" style="--sw:#7DABFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#7DABFF</code><span class="sw-cr">7.7:1 · Lc 56</span></div><div class="sw" style="--sw:#A99CFF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#A99CFF</code><span class="sw-cr">7.5:1 · Lc 54</span></div><div class="sw" style="--sw:#F28FCB"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F28FCB</code><span class="sw-cr">8.1:1 · Lc 58</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws" data-group="accent_bright"><div class="sw" style="--sw:#FF97AA"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF97AA</code><span class="sw-cr">8.7:1 · Lc 62</span></div><div class="sw" style="--sw:#FFBA90"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFBA90</code><span class="sw-cr">10.7:1 · Lc 73</span></div><div class="sw" style="--sw:#F9E4A3"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F9E4A3</code><span class="sw-cr">14.1:1 · Lc 90</span></div><div class="sw" style="--sw:#ABE6B0"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#ABE6B0</code><span class="sw-cr">12.4:1 · Lc 82</span></div><div class="sw" style="--sw:#97E5EC"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#97E5EC</code><span class="sw-cr">12.5:1 · Lc 82</span></div><div class="sw" style="--sw:#A0C2FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#A0C2FF</code><span class="sw-cr">9.9:1 · Lc 68</span></div><div class="sw" style="--sw:#C1B7FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#C1B7FF</code><span class="sw-cr">9.7:1 · Lc 67</span></div><div class="sw" style="--sw:#F6AED9"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F6AED9</code><span class="sw-cr">10.2:1 · Lc 70</span></div></div></div>
     </div>
-    <p class="cr-note">Numbers are WCAG contrast against <code>base</code> #131727.
-      Body text 14.4:1 · comments 5.2:1 · weakest accent
-      <code>red</code> 7.1:1.</p>
+    <p class="cr-note">Contrast against <code>base</code> #131727: body text 14.4:1 / Lc 91 · comments 5.2:1 / Lc 39 · accent lightness spread Lc 30. This palette fails 5 of 42 rules (round-1 palettes predate the APCA rules).</p>
     <details class="kitty">
       <summary>Try it in kitty now</summary>
       <div class="kitty-body">
-        <p>Append to <code>~/.config/kitty/kitty.conf</code>, then press <kbd>Ctrl+Shift+F5</kbd> to reload.</p>
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>; kitty reloads it automatically.</p>
         <pre id="kitty-deep-field"># Deep Field (proposal) - paste into kitty.conf to try it
 foreground #E2E7F5
 background #131727
@@ -339,8 +434,9 @@ color15 #F4F6FC</pre>
         <h2>Event Horizon</h2>
         <p class="tag">Lowest glare. Desaturated accents on warm graphite. For long sessions and dim rooms.</p>
       </div>
-      
+      <span class="round">round1</span>
     </header>
+    
     <div class="desk">
       
 <div class="bar">
@@ -390,17 +486,15 @@ color15 #F4F6FC</pre>
 </div></div>
     </div>
     <div class="ramps">
-      <div class="ramp"><h3>Base ramp</h3><div class="sws"><div class="sw" style="--sw:#17161B"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#17161B</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#1C1B21"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#1C1B21</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#212026"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#212026</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#2A2930"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#2A2930</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#323139"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#323139</code><span class="sw-cr">1.3</span></div><div class="sw" style="--sw:#47454F"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#47454F</code><span class="sw-cr">1.7</span></div><div class="sw" style="--sw:#8E8A98"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8E8A98</code><span class="sw-cr">4.8</span></div><div class="sw" style="--sw:#B8B4C0"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B8B4C0</code><span class="sw-cr">7.9</span></div><div class="sw" style="--sw:#DCD8E1"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#DCD8E1</code><span class="sw-cr">11.5</span></div><div class="sw" style="--sw:#ECE9F0"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#ECE9F0</code><span class="sw-cr">13.5</span></div></div></div>
-      <div class="ramp"><h3>Accents</h3><div class="sws"><div class="sw" style="--sw:#EC8597"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#EC8597</code><span class="sw-cr">6.4</span></div><div class="sw" style="--sw:#E6A684"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#E6A684</code><span class="sw-cr">7.8</span></div><div class="sw" style="--sw:#E0CD90"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E0CD90</code><span class="sw-cr">10.2</span></div><div class="sw" style="--sw:#AACC90"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#AACC90</code><span class="sw-cr">9.0</span></div><div class="sw" style="--sw:#8DC9D2"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#8DC9D2</code><span class="sw-cr">8.8</span></div><div class="sw" style="--sw:#98B0E4"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#98B0E4</code><span class="sw-cr">7.4</span></div><div class="sw" style="--sw:#B8A6E0"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#B8A6E0</code><span class="sw-cr">7.4</span></div><div class="sw" style="--sw:#DE9EC6"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#DE9EC6</code><span class="sw-cr">7.6</span></div></div></div>
-      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws"><div class="sw" style="--sw:#F2A0AE"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#F2A0AE</code><span class="sw-cr">8.0</span></div><div class="sw" style="--sw:#EDBBA0"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#EDBBA0</code><span class="sw-cr">9.4</span></div><div class="sw" style="--sw:#E9DBAD"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E9DBAD</code><span class="sw-cr">11.7</span></div><div class="sw" style="--sw:#BFD9AB"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BFD9AB</code><span class="sw-cr">10.6</span></div><div class="sw" style="--sw:#A9D7DE"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#A9D7DE</code><span class="sw-cr">10.4</span></div><div class="sw" style="--sw:#B1C3EB"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#B1C3EB</code><span class="sw-cr">9.1</span></div><div class="sw" style="--sw:#CBBDE9"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#CBBDE9</code><span class="sw-cr">9.2</span></div><div class="sw" style="--sw:#E7B7D5"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#E7B7D5</code><span class="sw-cr">9.3</span></div></div></div>
+      <div class="ramp"><h3>Base ramp</h3><div class="sws" data-group="base"><div class="sw" style="--sw:#17161B"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#17161B</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#1C1B21"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#1C1B21</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#212026"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#212026</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#2A2930"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#2A2930</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#323139"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#323139</code><span class="sw-cr">1.3:1 · Lc 0</span></div><div class="sw" style="--sw:#47454F"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#47454F</code><span class="sw-cr">1.7:1 · Lc 8</span></div><div class="sw" style="--sw:#8E8A98"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8E8A98</code><span class="sw-cr">4.8:1 · Lc 38</span></div><div class="sw" style="--sw:#B8B4C0"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B8B4C0</code><span class="sw-cr">7.9:1 · Lc 61</span></div><div class="sw" style="--sw:#DCD8E1"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#DCD8E1</code><span class="sw-cr">11.5:1 · Lc 82</span></div><div class="sw" style="--sw:#ECE9F0"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#ECE9F0</code><span class="sw-cr">13.5:1 · Lc 92</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws" data-group="accent"><div class="sw" style="--sw:#EC8597"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#EC8597</code><span class="sw-cr">6.4:1 · Lc 51</span></div><div class="sw" style="--sw:#E6A684"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#E6A684</code><span class="sw-cr">7.8:1 · Lc 60</span></div><div class="sw" style="--sw:#E0CD90"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E0CD90</code><span class="sw-cr">10.2:1 · Lc 75</span></div><div class="sw" style="--sw:#AACC90"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#AACC90</code><span class="sw-cr">9.0:1 · Lc 67</span></div><div class="sw" style="--sw:#8DC9D2"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#8DC9D2</code><span class="sw-cr">8.8:1 · Lc 66</span></div><div class="sw" style="--sw:#98B0E4"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#98B0E4</code><span class="sw-cr">7.4:1 · Lc 57</span></div><div class="sw" style="--sw:#B8A6E0"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#B8A6E0</code><span class="sw-cr">7.4:1 · Lc 57</span></div><div class="sw" style="--sw:#DE9EC6"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#DE9EC6</code><span class="sw-cr">7.6:1 · Lc 58</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws" data-group="accent_bright"><div class="sw" style="--sw:#F2A0AE"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#F2A0AE</code><span class="sw-cr">8.0:1 · Lc 61</span></div><div class="sw" style="--sw:#EDBBA0"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#EDBBA0</code><span class="sw-cr">9.4:1 · Lc 70</span></div><div class="sw" style="--sw:#E9DBAD"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E9DBAD</code><span class="sw-cr">11.7:1 · Lc 83</span></div><div class="sw" style="--sw:#BFD9AB"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BFD9AB</code><span class="sw-cr">10.6:1 · Lc 76</span></div><div class="sw" style="--sw:#A9D7DE"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#A9D7DE</code><span class="sw-cr">10.4:1 · Lc 75</span></div><div class="sw" style="--sw:#B1C3EB"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#B1C3EB</code><span class="sw-cr">9.1:1 · Lc 68</span></div><div class="sw" style="--sw:#CBBDE9"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#CBBDE9</code><span class="sw-cr">9.2:1 · Lc 69</span></div><div class="sw" style="--sw:#E7B7D5"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#E7B7D5</code><span class="sw-cr">9.3:1 · Lc 69</span></div></div></div>
     </div>
-    <p class="cr-note">Numbers are WCAG contrast against <code>base</code> #212026.
-      Body text 11.5:1 · comments 4.8:1 · weakest accent
-      <code>red</code> 6.4:1.</p>
+    <p class="cr-note">Contrast against <code>base</code> #212026: body text 11.5:1 / Lc 82 · comments 4.8:1 / Lc 38 · accent lightness spread Lc 24. This palette fails 3 of 42 rules (round-1 palettes predate the APCA rules).</p>
     <details class="kitty">
       <summary>Try it in kitty now</summary>
       <div class="kitty-body">
-        <p>Append to <code>~/.config/kitty/kitty.conf</code>, then press <kbd>Ctrl+Shift+F5</kbd> to reload.</p>
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>; kitty reloads it automatically.</p>
         <pre id="kitty-event-horizon"># Event Horizon (proposal) - paste into kitty.conf to try it
 foreground #DCD8E1
 background #212026
@@ -437,6 +531,110 @@ color15 #ECE9F0</pre>
     </details>
   </div>
 </section>
+<section class="prop" id="nebula" style="--p-crust:#121119;--p-mantle:#17161F;--p-base:#1C1B26;--p-surface0:#252433;--p-surface1:#302E42;--p-surface2:#423F59;--p-overlay:#8A86A6;--p-subtext:#B8B4CC;--p-text:#E4E1EE;--p-bright:#F4F2F9;--p-red:#FF6E8A;--p-orange:#FA9D6B;--p-yellow:#F2D57E;--p-green:#A9DC7A;--p-cyan:#7FD7E6;--p-blue:#86ACFF;--p-purple:#B79CF7;--p-pink:#F590CF;--pb-red:#FF8DA3;--pb-orange:#FFB38A;--pb-yellow:#F8E3A2;--pb-green:#BFE899;--pb-cyan:#A0E4EF;--pb-blue:#A5C1FF;--pb-purple:#CAB6FA;--pb-pink:#F8AEDC;--p-g0:#7FD7E6;--p-g1:#B79CF7;--p-cursor:#7FD7E6">
+  <div class="prop-in">
+    <header class="prop-head">
+      <div>
+        <h2>Nebula</h2>
+        <p class="tag">Monokai Pro accents on a violet-tinted deep-space base. Balanced default.</p>
+      </div>
+      <span class="round">round1</span>
+    </header>
+    
+    <div class="desk">
+      
+<div class="bar">
+  <div class="bar-l"><span class="ws">1</span><span class="ws ws-on">2</span><span class="ws">3</span><span class="ws">4</span><span class="ws">5</span></div>
+  <div class="bar-c">kitty — ~/claude-RICE-hyprland</div>
+  <div class="bar-r">
+    <span class="c-cyan">CPU 12%</span><span class="c-purple">MEM 3.1G</span>
+    <span class="c-green">VOL 45%</span><span class="c-yellow">BAT 82%</span>
+    <span class="clock">23:41</span>
+  </div>
+</div>
+      <div class="wins">
+<div class="win win-active">
+  <div class="win-title">kitty — ~/claude-RICE-hyprland</div>
+  <pre class="term"><span class="c-blue">~/claude-RICE-hyprland</span> <span class="c-purple">on  main</span> <span class="c-green">✓</span>
+<span class="c-green">❯</span> ls
+<span class="c-blue">colors</span>  <span class="c-blue">docs</span>  <span class="c-blue">tools</span>  CLAUDE.md  README.md  <span class="c-green">install.sh</span>
+<span class="c-green">❯</span> git log --oneline -3
+<span class="c-yellow">3f9c2e1</span> (<span class="c-cyan">HEAD -&gt; main</span>) colors: add palette proposals
+<span class="c-yellow">a07d4b8</span> docs: knowledge base for Hyprland 0.57 Lua config
+<span class="c-yellow">0c11e92</span> Initial commit
+<span class="c-green">❯</span> sudo pacman -S kitty
+<span class="c-red">error:</span> target not found: kity  <span class="c-orange">warning:</span> 2 packages held
+<span class="c-green">❯</span> hyprctl ver<span class="c-sugg">sion | head -n1</span><span class="cur"> </span>
+<span class="ansi"><span class="ab" style="background:#302E42" title="color0 #302E42"></span><span class="ab" style="background:#FF6E8A" title="color1 #FF6E8A"></span><span class="ab" style="background:#A9DC7A" title="color2 #A9DC7A"></span><span class="ab" style="background:#F2D57E" title="color3 #F2D57E"></span><span class="ab" style="background:#86ACFF" title="color4 #86ACFF"></span><span class="ab" style="background:#B79CF7" title="color5 #B79CF7"></span><span class="ab" style="background:#7FD7E6" title="color6 #7FD7E6"></span><span class="ab" style="background:#B8B4CC" title="color7 #B8B4CC"></span><span class="ab" style="background:#8A86A6" title="color8 #8A86A6"></span><span class="ab" style="background:#FF8DA3" title="color9 #FF8DA3"></span><span class="ab" style="background:#BFE899" title="color10 #BFE899"></span><span class="ab" style="background:#F8E3A2" title="color11 #F8E3A2"></span><span class="ab" style="background:#A5C1FF" title="color12 #A5C1FF"></span><span class="ab" style="background:#CAB6FA" title="color13 #CAB6FA"></span><span class="ab" style="background:#A0E4EF" title="color14 #A0E4EF"></span><span class="ab" style="background:#F4F2F9" title="color15 #F4F2F9"></span></span></pre>
+</div>
+<div class="win win-inactive">
+  <div class="win-title">nvim — hyprland.lua</div>
+  <pre class="code"><span class="cl"></span><span class="t-com">-- ~/.config/hypr/theme/colors.lua is generated from the palette</span>
+<span class="t-kw">local</span> <span class="t-field">c</span> <span class="t-op">=</span> <span class="t-bi">require</span>(<span class="t-str">&quot;theme.colors&quot;</span>)
+
+<span class="t-bi">hl</span>.<span class="t-bi">config</span>({
+    <span class="t-field">general</span> <span class="t-op">=</span> {
+        <span class="t-field">gaps_in</span>     <span class="t-op">=</span> <span class="t-num">6</span>,
+        <span class="t-field">border_size</span> <span class="t-op">=</span> <span class="t-num">2</span>,
+        <span class="t-field">col</span> <span class="t-op">=</span> {
+            <span class="t-field">active_border</span>   <span class="t-op">=</span> { <span class="t-field">colors</span> <span class="t-op">=</span> { c.cyan, c.purple }, <span class="t-field">angle</span> <span class="t-op">=</span> <span class="t-num">45</span> },
+            <span class="t-field">inactive_border</span> <span class="t-op">=</span> c.surface1,
+        },
+    },
+    <span class="t-field">decoration</span> <span class="t-op">=</span> { <span class="t-field">rounding</span> <span class="t-op">=</span> <span class="t-num">10</span>, <span class="t-field">active_opacity</span> <span class="t-op">=</span> <span class="t-num">1.0</span> },
+})
+
+<span class="t-kw">for</span> <span class="t-field">i</span> <span class="t-op">=</span> <span class="t-num">1</span>, <span class="t-num">9</span> <span class="t-kw">do</span>
+    <span class="t-bi">hl</span>.<span class="t-bi">bind</span>(<span class="t-str">&quot;SUPER + &quot;</span> <span class="t-op">..</span> i, <span class="t-bi">hl</span>.<span class="t-bi">dsp</span>.<span class="t-fn">focus</span>({ <span class="t-field">workspace</span> <span class="t-op">=</span> i }))
+<span class="t-kw">end</span></pre>
+</div></div>
+    </div>
+    <div class="ramps">
+      <div class="ramp"><h3>Base ramp</h3><div class="sws" data-group="base"><div class="sw" style="--sw:#121119"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#121119</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#17161F"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#17161F</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#1C1B26"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#1C1B26</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#252433"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#252433</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#302E42"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#302E42</code><span class="sw-cr">1.3:1 · Lc 0</span></div><div class="sw" style="--sw:#423F59"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#423F59</code><span class="sw-cr">1.7:1 · Lc 8</span></div><div class="sw" style="--sw:#8A86A6"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8A86A6</code><span class="sw-cr">4.9:1 · Lc 38</span></div><div class="sw" style="--sw:#B8B4CC"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B8B4CC</code><span class="sw-cr">8.5:1 · Lc 62</span></div><div class="sw" style="--sw:#E4E1EE"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#E4E1EE</code><span class="sw-cr">13.2:1 · Lc 88</span></div><div class="sw" style="--sw:#F4F2F9"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#F4F2F9</code><span class="sw-cr">15.3:1 · Lc 98</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws" data-group="accent"><div class="sw" style="--sw:#FF6E8A"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF6E8A</code><span class="sw-cr">6.4:1 · Lc 49</span></div><div class="sw" style="--sw:#FA9D6B"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FA9D6B</code><span class="sw-cr">8.2:1 · Lc 60</span></div><div class="sw" style="--sw:#F2D57E"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F2D57E</code><span class="sw-cr">11.8:1 · Lc 81</span></div><div class="sw" style="--sw:#A9DC7A"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#A9DC7A</code><span class="sw-cr">10.7:1 · Lc 75</span></div><div class="sw" style="--sw:#7FD7E6"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#7FD7E6</code><span class="sw-cr">10.3:1 · Lc 73</span></div><div class="sw" style="--sw:#86ACFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#86ACFF</code><span class="sw-cr">7.6:1 · Lc 56</span></div><div class="sw" style="--sw:#B79CF7"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#B79CF7</code><span class="sw-cr">7.4:1 · Lc 55</span></div><div class="sw" style="--sw:#F590CF"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F590CF</code><span class="sw-cr">7.9:1 · Lc 59</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws" data-group="accent_bright"><div class="sw" style="--sw:#FF8DA3"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF8DA3</code><span class="sw-cr">7.8:1 · Lc 58</span></div><div class="sw" style="--sw:#FFB38A"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFB38A</code><span class="sw-cr">9.8:1 · Lc 70</span></div><div class="sw" style="--sw:#F8E3A2"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F8E3A2</code><span class="sw-cr">13.4:1 · Lc 89</span></div><div class="sw" style="--sw:#BFE899"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BFE899</code><span class="sw-cr">12.3:1 · Lc 83</span></div><div class="sw" style="--sw:#A0E4EF"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#A0E4EF</code><span class="sw-cr">12.0:1 · Lc 82</span></div><div class="sw" style="--sw:#A5C1FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#A5C1FF</code><span class="sw-cr">9.5:1 · Lc 68</span></div><div class="sw" style="--sw:#CAB6FA"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#CAB6FA</code><span class="sw-cr">9.4:1 · Lc 67</span></div><div class="sw" style="--sw:#F8AEDC"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F8AEDC</code><span class="sw-cr">9.8:1 · Lc 70</span></div></div></div>
+    </div>
+    <p class="cr-note">Contrast against <code>base</code> #1C1B26: body text 13.2:1 / Lc 88 · comments 4.9:1 / Lc 38 · accent lightness spread Lc 32. This palette fails 3 of 42 rules (round-1 palettes predate the APCA rules).</p>
+    <details class="kitty">
+      <summary>Try it in kitty now</summary>
+      <div class="kitty-body">
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>; kitty reloads it automatically.</p>
+        <pre id="kitty-nebula"># Nebula (proposal) - paste into kitty.conf to try it
+foreground #E4E1EE
+background #1C1B26
+selection_foreground #E4E1EE
+selection_background #302E42
+cursor #7FD7E6
+cursor_text_color #1C1B26
+url_color #86ACFF
+active_border_color #7FD7E6
+inactive_border_color #423F59
+active_tab_foreground #121119
+active_tab_background #7FD7E6
+inactive_tab_foreground #B8B4CC
+inactive_tab_background #17161F
+tab_bar_background #121119
+color0 #302E42
+color1 #FF6E8A
+color2 #A9DC7A
+color3 #F2D57E
+color4 #86ACFF
+color5 #B79CF7
+color6 #7FD7E6
+color7 #B8B4CC
+color8 #8A86A6
+color9 #FF8DA3
+color10 #BFE899
+color11 #F8E3A2
+color12 #A5C1FF
+color13 #CAB6FA
+color14 #A0E4EF
+color15 #F4F2F9</pre>
+        <button type="button" class="copy" id="copy-nebula" data-target="kitty-nebula">Copy kitty colors</button>
+      </div>
+    </details>
+  </div>
+</section>
 <section class="prop" id="pulsar" style="--p-crust:#0C0B11;--p-mantle:#110F17;--p-base:#16151D;--p-surface0:#201E2A;--p-surface1:#2A2837;--p-surface2:#3C3950;--p-overlay:#85819C;--p-subtext:#BDB9CD;--p-text:#EEEBF4;--p-bright:#FBFAFD;--p-red:#FF5E95;--p-orange:#FD971F;--p-yellow:#E6DB74;--p-green:#A6E22E;--p-cyan:#66D9EF;--p-blue:#6FA3FF;--p-purple:#AE81FF;--p-pink:#FF6AC1;--pb-red:#FF7AA6;--pb-orange:#FFAE52;--pb-yellow:#EEE59A;--pb-green:#BCEB63;--pb-cyan:#8DE3F3;--pb-blue:#96BBFF;--pb-purple:#C4A3FF;--pb-pink:#FF8FD0;--p-g0:#FF6AC1;--p-g1:#FD971F;--p-cursor:#E6DB74">
   <div class="prop-in">
     <header class="prop-head">
@@ -444,8 +642,9 @@ color15 #ECE9F0</pre>
         <h2>Pulsar</h2>
         <p class="tag">Classic Monokai saturation on near-black space. Punchiest; least &#x27;soft&#x27;.</p>
       </div>
-      
+      <span class="round">round1</span>
     </header>
+    
     <div class="desk">
       
 <div class="bar">
@@ -495,17 +694,15 @@ color15 #ECE9F0</pre>
 </div></div>
     </div>
     <div class="ramps">
-      <div class="ramp"><h3>Base ramp</h3><div class="sws"><div class="sw" style="--sw:#0C0B11"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#0C0B11</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#110F17"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#110F17</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#16151D"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#16151D</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#201E2A"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#201E2A</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#2A2837"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#2A2837</code><span class="sw-cr">1.3</span></div><div class="sw" style="--sw:#3C3950"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#3C3950</code><span class="sw-cr">1.6</span></div><div class="sw" style="--sw:#85819C"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#85819C</code><span class="sw-cr">4.8</span></div><div class="sw" style="--sw:#BDB9CD"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#BDB9CD</code><span class="sw-cr">9.5</span></div><div class="sw" style="--sw:#EEEBF4"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#EEEBF4</code><span class="sw-cr">15.4</span></div><div class="sw" style="--sw:#FBFAFD"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#FBFAFD</code><span class="sw-cr">17.4</span></div></div></div>
-      <div class="ramp"><h3>Accents</h3><div class="sws"><div class="sw" style="--sw:#FF5E95"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF5E95</code><span class="sw-cr">6.3</span></div><div class="sw" style="--sw:#FD971F"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FD971F</code><span class="sw-cr">8.3</span></div><div class="sw" style="--sw:#E6DB74"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E6DB74</code><span class="sw-cr">12.7</span></div><div class="sw" style="--sw:#A6E22E"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#A6E22E</code><span class="sw-cr">11.7</span></div><div class="sw" style="--sw:#66D9EF"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#66D9EF</code><span class="sw-cr">11.0</span></div><div class="sw" style="--sw:#6FA3FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#6FA3FF</code><span class="sw-cr">7.2</span></div><div class="sw" style="--sw:#AE81FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#AE81FF</code><span class="sw-cr">6.4</span></div><div class="sw" style="--sw:#FF6AC1"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FF6AC1</code><span class="sw-cr">7.0</span></div></div></div>
-      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws"><div class="sw" style="--sw:#FF7AA6"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF7AA6</code><span class="sw-cr">7.4</span></div><div class="sw" style="--sw:#FFAE52"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFAE52</code><span class="sw-cr">9.9</span></div><div class="sw" style="--sw:#EEE59A"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#EEE59A</code><span class="sw-cr">14.1</span></div><div class="sw" style="--sw:#BCEB63"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BCEB63</code><span class="sw-cr">13.1</span></div><div class="sw" style="--sw:#8DE3F3"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#8DE3F3</code><span class="sw-cr">12.4</span></div><div class="sw" style="--sw:#96BBFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#96BBFF</code><span class="sw-cr">9.4</span></div><div class="sw" style="--sw:#C4A3FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#C4A3FF</code><span class="sw-cr">8.7</span></div><div class="sw" style="--sw:#FF8FD0"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FF8FD0</code><span class="sw-cr">8.7</span></div></div></div>
+      <div class="ramp"><h3>Base ramp</h3><div class="sws" data-group="base"><div class="sw" style="--sw:#0C0B11"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#0C0B11</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#110F17"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#110F17</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#16151D"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#16151D</code><span class="sw-cr">1.0:1 · Lc 0</span></div><div class="sw" style="--sw:#201E2A"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#201E2A</code><span class="sw-cr">1.1:1 · Lc 0</span></div><div class="sw" style="--sw:#2A2837"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#2A2837</code><span class="sw-cr">1.3:1 · Lc 0</span></div><div class="sw" style="--sw:#3C3950"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#3C3950</code><span class="sw-cr">1.6:1 · Lc 0</span></div><div class="sw" style="--sw:#85819C"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#85819C</code><span class="sw-cr">4.8:1 · Lc 36</span></div><div class="sw" style="--sw:#BDB9CD"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#BDB9CD</code><span class="sw-cr">9.5:1 · Lc 65</span></div><div class="sw" style="--sw:#EEEBF4"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#EEEBF4</code><span class="sw-cr">15.4:1 · Lc 95</span></div><div class="sw" style="--sw:#FBFAFD"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#FBFAFD</code><span class="sw-cr">17.4:1 · Lc 104</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws" data-group="accent"><div class="sw" style="--sw:#FF5E95"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF5E95</code><span class="sw-cr">6.3:1 · Lc 47</span></div><div class="sw" style="--sw:#FD971F"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FD971F</code><span class="sw-cr">8.3:1 · Lc 59</span></div><div class="sw" style="--sw:#E6DB74"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E6DB74</code><span class="sw-cr">12.7:1 · Lc 82</span></div><div class="sw" style="--sw:#A6E22E"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#A6E22E</code><span class="sw-cr">11.7:1 · Lc 77</span></div><div class="sw" style="--sw:#66D9EF"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#66D9EF</code><span class="sw-cr">11.0:1 · Lc 74</span></div><div class="sw" style="--sw:#6FA3FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#6FA3FF</code><span class="sw-cr">7.2:1 · Lc 52</span></div><div class="sw" style="--sw:#AE81FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#AE81FF</code><span class="sw-cr">6.4:1 · Lc 47</span></div><div class="sw" style="--sw:#FF6AC1"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FF6AC1</code><span class="sw-cr">7.0:1 · Lc 51</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws" data-group="accent_bright"><div class="sw" style="--sw:#FF7AA6"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF7AA6</code><span class="sw-cr">7.4:1 · Lc 54</span></div><div class="sw" style="--sw:#FFAE52"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFAE52</code><span class="sw-cr">9.9:1 · Lc 67</span></div><div class="sw" style="--sw:#EEE59A"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#EEE59A</code><span class="sw-cr">14.1:1 · Lc 89</span></div><div class="sw" style="--sw:#BCEB63"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BCEB63</code><span class="sw-cr">13.1:1 · Lc 84</span></div><div class="sw" style="--sw:#8DE3F3"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#8DE3F3</code><span class="sw-cr">12.4:1 · Lc 81</span></div><div class="sw" style="--sw:#96BBFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#96BBFF</code><span class="sw-cr">9.4:1 · Lc 64</span></div><div class="sw" style="--sw:#C4A3FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#C4A3FF</code><span class="sw-cr">8.7:1 · Lc 60</span></div><div class="sw" style="--sw:#FF8FD0"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FF8FD0</code><span class="sw-cr">8.7:1 · Lc 61</span></div></div></div>
     </div>
-    <p class="cr-note">Numbers are WCAG contrast against <code>base</code> #16151D.
-      Body text 15.4:1 · comments 4.8:1 · weakest accent
-      <code>red</code> 6.3:1.</p>
+    <p class="cr-note">Contrast against <code>base</code> #16151D: body text 15.4:1 / Lc 95 · comments 4.8:1 / Lc 36 · accent lightness spread Lc 36. This palette fails 8 of 42 rules (round-1 palettes predate the APCA rules).</p>
     <details class="kitty">
       <summary>Try it in kitty now</summary>
       <div class="kitty-body">
-        <p>Append to <code>~/.config/kitty/kitty.conf</code>, then press <kbd>Ctrl+Shift+F5</kbd> to reload.</p>
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>; kitty reloads it automatically.</p>
         <pre id="kitty-pulsar"># Pulsar (proposal) - paste into kitty.conf to try it
 foreground #EEEBF4
 background #16151D
@@ -543,7 +740,7 @@ color15 #FBFAFD</pre>
   </div>
 </section>
 <div class="wrap"><p class="foot">Generated by <code>tools/preview.py</code> from
-<code>colors/proposals/*.toml</code>. Edit the TOML, re-run, and the page follows.</p></div>
+<code>colors/proposals/**/*.toml</code>. Edit the TOML, re-run, and the page follows.</p></div>
 <script>
 document.querySelectorAll('.copy').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -556,5 +753,139 @@ document.querySelectorAll('.copy').forEach(btn => {
     } catch (e) { select(); }
   });
 });
+const DIAL = {"src": {"meta": {"name": "Pulsar", "tagline": "Classic Monokai saturation on near-black space. Punchiest; least 'soft'.", "border_gradient": ["pink", "orange"], "cursor": "yellow"}, "base": {"crust": "#0C0B11", "mantle": "#110F17", "base": "#16151D", "surface0": "#201E2A", "surface1": "#2A2837", "surface2": "#3C3950", "overlay": "#85819C", "subtext": "#BDB9CD", "text": "#EEEBF4", "bright": "#FBFAFD"}, "accent": {"red": "#FF5E95", "orange": "#FD971F", "yellow": "#E6DB74", "green": "#A6E22E", "cyan": "#66D9EF", "blue": "#6FA3FF", "purple": "#AE81FF", "pink": "#FF6AC1"}, "accent_bright": {"red": "#FF7AA6", "orange": "#FFAE52", "yellow": "#EEE59A", "green": "#BCEB63", "cyan": "#8DE3F3", "blue": "#96BBFF", "purple": "#C4A3FF", "pink": "#FF8FD0"}}, "dst": {"meta": {"name": "Event Horizon", "tagline": "Lowest glare. Desaturated accents on warm graphite. For long sessions and dim rooms.", "border_gradient": ["purple", "pink"], "cursor": "subtext"}, "base": {"crust": "#17161B", "mantle": "#1C1B21", "base": "#212026", "surface0": "#2A2930", "surface1": "#323139", "surface2": "#47454F", "overlay": "#8E8A98", "subtext": "#B8B4C0", "text": "#DCD8E1", "bright": "#ECE9F0"}, "accent": {"red": "#EC8597", "orange": "#E6A684", "yellow": "#E0CD90", "green": "#AACC90", "cyan": "#8DC9D2", "blue": "#98B0E4", "purple": "#B8A6E0", "pink": "#DE9EC6"}, "accent_bright": {"red": "#F2A0AE", "orange": "#EDBBA0", "yellow": "#E9DBAD", "green": "#BFD9AB", "cyan": "#A9D7DE", "blue": "#B1C3EB", "purple": "#CBBDE9", "pink": "#E7B7D5"}}, "srcName": "pulsar", "dstName": "event-horizon", "roles": {"base": ["crust", "mantle", "base", "surface0", "surface1", "surface2", "overlay", "subtext", "text", "bright"], "accent": ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"], "accent_bright": ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"]}, "bgRoles": ["crust", "mantle", "base", "surface0", "surface1", "surface2"], "fgRoles": ["overlay", "subtext", "text", "bright"], "accentLc": [58.0, 74.0], "commentLc": 47.0, "brightDelta": 9.0, "rules": [["WCAG", "base.text", "base.base", 11.0, 15.5, "body text readable"], ["WCAG", "base.subtext", "base.base", 7.0, null, "secondary text meets AAA"], ["WCAG", "base.overlay", "base.base", 4.5, null, "comments / ANSI 8 meet AA"], ["WCAG", "base.text", "base.surface1", 9.0, null, "text on selection"], ["WCAG", "base.surface2", "base.base", 1.4, null, "inactive borders visible"], ["WCAG", "accent.red", "base.base", 6.0, null, "accent on editor bg"], ["WCAG", "accent.orange", "base.base", 6.0, null, "accent on editor bg"], ["WCAG", "accent.yellow", "base.base", 6.0, null, "accent on editor bg"], ["WCAG", "accent.green", "base.base", 6.0, null, "accent on editor bg"], ["WCAG", "accent.cyan", "base.base", 6.0, null, "accent on editor bg"], ["WCAG", "accent.blue", "base.base", 6.0, null, "accent on editor bg"], ["WCAG", "accent.purple", "base.base", 6.0, null, "accent on editor bg"], ["WCAG", "accent.pink", "base.base", 6.0, null, "accent on editor bg"], ["WCAG", "accent.red", "base.surface1", 4.5, null, "accent inside a selection"], ["WCAG", "accent.orange", "base.surface1", 4.5, null, "accent inside a selection"], ["WCAG", "accent.yellow", "base.surface1", 4.5, null, "accent inside a selection"], ["WCAG", "accent.green", "base.surface1", 4.5, null, "accent inside a selection"], ["WCAG", "accent.cyan", "base.surface1", 4.5, null, "accent inside a selection"], ["WCAG", "accent.blue", "base.surface1", 4.5, null, "accent inside a selection"], ["WCAG", "accent.purple", "base.surface1", 4.5, null, "accent inside a selection"], ["WCAG", "accent.pink", "base.surface1", 4.5, null, "accent inside a selection"], ["WCAG", "accent_bright.red", "base.base", 7.0, null, "bright ANSI variant"], ["WCAG", "accent_bright.orange", "base.base", 7.0, null, "bright ANSI variant"], ["WCAG", "accent_bright.yellow", "base.base", 7.0, null, "bright ANSI variant"], ["WCAG", "accent_bright.green", "base.base", 7.0, null, "bright ANSI variant"], ["WCAG", "accent_bright.cyan", "base.base", 7.0, null, "bright ANSI variant"], ["WCAG", "accent_bright.blue", "base.base", 7.0, null, "bright ANSI variant"], ["WCAG", "accent_bright.purple", "base.base", 7.0, null, "bright ANSI variant"], ["WCAG", "accent_bright.pink", "base.base", 7.0, null, "bright ANSI variant"], ["WCAG", "base.crust", "accent.cyan", 7.0, null, "dark text on a cyan pill"], ["APCA", "base.text", "base.base", 75.0, 92.0, "body text fluent, no halation"], ["APCA", "base.subtext", "base.base", 60.0, null, "secondary text"], ["APCA", "base.overlay", "base.base", 45.0, null, "comments are read, not just seen"], ["APCA", "accent.red", "base.base", 55.0, 82.0, "accent lightness band"], ["APCA", "accent.orange", "base.base", 55.0, 82.0, "accent lightness band"], ["APCA", "accent.yellow", "base.base", 55.0, 82.0, "accent lightness band"], ["APCA", "accent.green", "base.base", 55.0, 82.0, "accent lightness band"], ["APCA", "accent.cyan", "base.base", 55.0, 82.0, "accent lightness band"], ["APCA", "accent.blue", "base.base", 55.0, 82.0, "accent lightness band"], ["APCA", "accent.purple", "base.base", 55.0, 82.0, "accent lightness band"], ["APCA", "accent.pink", "base.base", 55.0, 82.0, "accent lightness band"]], "spreadMax": 18.0, "defaults": [0.3, 0.55, 0.4], "gradient": ["red", "purple"], "cursor": "yellow"};
+
+(() => {
+const D = DIAL;
+const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+const lin = c => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+const delin = c => c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
+const clamp01 = c => Math.min(1, Math.max(0, c));
+const toHex = rgb => '#' + rgb.map(c => Math.round(clamp01(c) * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+function toOklch(h) {
+  const [r, g, b] = hexRgb(h).map(lin);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s;
+  const a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+  const bb = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+  return [L, Math.hypot(a, bb), ((Math.atan2(bb, a) * 180 / Math.PI) % 360 + 360) % 360];
+}
+function fromOklch(L, C, H) {
+  let rgb;
+  for (let i = 0; i < 40; i++) {
+    const a = C * Math.cos(H * Math.PI / 180), b = C * Math.sin(H * Math.PI / 180);
+    const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+    const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+    const s = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+    rgb = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+           -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+           -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s];
+    if (rgb.every(c => c >= -1e-4 && c <= 1 + 1e-4)) break;
+    C *= 0.95;
+  }
+  return toHex(rgb.map(c => delin(clamp01(c))));
+}
+function mix(x, y, t) {
+  let [La, Ca, Ha] = toOklch(x), [Lb, Cb, Hb] = toOklch(y);
+  if (Ca < 0.02) Ha = Hb;
+  if (Cb < 0.02) Hb = Ha;
+  const dh = ((((Hb - Ha + 180) % 360) + 360) % 360) - 180;
+  return fromOklch(La + (Lb - La) * t, Ca + (Cb - Ca) * t, Ha + dh * t);
+}
+const lum = h => { const [r, g, b] = hexRgb(h).map(lin); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+const wcag = (x, y) => { const [a, b] = [lum(x), lum(y)].sort((p, q) => q - p); return (a + 0.05) / (b + 0.05); };
+function apca(t, bg) {
+  const Y = h => { const [r, g, b] = hexRgb(h); const y = 0.2126729 * r ** 2.4 + 0.7151522 * g ** 2.4 + 0.0721750 * b ** 2.4;
+    return y < 0.022 ? y + (0.022 - y) ** 1.414 : y; };
+  const yt = Y(t), yb = Y(bg);
+  if (Math.abs(yb - yt) < 0.0005) return 0;
+  if (yb > yt) { const s = (yb ** 0.56 - yt ** 0.57) * 1.14; return s < 0.1 ? 0 : (s - 0.027) * 100; }
+  const s = (yb ** 0.65 - yt ** 0.62) * 1.14; return s > -0.1 ? 0 : -(s + 0.027) * 100;
+}
+function setLc(c, bg, target) {
+  const [, C, H] = toOklch(c); let lo = 0, hi = 1;
+  for (let i = 0; i < 40; i++) { const mid = (lo + hi) / 2; if (apca(fromOklch(mid, C, H), bg) < target) lo = mid; else hi = mid; }
+  return fromOklch(hi, C, H);
+}
+function blend(tbg, tfg, tacc) {
+  const base = {};
+  D.bgRoles.forEach(r => base[r] = mix(D.src.base[r], D.dst.base[r], tbg));
+  D.fgRoles.forEach(r => base[r] = mix(D.src.base[r], D.dst.base[r], tfg));
+  const bg = base.base;
+  if (apca(base.overlay, bg) < D.commentLc) base.overlay = setLc(base.overlay, bg, D.commentLc);
+  const accent = {}, bright = {};
+  const [lo, hi] = D.accentLc;
+  D.roles.accent.forEach(r => {
+    let c = mix(D.src.accent[r], D.dst.accent[r], tacc);
+    const lc = apca(c, bg);
+    if (lc < lo || lc > hi) c = setLc(c, bg, Math.min(Math.max(lc, lo), hi));
+    accent[r] = c;
+    bright[r] = setLc(c, bg, apca(c, bg) + D.brightDelta);
+  });
+  return { base, accent, accent_bright: bright };
+}
+function failures(pal) {
+  const out = [];
+  for (const [kind, fg, bg, lo, hi, why] of D.rules) {
+    const [g1, r1] = fg.split('.'), [g2, r2] = bg.split('.');
+    const v = (kind === 'WCAG' ? wcag : apca)(pal[g1][r1], pal[g2][r2]);
+    if (v < lo || (hi !== null && v > hi)) out.push(`${kind} ${fg} on ${bg} = ${v.toFixed(1)} (want >= ${lo}${hi !== null ? ' and <= ' + hi : ''}; ${why})`);
+  }
+  const lcs = D.roles.accent.map(r => apca(pal.accent[r], pal.base.base));
+  const spread = Math.max(...lcs) - Math.min(...lcs);
+  if (spread > D.spreadMax) out.push(`APCA accent spread = ${spread.toFixed(1)} (want <= ${D.spreadMax})`);
+  return { out, spread };
+}
+const sec = document.getElementById('dial');
+const inputs = ['bg', 'fg', 'acc'].map(k => [document.getElementById('d-' + k), document.getElementById('o-' + k)]);
+function swatchHtml(hex, label, on) {
+  return `<div class="sw" style="--sw:${hex}"><span class="sw-chip"></span><span class="sw-name">${label}</span>` +
+    `<code class="sw-hex">${hex}</code><span class="sw-cr">${wcag(hex, on).toFixed(1)}:1 · Lc ${apca(hex, on).toFixed(0)}</span></div>`;
+}
+function toml(pal, t) {
+  const lines = ['[meta]', 'name = "Custom blend"', 'tagline = ""',
+    `blend = "${D.srcName} -> ${D.dstName}: bg ${t[0]}, fg ${t[1]}, accent ${t[2]}"`,
+    `border_gradient = ["${D.gradient[0]}", "${D.gradient[1]}"]`, `cursor = "${D.cursor}"`];
+  for (const g of ['base', 'accent', 'accent_bright']) {
+    const w = Math.max(...D.roles[g].map(r => r.length));
+    lines.push('', `[${g}]`, ...D.roles[g].map(r => `${r.padEnd(w)} = "${pal[g][r]}"`));
+  }
+  const cmd = `# python3 tools/blend.py colors/proposals/round1/${D.srcName}.toml colors/proposals/round1/${D.dstName}.toml ` +
+    `--bg ${t[0]} --fg ${t[1]} --accent ${t[2]} --gradient ${D.gradient[0]} ${D.gradient[1]} --cursor ${D.cursor}`;
+  return cmd + '\n' + lines.join('\n') + '\n';
+}
+function update() {
+  const t = inputs.map(([i, o]) => { o.value = i.value + '%'; return +(i.value / 100).toFixed(2); });
+  const pal = blend(...t);
+  const set = (k, v) => sec.style.setProperty(k, v);
+  for (const [k, v] of Object.entries(pal.base)) set('--p-' + k, v);
+  for (const [k, v] of Object.entries(pal.accent)) set('--p-' + k, v);
+  for (const [k, v] of Object.entries(pal.accent_bright)) set('--pb-' + k, v);
+  set('--p-g0', pal.accent[D.gradient[0]]); set('--p-g1', pal.accent[D.gradient[1]]); set('--p-cursor', pal.accent[D.cursor]);
+  for (const el of sec.querySelectorAll('.sws')) {
+    const g = el.dataset.group;
+    el.innerHTML = D.roles[g].map(r => swatchHtml(pal[g][r], r, pal.base.base)).join('');
+  }
+  const b = pal.base, a = pal.accent, ab = pal.accent_bright;
+  const ansi = [b.surface1, a.red, a.green, a.yellow, a.blue, a.purple, a.cyan, b.subtext,
+                b.overlay, ab.red, ab.green, ab.yellow, ab.blue, ab.purple, ab.cyan, b.bright];
+  sec.querySelector('.ansi').innerHTML = ansi.map((c, i) => `<span class="ab" style="background:${c}" title="color${i} ${c}"></span>`).join('');
+  const { out, spread } = failures(pal);
+  const v = document.getElementById('dial-verdict');
+  v.textContent = out.length ? `${out.length} rule(s) fail at this point` : `All ${D.rules.length + 1} rules pass`;
+  v.className = 'verdict ' + (out.length ? 'bad' : 'ok');
+  document.getElementById('dial-rules').innerHTML = out.map(m => `<li>${m}</li>`).join('');
+  sec.querySelector('.cr-note').textContent =
+    `Contrast against base ${b.base}: body text ${wcag(b.text, b.base).toFixed(1)}:1 / Lc ${apca(b.text, b.base).toFixed(0)} · ` +
+    `comments ${wcag(b.overlay, b.base).toFixed(1)}:1 / Lc ${apca(b.overlay, b.base).toFixed(0)} · accent lightness spread Lc ${spread.toFixed(0)}.`;
+  document.getElementById('toml-dial').textContent = toml(pal, t);
+}
+function reset() { inputs.forEach(([i], n) => i.value = Math.round(D.defaults[n] * 100)); update(); }
+inputs.forEach(([i]) => i.addEventListener('input', update));
+document.getElementById('d-reset').addEventListener('click', reset);
+reset();
+})();
 </script>
 </body></html>

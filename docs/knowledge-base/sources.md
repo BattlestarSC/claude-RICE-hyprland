@@ -9,8 +9,21 @@ Retrieved 2026-10-29 unless noted. "Primary" = upstream source or upstream docum
 | `hyprwm/hyprland-wiki` @ `main` (last commit 2026-10-29 "naming-conventions: better explanation for params (#1681)") | Lua config path, `require` semantics, error behavior, binds, dispatchers, rules, events, hyprctl Lua syntax, ecosystem tool config formats | `git clone --depth 1 https://github.com/hyprwm/hyprland-wiki` → `content/` |
 | `hyprwm/Hyprland` tag `v0.57.0` | `example/hyprland.lua` (canonical API usage), Lua 5.5 requirement (`CMakeLists.txt`), CLI flags incl. `--verify-config`, `--version-json` (`src/main.cpp`) | `git clone --depth 1 --branch v0.57.0 https://github.com/hyprwm/Hyprland` |
 | `kovidgoyal/kitty` @ `master` (2026-10-29) | Option names/defaults: `auto_reload_config`, `background_blur`, `background_opacity`, `cursor_trail`, `shell_integration`, `tab_bar_style`, `reload_config_file` | `kitty/options/definition.py` |
+| `hyprwm/Hyprland` `v0.57.0` `src/state/FallbackState.cpp`, `src/state/workspace/LifecyclePolicy.cpp`, `LifecyclePolicyAdapter.cpp` | Monitor hot-unplug: `FALLBACK` headless output, workspace return keyed by connector name | sparse checkout `src/state` |
+| `davatorium/rofi` @ `master` (2026-10-29) | Wayland layer surface namespace `rofi`, anchored to all edges; rasi gradients, `url()` images, box widgets; default placeholder and drun format | `doc/rofi-theme.5.markdown`, `doc/default_theme.rasi`, `source/wayland/display.c` |
+| `sddm/sddm` @ `develop` (2026-10-20) | `DisplayServer` default `x11`; Wayland `CompositorCommand` default `weston --shell=kiosk`; `EnableHiDPI` default true; Wayland greeter "experimental" | `src/common/Configuration.h`, `ChangeLog` |
+| APCA-W3 0.0.98G constants | `tools/palette.py` `apca()`; checked against reference values (`#888` on `#fff` = 63.06, `#fff` on `#888` = −68.54) | |
 
 ## Secondary (not independently confirmed)
+
+| Source | Claim |
+| --- | --- |
+| [rofi 2.0.0 release (newreleases.io)](https://newreleases.io/project/github/davatorium/rofi/release/2.0.0) | 2025-09-01; Wayland port merged into mainline; meson only; no IMDKit on Wayland |
+| [archlinux.org: quickshell](https://archlinux.org/packages/extra/x86_64/quickshell/) | `quickshell` 0.3.1 in `extra` |
+| [archlinux.org: blender](https://archlinux.org/packages/extra/x86_64/blender/), [ArchWiki: Blender](https://wiki.archlinux.org/title/Blender) | `hip-runtime-amd` and `hiprt` optdepends; GFX9/CDNA/RDNA supported; HIP viewport issues |
+| [noctalia-qs AUR](https://aur.archlinux.org/packages/noctalia-qs?all_deps=1) | Quickshell-based shells crashing when quickshell isn't rebuilt after Qt updates (motivation for a fork) |
+
+## Secondary, round 1
 
 | Source | Claim |
 | --- | --- |

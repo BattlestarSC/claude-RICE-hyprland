@@ -41,41 +41,56 @@ would make us revisit it. Open entries list a recommendation; they need the owne
   translucency are for chrome (bar, launcher, notifications). Motion blur off. Wobble off.
 - **Revisit if:** the owner wants a showier default; effects stay one toggle away either way.
 
+### D7. Session start: SDDM (owner's call, 2026-10-29)
+
+- Graphical login via SDDM. Greeter on X11 in v1 (SDDM's default, most tested; requires
+  `xorg-server`), Wayland greeter via weston documented as an option (upstream still calls it
+  experimental). Space-themed SDDM QML theme is a Phase 3 sub-project.
+  Details: [knowledge-base/hardware.md](knowledge-base/hardware.md#sddm).
+- **Consequence:** the TTY auto-start in `~/.zprofile` is dropped; enabling SDDM is a prompted system change.
+
+### D8. Primary hardware target (owner's machine, 2026-10-29)
+
+- AMD GPU; two 27" 4K ASUS ProArt panels through a KVM whose outputs disappear on switch;
+  Blender with HIP/ROCm. NVIDIA is out of scope beyond a detection warning.
+- Monitors configured by EDID description at scale 1.5; workspaces bound to monitors in config
+  so they survive KVM switches; ROCm is an opt-in installer step.
+  Details: [knowledge-base/hardware.md](knowledge-base/hardware.md).
+
+### D9. Palette contrast rules include APCA (round 2)
+
+- **Why:** the owner found Event Horizon more readable and Pulsar more comfortable, the
+  opposite of what WCAG ratios predict. APCA explains it: Pulsar's text is past the glare
+  threshold (Lc 95) and its accents span Lc 47–82, so some tokens glare while others recede.
+  Rules now cap text at Lc 92, require comments ≥ Lc 45, and limit accent spread to Lc 18.
+  See [colors/proposals.md](colors/proposals.md).
+
+### D10. Palette: Quasar (owner's call, 2026-10-29)
+
+- `colors/proposals/round2/quasar.toml`: Pulsar ↔ Event Horizon blend (background 30%, text 55%,
+  accents 40% toward Event Horizon), accents clamped to APCA Lc 58–74. Passes all 42 rules.
+- Next step: promote it to `colors/quasar.toml` as the single source of truth when the theme
+  generator lands (Phase 1). Fine-tuning stays possible via the blend dial.
+
 ## Open
 
-### O1. Color scheme
+### O3. Status bar: Quickshell vs waybar (next topic)
 
-Four proposals in [colors/proposals.md](colors/proposals.md).
-**Recommendation: Nebula.** Blends are possible.
+The owner is interested in Quickshell. Inputs so far: Arch `extra` ships `quickshell` 0.3.1 [S];
+per-screen instances suit the KVM hotplug case [BK]; it is a QML framework, so the bar is written
+rather than configured. waybar is the configured alternative with a weaker hotplug record [BK].
+To be researched properly before deciding.
 
-### O2. How the session starts
+### O4. Launcher: rofi (proposed), concept pending
 
-| Option | Notes |
-| --- | --- |
-| **TTY + auto `start-hyprland` on VT1 (recommended)** | zero extra packages, no `/etc` changes |
-| greetd + tuigreet | small, Wayland-native; needs `/etc/greetd/config.toml` + service |
-| SDDM | heavier, separate theming effort |
-
-### O3. Status bar
-
-**Recommendation: waybar.** In `extra`, CSS-themed (direct palette mapping), mature, Hyprland
-workspace module. Alternatives: a Quickshell/AGS shell (far more work, AUR-heavy), or none.
-
-### O4. Launcher
-
-| Option | Notes |
-| --- | --- |
-| hyprlauncher | native, themed by `hyprtoolkit.conf` (same file themes the polkit dialog); Hyprland's emergency bind expects it |
-| fuzzel | simple ini theming, very fast, dmenu mode for scripts (power menu, clipboard) |
-| rofi | most features and themes, heavier config |
-
-**Recommendation:** hyprlauncher for apps (one theme file covers several hypr tools) plus
-fuzzel in dmenu mode for scripted menus, if hyprlauncher lacks a dmenu mode. [TODO-verify]
+rofi 2.x for apps and as the `-dmenu` engine for scripted menus. Pick a concept from
+[launcher/concepts.html](launcher/concepts.html): **Glass** or **Rim** for apps, plus **Horizon
+line** for scripted menus. Details: [knowledge-base/launcher.md](knowledge-base/launcher.md).
 
 ### O5. Notifications
 
-**Recommendation: mako** (small, ini config, D-Bus activated). swaync if you want a
-notification center / control panel.
+**Recommendation: mako**; swaync if a notification center is wanted. Revisit with O3: a
+Quickshell bar can host notifications itself.
 
 ### O6. Deploy method: symlink into the repo vs copy
 
@@ -84,24 +99,33 @@ is moved or deleted. Copy is robust but makes updates explicit. **Blocked on** v
 Hyprland's config watcher reacts to edits through symlinks ([knowledge-base/hyprland.md](knowledge-base/hyprland.md)).
 Leaning symlink, with the installer recording the repo path and warning if it moves.
 
-### O7. NVIDIA scope for v1
-
-Detect and warn only, or automate driver + env setup? Automating is a large, hardware-specific
-surface. **Recommendation:** detect and warn in v1, automate in a later phase with hardware to test on.
-
 ### O8. Project name
 
-Used for state paths (`~/.local/state/<name>/`), the theme switcher command, and README. Needs a short
-lowercase name. Placeholder in docs: `<rice>`.
+Used for state paths (`~/.local/state/<name>/`), the theme switcher command, menu script
+prefixes and README. Needs a short lowercase name. Placeholder in docs: `<rice>`.
 
 ### O9. Scope beyond Hyprland + kitty + zsh for v1
 
-Candidates: neovim theme, btop, GTK/Qt theming, fastfetch, file manager (thunar/yazi), browser
-(none; only GTK dark preference). **Recommendation:** v1 = Hyprland, hyprlock, hypridle,
-hyprpaper, kitty, zsh + starship, waybar, launcher, notifications, GTK/Qt dark preference.
-Everything else in v2.
+**Recommendation:** v1 = Hyprland, hyprlock, hypridle, hyprpaper, kitty, zsh + starship, bar,
+rofi + menus, notifications, SDDM (stock theme), GTK/Qt dark preference. v2: SDDM theme,
+neovim/btop/fastfetch themes, Blender UI theme from the palette.
 
 ### O10. License
 
 No license yet. Without one, the repo is "all rights reserved" by default. MIT is the common
 choice for dotfiles.
+
+### O11. Keymap: i3-compatible?
+
+Coming from i3, the proposal is i3's defaults where Hyprland has an equivalent: `Super+Enter`
+terminal, `Super+D` launcher, `Super+Shift+Q` close, `Super+Shift+E` power menu,
+`Super+1..0` / `Super+Shift+1..0` workspaces, `Super+H/J/K/L` (and arrows) focus,
+`Super+Shift+H/J/K/L` move, `Super+F` fullscreen, `Super+Shift+Space` float. Did you use
+i3's `jkl;` or vim `hjkl`? Any custom i3 binds to carry over?
+
+### O12. Hardware details needed
+
+AMD GPU model (ROCm/HIP RT support), exact ProArt model (10-bit, gamut, refresh), KVM model and
+whether it is DisplayPort, and whether a dock/MST hub is in the chain.
+
+Closed: O1 → D10, O2 → D7, O7 → D8.

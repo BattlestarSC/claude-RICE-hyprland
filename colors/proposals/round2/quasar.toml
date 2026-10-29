@@ -1,0 +1,38 @@
+[meta]
+name = "Quasar"
+tagline = "Pulsar's dark base and Monokai hues, Event Horizon's softer text, accents evened out in perceived lightness."
+blend = "pulsar -> event-horizon: bg 0.3, fg 0.55, accent 0.4"
+border_gradient = ["red", "purple"]
+cursor = "yellow"
+
+[base]
+crust    = "#0F0E14"
+mantle   = "#14131A"
+base     = "#191820"
+surface0 = "#23212C"
+surface1 = "#2C2B38"
+surface2 = "#3F3D50"
+overlay  = "#9D99AD"
+subtext  = "#BAB6C6"
+text     = "#E4E0E9"
+bright   = "#F3F1F6"
+
+[accent]
+red    = "#FD8DA8"
+orange = "#F69C56"
+yellow = "#DCCD77"
+green  = "#A6DA64"
+cyan   = "#78D3E3"
+blue   = "#88AFFD"
+purple = "#BEA0FE"
+pink   = "#FB89CD"
+
+[accent_bright]
+red    = "#FFA7BA"
+orange = "#FEB076"
+yellow = "#EBDC85"
+green  = "#B5EA73"
+cyan   = "#87E3F3"
+blue   = "#A0C0FD"
+purple = "#CBB5FE"
+pink   = "#FDA4D7"

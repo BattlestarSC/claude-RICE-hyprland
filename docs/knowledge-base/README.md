@@ -22,6 +22,8 @@ Every non-trivial claim carries one of these labels. Keep them accurate when edi
 | [hyprland.md](hyprland.md) | Hyprland 0.57: Lua-only config, API surface, binds, rules, hyprctl, pitfalls. **Read this first.** |
 | [hypr-ecosystem.md](hypr-ecosystem.md) | hyprlock, hypridle, hyprpaper, hyprtoolkit, hyprlauncher, hyprpolkitagent, XDPH. These still use hyprlang `.conf`. |
 | [arch-install.md](arch-install.md) | Vanilla Arch assumptions, package strategy, session startup, installer design constraints. |
+| [hardware.md](hardware.md) | The owner's machine: dual 4K ProArt via KVM (hot-unplug behavior from Hyprland source), AMD + ROCm/HIP, SDDM. |
+| [launcher.md](launcher.md) | rofi 2.x on Wayland: layer-surface facts, rasi capabilities and limits, menu layout. |
 | [kitty.md](kitty.md) | Kitty config keys relevant to theming, reload behavior, Hyprland interplay. |
 | [zsh.md](zsh.md) | Zsh setup without a framework, plugin sourcing on Arch, prompt, ANSI-color dependencies. |
 | [theming.md](theming.md) | How one palette reaches every app: Hyprland, kitty, zsh, GTK, Qt, cursors, fonts. |
