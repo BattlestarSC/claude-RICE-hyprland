@@ -65,7 +65,8 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 | Wallpaper | hyprpaper | |
 | Login | SDDM | X11 greeter in v1; themed later |
 | Bar | Quickshell or waybar (next decision) | [O3](docs/decisions.md#o3-status-bar-quickshell-vs-waybar-next-topic) |
-| Launcher + menus | rofi 2.x (native Wayland), `rofi -dmenu` scripts | [concepts](docs/launcher/concepts.html), [O4](docs/decisions.md#o4-launcher-rofi-proposed-concept-pending) |
+| Launcher + menus | rofi 2.x or Quickshell (depends on concept), `rofi -dmenu` scripts | [concepts](docs/launcher/concepts.html), [O4](docs/decisions.md#o4-launcher-concept-pending-round-2-six-concepts) |
+| Wallpaper art | generated from the palette (`tools/spacegen.py`) | |
 | Notifications | mako (proposed) | [O5](docs/decisions.md#o5-notifications) |
 | Blender GPU | ROCm / HIP (`hip-runtime-amd`, `hiprt`) | opt-in |
 | Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing, file picker |
@@ -101,7 +102,8 @@ tools/                    dev only (Python 3.11+); the installer never uses thes
 ├── palette.py            color math, WCAG + APCA contrast rules, reports
 ├── blend.py              OKLCH blend of two palettes, normalized to the rules
 ├── preview.py            renders docs/colors/preview.html
-└── launcher_preview.py   renders docs/launcher/concepts.html
+├── launcher_preview.py   renders docs/launcher/concepts.html
+└── spacegen.py           palette-colored space art (SVG): wallpaper, starfields, planets
 ```
 
 The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout-target-create-directories-as-phases-need-them).

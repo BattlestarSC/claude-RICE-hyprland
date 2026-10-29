@@ -19,6 +19,7 @@ themes/<palette>/
   ├── zsh/theme.zsh             → syntax-highlight styles, FZF_DEFAULT_OPTS
   ├── waybar/colors.css         → @define-color ...
   ├── starship/palette.toml
+  ├── art/*.svg                 → tools/spacegen.py: wallpaper, panel starfield, planets (seeded)
   ├── gtk/colors.css            → GTK3/4 @define-color overrides (libadwaita-compatible names)
   └── ...                       (mako/swaync, btop, nvim, bat as they get added)
         │
@@ -26,6 +27,10 @@ themes/<palette>/
         ▼
 ~/.config/...                   (symlinks to the selected theme's files)
 ```
+
+Generated art is SVG (sharp at 4K, a few KB to ~50 KB). Consumers that need raster images (rofi
+`url()` through gdk-pixbuf, hyprpaper) get PNGs from `rsvg-convert` (package `librsvg`) at install
+time. Whether gdk-pixbuf in rofi loads SVG directly: [TODO-verify]; rasterizing avoids the question.
 
 ### Why render at dev time and commit the outputs
 

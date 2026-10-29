@@ -81,11 +81,15 @@ per-screen instances suit the KVM hotplug case [BK]; it is a QML framework, so t
 rather than configured. waybar is the configured alternative with a weaker hotplug record [BK].
 To be researched properly before deciding.
 
-### O4. Launcher: rofi (proposed), concept pending
+### O4. Launcher: concept pending (round 2: six concepts)
 
-rofi 2.x for apps and as the `-dmenu` engine for scripted menus. Pick a concept from
-[launcher/concepts.html](launcher/concepts.html): **Glass** or **Rim** for apps, plus **Horizon
-line** for scripted menus. Details: [knowledge-base/launcher.md](knowledge-base/launcher.md).
+Round 1 (Glass, Rim, Horizon line): owner liked Rim but wanted icons, and brought two references
+(a retro TUI menu, Aylur's "Globes"). Round 2 in [launcher/concepts.html](launcher/concepts.html):
+Halo, Orbit, Mission Control (no retro); Terminal Vision, Flight Deck, Waypoint (strong → light retro).
+**Engine follows the pick:** Mission Control or a faithful Terminal Vision mean Quickshell (and then
+the bar is Quickshell too, settling O3); the others are rofi. `rofi -dmenu` stays for scripts regardless.
+Recommendation: **Waypoint** if staying on rofi (it is the requested middle ground); **Mission Control**
+if the bar goes Quickshell. Details: [knowledge-base/launcher.md](knowledge-base/launcher.md).
 
 ### O5. Notifications
 

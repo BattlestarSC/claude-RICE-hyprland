@@ -7,6 +7,13 @@ and `{name} [<i>({generic})</i>]` row format are rofi defaults [V: rofi `doc/def
 `doc/rofi.1.markdown`]). Proposed: rofi for app launching **and** as the `-dmenu` engine for all
 scripted menus. Concepts: [docs/launcher/concepts.html](../launcher/concepts.html).
 
+Round 2 (2026-10-29): the owner liked Rim (but wanted icons), a retro TUI-style menu (appears to
+be Quickshell; quick settings and `--->` submenus inside the launcher list, hotkey letters, hard
+offset shadow) and Aylur's "Globes" (Hyprland Hall of Fame #2, built with AGS: icons with
+descriptions, quick-settings panel, planets on the wallpaper). Six concepts now: Halo, Orbit,
+Mission Control (no retro), Terminal Vision, Flight Deck, Waypoint (strong → light retro).
+Mission Control and a faithful Terminal Vision need Quickshell; the rest are rofi.
+
 ## Facts
 
 Verified against `davatorium/rofi` master on 2026-10-29 unless noted.
@@ -39,6 +46,19 @@ Verified against `davatorium/rofi` master on 2026-10-29 unless noted.
   painting the gradient on `window` and inset an opaque `mainbox` (padding = frame width). A
   translucent `mainbox` would reveal the gradient, not the blurred desktop. Hence the two concepts
   "Glass" (translucent, gradient bar only) and "Rim" (gradient frame, opaque body).
+- **Script mode rows** can carry `icon`, `meta` (hidden search terms), `nonselectable` (section
+  headers) and `info` (passed back as `ROFI_INFO`) via `\0key\x1fvalue` suffixes. [V: `doc/rofi-script.5.markdown`]
+  This is how quick-settings rows, section headers and submenus inside the list are built.
+- **Pango markup** in rows (`-markup-rows`) and in `drun-display-format`: bold names, a dim second
+  line, coloured or underlined hotkey letters. [V: `doc/rofi.1.markdown`]
+- **Decorative image widget:** `icon-<name> { filename: "/path/or/icon-name"; size: N }`; `squared`
+  and `tint` properties exist. Used for the generated planet in Orbit. [V: `rofi-theme.5` "Icon"]
+- **Border styles** are only `solid` and `dash`; a double-line frame needs two nested boxes. [V]
+- **Hotkey letters:** typing filters the list, so a marked letter is a hint. Real one-key
+  accelerators need `kb-custom-1..19` bindings that a script maps (exit codes 10–28) [BK], or Quickshell.
+- **Hard offset shadow** (retro look): no shadow property; approximate with nested boxes, one offset
+  by padding. Renders as intended: [TODO-verify]. For windows, Hyprland can draw retro hard shadows
+  itself: `decoration.shadow = { sharp = true, offset = {8, 8} }`. [V: option names in `config-options.md`]
 - **Monitor selection:** rofi should open on the focused output. Wayland behavior of `-m` with
   Hyprland: [TODO-verify]. Matters on the dual-monitor setup.
 - **Window switcher mode** on Hyprland (needs foreign-toplevel protocol): [TODO-verify]; fallback
@@ -53,7 +73,8 @@ Verified against `davatorium/rofi` master on 2026-10-29 unless noted.
 ├── apps.rasi            # chosen app-launcher concept (glass or rim), @import "colors.rasi"
 ├── horizon.rasi         # dmenu strip for scripts, @import "colors.rasi"
 └── local.rasi           # user overrides, @import-ed last if present
-~/.local/share/<rice>/rofi/starfield.png   # generated (Rim concept only)
+~/.local/share/<rice>/art/                 # spacegen.py output rasterized by rsvg-convert at install:
+                                           #   starfield.png (panel), planet.png, wallpaper-3840x2160.png
 ~/.local/bin/rice-menu-*                    # scripted menus: power, clipboard, screenshot, monitors, keys
 ```
 
@@ -65,4 +86,4 @@ Verified against `davatorium/rofi` master on 2026-10-29 unless noted.
 | fuzzel | fast, has dmenu mode, but ini theming is flat colors + one border; can't do the space look |
 | wofi | effectively unmaintained [BK] |
 | walker / anyrun | GTK-based, flexible, but AUR-dependent [BK] and not dmenu-script compatible out of the box |
-| Quickshell (QML) | could draw anything (animated starfield, shaders). Revisit if the bar moves to Quickshell; rofi stays as the `-dmenu` engine for scripts either way. Arch `extra` has `quickshell` 0.3.1 [S]. |
+| Quickshell (QML) | could draw anything (live quick settings, real accelerators, animated starfield). Required by concepts 3 and a faithful 4; picking one of those merges the launcher and bar decisions. rofi stays as the `-dmenu` engine for scripts either way. Arch `extra` has `quickshell` 0.3.1 [S]. |

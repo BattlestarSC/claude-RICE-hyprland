@@ -85,6 +85,7 @@ python3 tools/blend.py colors/proposals/round1/pulsar.toml colors/proposals/roun
     --bg 0.3 --fg 0.55 --accent 0.4 --name Quasar --gradient red purple --cursor yellow   # regenerates quasar.toml
 python3 tools/preview.py --standalone colors/proposals/round2/*.toml colors/proposals/round1/*.toml > docs/colors/preview.html
 python3 tools/launcher_preview.py --standalone colors/proposals/round2/quasar.toml > docs/launcher/concepts.html
+python3 tools/spacegen.py colors/proposals/round2/quasar.toml wallpaper 3840 2160 > wallpaper.svg   # also: starfield, planet
 ```
 
 Round-1 palettes fail the APCA rules by design (they predate them); only round 2 and later must pass.
