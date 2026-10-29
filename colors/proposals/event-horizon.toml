@@ -1,0 +1,37 @@
+[meta]
+name = "Event Horizon"
+tagline = "Lowest glare. Desaturated accents on warm graphite. For long sessions and dim rooms."
+border_gradient = ["purple", "pink"]
+cursor = "subtext"
+
+[base]
+crust    = "#17161B"
+mantle   = "#1C1B21"
+base     = "#212026"
+surface0 = "#2A2930"
+surface1 = "#323139"
+surface2 = "#47454F"
+overlay  = "#8E8A98"
+subtext  = "#B8B4C0"
+text     = "#DCD8E1"
+bright   = "#ECE9F0"
+
+[accent]
+red    = "#EC8597"
+orange = "#E6A684"
+yellow = "#E0CD90"
+green  = "#AACC90"
+cyan   = "#8DC9D2"
+blue   = "#98B0E4"
+purple = "#B8A6E0"
+pink   = "#DE9EC6"
+
+[accent_bright]
+red    = "#F2A0AE"
+orange = "#EDBBA0"
+yellow = "#E9DBAD"
+green  = "#BFD9AB"
+cyan   = "#A9D7DE"
+blue   = "#B1C3EB"
+purple = "#CBBDE9"
+pink   = "#E7B7D5"

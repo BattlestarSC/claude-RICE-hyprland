@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>body{margin:0}</style>
+</head><body>
+<title>Rice Palette Proposals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Unbounded:wght@600&display=swap">
+<style>
+:root{
+  /* Layout: a quiet neutral frame; each proposal renders full-bleed in its own palette. */
+  --frame-bg:#0F0F13; --frame-fg:#D9D8DF; --frame-dim:#8F8D9A; --frame-line:#25242D; --frame-accent:#B9A7F2;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Menlo,monospace;
+  color-scheme:dark;
+}
+body{background:var(--frame-bg);color:var(--frame-fg);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-block:40px 24px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(26px,4vw,40px);letter-spacing:-.01em;margin:0 0 8px;text-wrap:balance}
+.lede{max-width:68ch;color:var(--frame-dim);margin:0 0 24px}
+.lede strong{color:var(--frame-fg);font-weight:500}
+a{color:var(--frame-accent)}
+code,kbd{font-family:var(--f-mono);font-size:.88em}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--frame-line);border-radius:8px}
+.sum{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+.sum th,.sum td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--frame-line);white-space:nowrap}
+.sum tbody tr:last-child td{border-bottom:0}
+.sum th{font-weight:500;color:var(--frame-dim);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sum .num{text-align:right;font-variant-numeric:tabular-nums}
+.sum a{text-decoration:none;font-weight:500}
+.dim{color:var(--frame-dim);font-size:12px}
+.mini{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:3px}
+.mini-bg{width:18px;outline:1px solid var(--frame-line);margin-right:8px}
+.chips{display:inline-flex;gap:2px;vertical-align:middle}
+.legend{color:var(--frame-dim);font-size:13px;margin:10px 0 0;max-width:80ch}
+
+.prop{background:var(--p-base);color:var(--p-text);border-top:1px solid var(--p-surface2)}
+.prop-in{max-width:1180px;margin:0 auto;padding-block:40px 44px;display:grid;gap:22px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.prop-head{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.prop h2{font-family:var(--f-display);font-weight:600;font-size:clamp(24px,3.4vw,34px);margin:0;color:var(--p-bright);letter-spacing:-.01em}
+.tag{margin:4px 0 0;color:var(--p-subtext);max-width:70ch}
+.rec{font-size:12px;text-transform:uppercase;letter-spacing:.08em;padding:6px 10px;border-radius:999px;
+  background:var(--p-g0);color:var(--p-crust);font-weight:600}
+
+.desk{border-radius:12px;overflow:hidden;border:1px solid var(--p-surface0);
+  background:
+    radial-gradient(1px 1px at 12% 30%,var(--p-subtext),transparent 60%),
+    radial-gradient(1px 1px at 68% 18%,var(--p-overlay),transparent 60%),
+    radial-gradient(1.5px 1.5px at 84% 64%,var(--p-subtext),transparent 60%),
+    radial-gradient(1px 1px at 33% 82%,var(--p-overlay),transparent 60%),
+    radial-gradient(1px 1px at 52% 46%,var(--p-overlay),transparent 60%),
+    radial-gradient(120% 90% at 85% 110%,color-mix(in srgb,var(--p-purple) 14%,transparent),transparent 60%),
+    radial-gradient(90% 70% at 0% 0%,color-mix(in srgb,var(--p-cyan) 8%,transparent),transparent 60%),
+    var(--p-crust)}
+.bar{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;
+  padding:6px 10px;background:color-mix(in srgb,var(--p-mantle) 92%,transparent);
+  border-bottom:1px solid var(--p-surface0);font-family:var(--f-mono);font-size:12.5px}
+.bar-l{display:flex;gap:4px}
+.ws{min-width:24px;text-align:center;padding:2px 6px;border-radius:6px;color:var(--p-overlay)}
+.ws-on{background:linear-gradient(45deg,var(--p-g0),var(--p-g1));color:var(--p-crust);font-weight:700}
+.bar-c{color:var(--p-subtext);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 160px;text-align:center}
+.bar-r{display:flex;gap:14px;flex-wrap:wrap}
+.clock{color:var(--p-text);font-weight:600}
+.wins{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px;padding:14px}
+.win{min-width:0;border-radius:10px;background:var(--p-base);overflow:hidden}
+.win-active{border:2px solid transparent;
+  background:linear-gradient(var(--p-base),var(--p-base)) padding-box,linear-gradient(45deg,var(--p-g0),var(--p-g1)) border-box;
+  box-shadow:0 10px 30px -10px color-mix(in srgb,var(--p-crust) 80%,transparent)}
+.win-inactive{border:2px solid var(--p-surface1)}
+.win-title{font-family:var(--f-mono);font-size:11.5px;color:var(--p-overlay);padding:6px 12px;background:var(--p-mantle);border-bottom:1px solid var(--p-surface0)}
+.term,.code{margin:0;padding:12px 14px;font-family:var(--f-mono);font-size:12.5px;line-height:1.6;overflow-x:auto;color:var(--p-text);background:var(--p-base)}
+.c-red{color:var(--p-red)} .c-orange{color:var(--p-orange)} .c-yellow{color:var(--p-yellow)} .c-green{color:var(--p-green)}
+.c-cyan{color:var(--p-cyan)} .c-blue{color:var(--p-blue)} .c-purple{color:var(--p-purple)} .c-pink{color:var(--p-pink)}
+.c-sugg{color:var(--p-overlay)}
+.cur{background:var(--p-cursor)}
+.ansi{display:flex;gap:3px;margin-top:8px;flex-wrap:wrap}
+.ab{width:18px;height:14px;border-radius:2px}
+.t-kw,.t-op{color:var(--p-red)} .t-str{color:var(--p-yellow)} .t-num{color:var(--p-purple)}
+.t-fn{color:var(--p-green)} .t-bi{color:var(--p-cyan)} .t-field{color:var(--p-orange)}
+.t-com{color:var(--p-overlay);font-style:italic}
+
+.ramps{display:grid;gap:18px}
+.ramp h3{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--p-subtext);margin:0 0 8px}
+.sws{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.sw{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto auto;column-gap:8px;align-items:center;
+  padding:6px;border-radius:8px;background:var(--p-mantle);border:1px solid var(--p-surface0);min-width:0}
+.sw-chip{grid-row:1 / span 3;width:28px;height:28px;border-radius:6px;background:var(--sw);outline:1px solid color-mix(in srgb,var(--p-text) 12%,transparent)}
+.sw-name{font-size:12px;color:var(--p-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw-hex{font-size:11px;color:var(--p-subtext)}
+.sw-cr{font-family:var(--f-mono);font-size:10.5px;color:var(--p-overlay);font-variant-numeric:tabular-nums}
+.sw-cr::after{content:":1"}
+.cr-note{margin:0;font-size:13px;color:var(--p-subtext)}
+.cr-note code{color:var(--p-text)}
+.kitty{border:1px solid var(--p-surface1);border-radius:8px;background:var(--p-mantle)}
+.kitty summary{cursor:pointer;padding:10px 14px;color:var(--p-text);font-weight:500}
+.kitty summary:focus-visible,.copy:focus-visible,a:focus-visible{outline:2px solid var(--p-g0, var(--frame-accent));outline-offset:2px}
+.kitty-body{padding:0 14px 14px;display:grid;gap:10px}
+.kitty-body p{margin:0;font-size:13px;color:var(--p-subtext)}
+.kitty pre{margin:0;padding:12px;border-radius:6px;background:var(--p-crust);color:var(--p-subtext);font-family:var(--f-mono);font-size:12px;overflow-x:auto;max-height:280px}
+kbd{padding:1px 5px;border-radius:4px;border:1px solid var(--p-surface2);background:var(--p-surface0);color:var(--p-text)}
+.copy{justify-self:start;font:500 13px var(--f-body);padding:7px 12px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--p-surface2);background:var(--p-surface0);color:var(--p-text)}
+.copy:hover{background:var(--p-surface1)}
+.foot{color:var(--frame-dim);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+<div class="wrap">
+  <h1>Rice Palette Proposals</h1>
+  <p class="lede">Four candidate color schemes for the Hyprland + Kitty + Zsh rice. All share Monokai's
+  role mapping (keywords red, functions green, strings yellow, numbers purple, builtins cyan,
+  parameters orange) on a dark, blue-violet "space" base. <strong>They differ in base hue, accent
+  saturation, and contrast.</strong> Every palette passes the same contrast rules
+  (<code>tools/palette.py check</code>); the mockups below use the real hex values.</p>
+  
+<div class="tbl-wrap"><table class="sum">
+<thead><tr><th>Proposal</th><th>Background</th><th>Accents</th>
+<th class="num">Text</th><th class="num">Comments</th><th class="num">Weakest accent</th></tr></thead>
+<tbody><tr><td><a href="#nebula">Nebula</a> ★</td><td><span class="mini mini-bg" style="background:#1C1B26"></span><code>#1C1B26</code></td><td><span class="chips"><span class="mini" style="background:#FF6E8A"></span><span class="mini" style="background:#FA9D6B"></span><span class="mini" style="background:#F2D57E"></span><span class="mini" style="background:#A9DC7A"></span><span class="mini" style="background:#7FD7E6"></span><span class="mini" style="background:#86ACFF"></span><span class="mini" style="background:#B79CF7"></span><span class="mini" style="background:#F590CF"></span></span></td><td class="num">13.2</td><td class="num">4.9</td><td class="num">6.4 <span class="dim">red</span></td></tr><tr><td><a href="#deep-field">Deep Field</a></td><td><span class="mini mini-bg" style="background:#131727"></span><code>#131727</code></td><td><span class="chips"><span class="mini" style="background:#FF7891"></span><span class="mini" style="background:#FFA46E"></span><span class="mini" style="background:#F5D67B"></span><span class="mini" style="background:#8EDB95"></span><span class="mini" style="background:#6FD9E4"></span><span class="mini" style="background:#7DABFF"></span><span class="mini" style="background:#A99CFF"></span><span class="mini" style="background:#F28FCB"></span></span></td><td class="num">14.4</td><td class="num">5.2</td><td class="num">7.1 <span class="dim">red</span></td></tr><tr><td><a href="#event-horizon">Event Horizon</a></td><td><span class="mini mini-bg" style="background:#212026"></span><code>#212026</code></td><td><span class="chips"><span class="mini" style="background:#EC8597"></span><span class="mini" style="background:#E6A684"></span><span class="mini" style="background:#E0CD90"></span><span class="mini" style="background:#AACC90"></span><span class="mini" style="background:#8DC9D2"></span><span class="mini" style="background:#98B0E4"></span><span class="mini" style="background:#B8A6E0"></span><span class="mini" style="background:#DE9EC6"></span></span></td><td class="num">11.5</td><td class="num">4.8</td><td class="num">6.4 <span class="dim">red</span></td></tr><tr><td><a href="#pulsar">Pulsar</a></td><td><span class="mini mini-bg" style="background:#16151D"></span><code>#16151D</code></td><td><span class="chips"><span class="mini" style="background:#FF5E95"></span><span class="mini" style="background:#FD971F"></span><span class="mini" style="background:#E6DB74"></span><span class="mini" style="background:#A6E22E"></span><span class="mini" style="background:#66D9EF"></span><span class="mini" style="background:#6FA3FF"></span><span class="mini" style="background:#AE81FF"></span><span class="mini" style="background:#FF6AC1"></span></span></td><td class="num">15.4</td><td class="num">4.8</td><td class="num">6.3 <span class="dim">red</span></td></tr></tbody></table></div>
+  <p class="legend">Contrast is the WCAG ratio against each palette's own background. Body text is capped
+  near 15:1 on purpose: pure white on black (21:1) causes halation on dark themes. Comments sit at
+  4.5:1 or above, where classic Monokai's comment color is about 3:1.</p>
+</div>
+
+<section class="prop" id="nebula" style="--p-crust:#121119;--p-mantle:#17161F;--p-base:#1C1B26;--p-surface0:#252433;--p-surface1:#302E42;--p-surface2:#423F59;--p-overlay:#8A86A6;--p-subtext:#B8B4CC;--p-text:#E4E1EE;--p-bright:#F4F2F9;--p-red:#FF6E8A;--p-orange:#FA9D6B;--p-yellow:#F2D57E;--p-green:#A9DC7A;--p-cyan:#7FD7E6;--p-blue:#86ACFF;--p-purple:#B79CF7;--p-pink:#F590CF;--pb-red:#FF8DA3;--pb-orange:#FFB38A;--pb-yellow:#F8E3A2;--pb-green:#BFE899;--pb-cyan:#A0E4EF;--pb-blue:#A5C1FF;--pb-purple:#CAB6FA;--pb-pink:#F8AEDC;--p-g0:#7FD7E6;--p-g1:#B79CF7;--p-cursor:#7FD7E6">
+  <div class="prop-in">
+    <header class="prop-head">
+      <div>
+        <h2>Nebula</h2>
+        <p class="tag">Monokai Pro accents on a violet-tinted deep-space base. Balanced default.</p>
+      </div>
+      <span class="rec">Recommended starting point</span>
+    </header>
+    <div class="desk">
+      
+<div class="bar">
+  <div class="bar-l"><span class="ws">1</span><span class="ws ws-on">2</span><span class="ws">3</span><span class="ws">4</span><span class="ws">5</span></div>
+  <div class="bar-c">kitty — ~/claude-RICE-hyprland</div>
+  <div class="bar-r">
+    <span class="c-cyan">CPU 12%</span><span class="c-purple">MEM 3.1G</span>
+    <span class="c-green">VOL 45%</span><span class="c-yellow">BAT 82%</span>
+    <span class="clock">23:41</span>
+  </div>
+</div>
+      <div class="wins">
+<div class="win win-active">
+  <div class="win-title">kitty — ~/claude-RICE-hyprland</div>
+  <pre class="term"><span class="c-blue">~/claude-RICE-hyprland</span> <span class="c-purple">on  main</span> <span class="c-green">✓</span>
+<span class="c-green">❯</span> ls
+<span class="c-blue">colors</span>  <span class="c-blue">docs</span>  <span class="c-blue">tools</span>  CLAUDE.md  README.md  <span class="c-green">install.sh</span>
+<span class="c-green">❯</span> git log --oneline -3
+<span class="c-yellow">3f9c2e1</span> (<span class="c-cyan">HEAD -&gt; main</span>) colors: add palette proposals
+<span class="c-yellow">a07d4b8</span> docs: knowledge base for Hyprland 0.57 Lua config
+<span class="c-yellow">0c11e92</span> Initial commit
+<span class="c-green">❯</span> sudo pacman -S kitty
+<span class="c-red">error:</span> target not found: kity  <span class="c-orange">warning:</span> 2 packages held
+<span class="c-green">❯</span> hyprctl ver<span class="c-sugg">sion | head -n1</span><span class="cur"> </span>
+<span class="ansi"><span class="ab" style="background:#302E42" title="color0 #302E42"></span><span class="ab" style="background:#FF6E8A" title="color1 #FF6E8A"></span><span class="ab" style="background:#A9DC7A" title="color2 #A9DC7A"></span><span class="ab" style="background:#F2D57E" title="color3 #F2D57E"></span><span class="ab" style="background:#86ACFF" title="color4 #86ACFF"></span><span class="ab" style="background:#B79CF7" title="color5 #B79CF7"></span><span class="ab" style="background:#7FD7E6" title="color6 #7FD7E6"></span><span class="ab" style="background:#B8B4CC" title="color7 #B8B4CC"></span><span class="ab" style="background:#8A86A6" title="color8 #8A86A6"></span><span class="ab" style="background:#FF8DA3" title="color9 #FF8DA3"></span><span class="ab" style="background:#BFE899" title="color10 #BFE899"></span><span class="ab" style="background:#F8E3A2" title="color11 #F8E3A2"></span><span class="ab" style="background:#A5C1FF" title="color12 #A5C1FF"></span><span class="ab" style="background:#CAB6FA" title="color13 #CAB6FA"></span><span class="ab" style="background:#A0E4EF" title="color14 #A0E4EF"></span><span class="ab" style="background:#F4F2F9" title="color15 #F4F2F9"></span></span></pre>
+</div>
+<div class="win win-inactive">
+  <div class="win-title">nvim — hyprland.lua</div>
+  <pre class="code"><span class="cl"></span><span class="t-com">-- ~/.config/hypr/theme/colors.lua is generated from the palette</span>
+<span class="t-kw">local</span> <span class="t-field">c</span> <span class="t-op">=</span> <span class="t-bi">require</span>(<span class="t-str">&quot;theme.colors&quot;</span>)
+
+<span class="t-bi">hl</span>.<span class="t-bi">config</span>({
+    <span class="t-field">general</span> <span class="t-op">=</span> {
+        <span class="t-field">gaps_in</span>     <span class="t-op">=</span> <span class="t-num">6</span>,
+        <span class="t-field">border_size</span> <span class="t-op">=</span> <span class="t-num">2</span>,
+        <span class="t-field">col</span> <span class="t-op">=</span> {
+            <span class="t-field">active_border</span>   <span class="t-op">=</span> { <span class="t-field">colors</span> <span class="t-op">=</span> { c.cyan, c.purple }, <span class="t-field">angle</span> <span class="t-op">=</span> <span class="t-num">45</span> },
+            <span class="t-field">inactive_border</span> <span class="t-op">=</span> c.surface1,
+        },
+    },
+    <span class="t-field">decoration</span> <span class="t-op">=</span> { <span class="t-field">rounding</span> <span class="t-op">=</span> <span class="t-num">10</span>, <span class="t-field">active_opacity</span> <span class="t-op">=</span> <span class="t-num">1.0</span> },
+})
+
+<span class="t-kw">for</span> <span class="t-field">i</span> <span class="t-op">=</span> <span class="t-num">1</span>, <span class="t-num">9</span> <span class="t-kw">do</span>
+    <span class="t-bi">hl</span>.<span class="t-bi">bind</span>(<span class="t-str">&quot;SUPER + &quot;</span> <span class="t-op">..</span> i, <span class="t-bi">hl</span>.<span class="t-bi">dsp</span>.<span class="t-fn">focus</span>({ <span class="t-field">workspace</span> <span class="t-op">=</span> i }))
+<span class="t-kw">end</span></pre>
+</div></div>
+    </div>
+    <div class="ramps">
+      <div class="ramp"><h3>Base ramp</h3><div class="sws"><div class="sw" style="--sw:#121119"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#121119</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#17161F"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#17161F</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#1C1B26"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#1C1B26</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#252433"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#252433</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#302E42"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#302E42</code><span class="sw-cr">1.3</span></div><div class="sw" style="--sw:#423F59"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#423F59</code><span class="sw-cr">1.7</span></div><div class="sw" style="--sw:#8A86A6"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8A86A6</code><span class="sw-cr">4.9</span></div><div class="sw" style="--sw:#B8B4CC"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B8B4CC</code><span class="sw-cr">8.5</span></div><div class="sw" style="--sw:#E4E1EE"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#E4E1EE</code><span class="sw-cr">13.2</span></div><div class="sw" style="--sw:#F4F2F9"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#F4F2F9</code><span class="sw-cr">15.3</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws"><div class="sw" style="--sw:#FF6E8A"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF6E8A</code><span class="sw-cr">6.4</span></div><div class="sw" style="--sw:#FA9D6B"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FA9D6B</code><span class="sw-cr">8.2</span></div><div class="sw" style="--sw:#F2D57E"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F2D57E</code><span class="sw-cr">11.8</span></div><div class="sw" style="--sw:#A9DC7A"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#A9DC7A</code><span class="sw-cr">10.7</span></div><div class="sw" style="--sw:#7FD7E6"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#7FD7E6</code><span class="sw-cr">10.3</span></div><div class="sw" style="--sw:#86ACFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#86ACFF</code><span class="sw-cr">7.6</span></div><div class="sw" style="--sw:#B79CF7"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#B79CF7</code><span class="sw-cr">7.4</span></div><div class="sw" style="--sw:#F590CF"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F590CF</code><span class="sw-cr">7.9</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws"><div class="sw" style="--sw:#FF8DA3"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF8DA3</code><span class="sw-cr">7.8</span></div><div class="sw" style="--sw:#FFB38A"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFB38A</code><span class="sw-cr">9.8</span></div><div class="sw" style="--sw:#F8E3A2"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F8E3A2</code><span class="sw-cr">13.4</span></div><div class="sw" style="--sw:#BFE899"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BFE899</code><span class="sw-cr">12.3</span></div><div class="sw" style="--sw:#A0E4EF"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#A0E4EF</code><span class="sw-cr">12.0</span></div><div class="sw" style="--sw:#A5C1FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#A5C1FF</code><span class="sw-cr">9.5</span></div><div class="sw" style="--sw:#CAB6FA"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#CAB6FA</code><span class="sw-cr">9.4</span></div><div class="sw" style="--sw:#F8AEDC"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F8AEDC</code><span class="sw-cr">9.8</span></div></div></div>
+    </div>
+    <p class="cr-note">Numbers are WCAG contrast against <code>base</code> #1C1B26.
+      Body text 13.2:1 · comments 4.9:1 · weakest accent
+      <code>red</code> 6.4:1.</p>
+    <details class="kitty">
+      <summary>Try it in kitty now</summary>
+      <div class="kitty-body">
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>, then press <kbd>Ctrl+Shift+F5</kbd> to reload.</p>
+        <pre id="kitty-nebula"># Nebula (proposal) - paste into kitty.conf to try it
+foreground #E4E1EE
+background #1C1B26
+selection_foreground #E4E1EE
+selection_background #302E42
+cursor #7FD7E6
+cursor_text_color #1C1B26
+url_color #86ACFF
+active_border_color #7FD7E6
+inactive_border_color #423F59
+active_tab_foreground #121119
+active_tab_background #7FD7E6
+inactive_tab_foreground #B8B4CC
+inactive_tab_background #17161F
+tab_bar_background #121119
+color0 #302E42
+color1 #FF6E8A
+color2 #A9DC7A
+color3 #F2D57E
+color4 #86ACFF
+color5 #B79CF7
+color6 #7FD7E6
+color7 #B8B4CC
+color8 #8A86A6
+color9 #FF8DA3
+color10 #BFE899
+color11 #F8E3A2
+color12 #A5C1FF
+color13 #CAB6FA
+color14 #A0E4EF
+color15 #F4F2F9</pre>
+        <button type="button" class="copy" id="copy-nebula" data-target="kitty-nebula">Copy kitty colors</button>
+      </div>
+    </details>
+  </div>
+</section>
+<section class="prop" id="deep-field" style="--p-crust:#0A0D18;--p-mantle:#0E1220;--p-base:#131727;--p-surface0:#1B2036;--p-surface1:#262C47;--p-surface2:#38405F;--p-overlay:#8189AC;--p-subtext:#B2BAD8;--p-text:#E2E7F5;--p-bright:#F4F6FC;--p-red:#FF7891;--p-orange:#FFA46E;--p-yellow:#F5D67B;--p-green:#8EDB95;--p-cyan:#6FD9E4;--p-blue:#7DABFF;--p-purple:#A99CFF;--p-pink:#F28FCB;--pb-red:#FF97AA;--pb-orange:#FFBA90;--pb-yellow:#F9E4A3;--pb-green:#ABE6B0;--pb-cyan:#97E5EC;--pb-blue:#A0C2FF;--pb-purple:#C1B7FF;--pb-pink:#F6AED9;--p-g0:#7DABFF;--p-g1:#6FD9E4;--p-cursor:#F5D67B">
+  <div class="prop-in">
+    <header class="prop-head">
+      <div>
+        <h2>Deep Field</h2>
+        <p class="tag">Cool navy-black, cooler accents, highest contrast of the set. Hubble deep field.</p>
+      </div>
+      
+    </header>
+    <div class="desk">
+      
+<div class="bar">
+  <div class="bar-l"><span class="ws">1</span><span class="ws ws-on">2</span><span class="ws">3</span><span class="ws">4</span><span class="ws">5</span></div>
+  <div class="bar-c">kitty — ~/claude-RICE-hyprland</div>
+  <div class="bar-r">
+    <span class="c-cyan">CPU 12%</span><span class="c-purple">MEM 3.1G</span>
+    <span class="c-green">VOL 45%</span><span class="c-yellow">BAT 82%</span>
+    <span class="clock">23:41</span>
+  </div>
+</div>
+      <div class="wins">
+<div class="win win-active">
+  <div class="win-title">kitty — ~/claude-RICE-hyprland</div>
+  <pre class="term"><span class="c-blue">~/claude-RICE-hyprland</span> <span class="c-purple">on  main</span> <span class="c-green">✓</span>
+<span class="c-green">❯</span> ls
+<span class="c-blue">colors</span>  <span class="c-blue">docs</span>  <span class="c-blue">tools</span>  CLAUDE.md  README.md  <span class="c-green">install.sh</span>
+<span class="c-green">❯</span> git log --oneline -3
+<span class="c-yellow">3f9c2e1</span> (<span class="c-cyan">HEAD -&gt; main</span>) colors: add palette proposals
+<span class="c-yellow">a07d4b8</span> docs: knowledge base for Hyprland 0.57 Lua config
+<span class="c-yellow">0c11e92</span> Initial commit
+<span class="c-green">❯</span> sudo pacman -S kitty
+<span class="c-red">error:</span> target not found: kity  <span class="c-orange">warning:</span> 2 packages held
+<span class="c-green">❯</span> hyprctl ver<span class="c-sugg">sion | head -n1</span><span class="cur"> </span>
+<span class="ansi"><span class="ab" style="background:#262C47" title="color0 #262C47"></span><span class="ab" style="background:#FF7891" title="color1 #FF7891"></span><span class="ab" style="background:#8EDB95" title="color2 #8EDB95"></span><span class="ab" style="background:#F5D67B" title="color3 #F5D67B"></span><span class="ab" style="background:#7DABFF" title="color4 #7DABFF"></span><span class="ab" style="background:#A99CFF" title="color5 #A99CFF"></span><span class="ab" style="background:#6FD9E4" title="color6 #6FD9E4"></span><span class="ab" style="background:#B2BAD8" title="color7 #B2BAD8"></span><span class="ab" style="background:#8189AC" title="color8 #8189AC"></span><span class="ab" style="background:#FF97AA" title="color9 #FF97AA"></span><span class="ab" style="background:#ABE6B0" title="color10 #ABE6B0"></span><span class="ab" style="background:#F9E4A3" title="color11 #F9E4A3"></span><span class="ab" style="background:#A0C2FF" title="color12 #A0C2FF"></span><span class="ab" style="background:#C1B7FF" title="color13 #C1B7FF"></span><span class="ab" style="background:#97E5EC" title="color14 #97E5EC"></span><span class="ab" style="background:#F4F6FC" title="color15 #F4F6FC"></span></span></pre>
+</div>
+<div class="win win-inactive">
+  <div class="win-title">nvim — hyprland.lua</div>
+  <pre class="code"><span class="cl"></span><span class="t-com">-- ~/.config/hypr/theme/colors.lua is generated from the palette</span>
+<span class="t-kw">local</span> <span class="t-field">c</span> <span class="t-op">=</span> <span class="t-bi">require</span>(<span class="t-str">&quot;theme.colors&quot;</span>)
+
+<span class="t-bi">hl</span>.<span class="t-bi">config</span>({
+    <span class="t-field">general</span> <span class="t-op">=</span> {
+        <span class="t-field">gaps_in</span>     <span class="t-op">=</span> <span class="t-num">6</span>,
+        <span class="t-field">border_size</span> <span class="t-op">=</span> <span class="t-num">2</span>,
+        <span class="t-field">col</span> <span class="t-op">=</span> {
+            <span class="t-field">active_border</span>   <span class="t-op">=</span> { <span class="t-field">colors</span> <span class="t-op">=</span> { c.cyan, c.purple }, <span class="t-field">angle</span> <span class="t-op">=</span> <span class="t-num">45</span> },
+            <span class="t-field">inactive_border</span> <span class="t-op">=</span> c.surface1,
+        },
+    },
+    <span class="t-field">decoration</span> <span class="t-op">=</span> { <span class="t-field">rounding</span> <span class="t-op">=</span> <span class="t-num">10</span>, <span class="t-field">active_opacity</span> <span class="t-op">=</span> <span class="t-num">1.0</span> },
+})
+
+<span class="t-kw">for</span> <span class="t-field">i</span> <span class="t-op">=</span> <span class="t-num">1</span>, <span class="t-num">9</span> <span class="t-kw">do</span>
+    <span class="t-bi">hl</span>.<span class="t-bi">bind</span>(<span class="t-str">&quot;SUPER + &quot;</span> <span class="t-op">..</span> i, <span class="t-bi">hl</span>.<span class="t-bi">dsp</span>.<span class="t-fn">focus</span>({ <span class="t-field">workspace</span> <span class="t-op">=</span> i }))
+<span class="t-kw">end</span></pre>
+</div></div>
+    </div>
+    <div class="ramps">
+      <div class="ramp"><h3>Base ramp</h3><div class="sws"><div class="sw" style="--sw:#0A0D18"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#0A0D18</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#0E1220"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#0E1220</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#131727"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#131727</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#1B2036"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#1B2036</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#262C47"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#262C47</code><span class="sw-cr">1.3</span></div><div class="sw" style="--sw:#38405F"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#38405F</code><span class="sw-cr">1.8</span></div><div class="sw" style="--sw:#8189AC"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8189AC</code><span class="sw-cr">5.2</span></div><div class="sw" style="--sw:#B2BAD8"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B2BAD8</code><span class="sw-cr">9.2</span></div><div class="sw" style="--sw:#E2E7F5"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#E2E7F5</code><span class="sw-cr">14.4</span></div><div class="sw" style="--sw:#F4F6FC"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#F4F6FC</code><span class="sw-cr">16.5</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws"><div class="sw" style="--sw:#FF7891"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF7891</code><span class="sw-cr">7.1</span></div><div class="sw" style="--sw:#FFA46E"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFA46E</code><span class="sw-cr">9.1</span></div><div class="sw" style="--sw:#F5D67B"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F5D67B</code><span class="sw-cr">12.5</span></div><div class="sw" style="--sw:#8EDB95"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#8EDB95</code><span class="sw-cr">10.8</span></div><div class="sw" style="--sw:#6FD9E4"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#6FD9E4</code><span class="sw-cr">10.8</span></div><div class="sw" style="--sw:#7DABFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#7DABFF</code><span class="sw-cr">7.7</span></div><div class="sw" style="--sw:#A99CFF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#A99CFF</code><span class="sw-cr">7.5</span></div><div class="sw" style="--sw:#F28FCB"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F28FCB</code><span class="sw-cr">8.1</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws"><div class="sw" style="--sw:#FF97AA"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF97AA</code><span class="sw-cr">8.7</span></div><div class="sw" style="--sw:#FFBA90"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFBA90</code><span class="sw-cr">10.7</span></div><div class="sw" style="--sw:#F9E4A3"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#F9E4A3</code><span class="sw-cr">14.1</span></div><div class="sw" style="--sw:#ABE6B0"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#ABE6B0</code><span class="sw-cr">12.4</span></div><div class="sw" style="--sw:#97E5EC"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#97E5EC</code><span class="sw-cr">12.5</span></div><div class="sw" style="--sw:#A0C2FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#A0C2FF</code><span class="sw-cr">9.9</span></div><div class="sw" style="--sw:#C1B7FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#C1B7FF</code><span class="sw-cr">9.7</span></div><div class="sw" style="--sw:#F6AED9"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#F6AED9</code><span class="sw-cr">10.2</span></div></div></div>
+    </div>
+    <p class="cr-note">Numbers are WCAG contrast against <code>base</code> #131727.
+      Body text 14.4:1 · comments 5.2:1 · weakest accent
+      <code>red</code> 7.1:1.</p>
+    <details class="kitty">
+      <summary>Try it in kitty now</summary>
+      <div class="kitty-body">
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>, then press <kbd>Ctrl+Shift+F5</kbd> to reload.</p>
+        <pre id="kitty-deep-field"># Deep Field (proposal) - paste into kitty.conf to try it
+foreground #E2E7F5
+background #131727
+selection_foreground #E2E7F5
+selection_background #262C47
+cursor #F5D67B
+cursor_text_color #131727
+url_color #7DABFF
+active_border_color #7DABFF
+inactive_border_color #38405F
+active_tab_foreground #0A0D18
+active_tab_background #7DABFF
+inactive_tab_foreground #B2BAD8
+inactive_tab_background #0E1220
+tab_bar_background #0A0D18
+color0 #262C47
+color1 #FF7891
+color2 #8EDB95
+color3 #F5D67B
+color4 #7DABFF
+color5 #A99CFF
+color6 #6FD9E4
+color7 #B2BAD8
+color8 #8189AC
+color9 #FF97AA
+color10 #ABE6B0
+color11 #F9E4A3
+color12 #A0C2FF
+color13 #C1B7FF
+color14 #97E5EC
+color15 #F4F6FC</pre>
+        <button type="button" class="copy" id="copy-deep-field" data-target="kitty-deep-field">Copy kitty colors</button>
+      </div>
+    </details>
+  </div>
+</section>
+<section class="prop" id="event-horizon" style="--p-crust:#17161B;--p-mantle:#1C1B21;--p-base:#212026;--p-surface0:#2A2930;--p-surface1:#323139;--p-surface2:#47454F;--p-overlay:#8E8A98;--p-subtext:#B8B4C0;--p-text:#DCD8E1;--p-bright:#ECE9F0;--p-red:#EC8597;--p-orange:#E6A684;--p-yellow:#E0CD90;--p-green:#AACC90;--p-cyan:#8DC9D2;--p-blue:#98B0E4;--p-purple:#B8A6E0;--p-pink:#DE9EC6;--pb-red:#F2A0AE;--pb-orange:#EDBBA0;--pb-yellow:#E9DBAD;--pb-green:#BFD9AB;--pb-cyan:#A9D7DE;--pb-blue:#B1C3EB;--pb-purple:#CBBDE9;--pb-pink:#E7B7D5;--p-g0:#B8A6E0;--p-g1:#DE9EC6;--p-cursor:#B8B4C0">
+  <div class="prop-in">
+    <header class="prop-head">
+      <div>
+        <h2>Event Horizon</h2>
+        <p class="tag">Lowest glare. Desaturated accents on warm graphite. For long sessions and dim rooms.</p>
+      </div>
+      
+    </header>
+    <div class="desk">
+      
+<div class="bar">
+  <div class="bar-l"><span class="ws">1</span><span class="ws ws-on">2</span><span class="ws">3</span><span class="ws">4</span><span class="ws">5</span></div>
+  <div class="bar-c">kitty — ~/claude-RICE-hyprland</div>
+  <div class="bar-r">
+    <span class="c-cyan">CPU 12%</span><span class="c-purple">MEM 3.1G</span>
+    <span class="c-green">VOL 45%</span><span class="c-yellow">BAT 82%</span>
+    <span class="clock">23:41</span>
+  </div>
+</div>
+      <div class="wins">
+<div class="win win-active">
+  <div class="win-title">kitty — ~/claude-RICE-hyprland</div>
+  <pre class="term"><span class="c-blue">~/claude-RICE-hyprland</span> <span class="c-purple">on  main</span> <span class="c-green">✓</span>
+<span class="c-green">❯</span> ls
+<span class="c-blue">colors</span>  <span class="c-blue">docs</span>  <span class="c-blue">tools</span>  CLAUDE.md  README.md  <span class="c-green">install.sh</span>
+<span class="c-green">❯</span> git log --oneline -3
+<span class="c-yellow">3f9c2e1</span> (<span class="c-cyan">HEAD -&gt; main</span>) colors: add palette proposals
+<span class="c-yellow">a07d4b8</span> docs: knowledge base for Hyprland 0.57 Lua config
+<span class="c-yellow">0c11e92</span> Initial commit
+<span class="c-green">❯</span> sudo pacman -S kitty
+<span class="c-red">error:</span> target not found: kity  <span class="c-orange">warning:</span> 2 packages held
+<span class="c-green">❯</span> hyprctl ver<span class="c-sugg">sion | head -n1</span><span class="cur"> </span>
+<span class="ansi"><span class="ab" style="background:#323139" title="color0 #323139"></span><span class="ab" style="background:#EC8597" title="color1 #EC8597"></span><span class="ab" style="background:#AACC90" title="color2 #AACC90"></span><span class="ab" style="background:#E0CD90" title="color3 #E0CD90"></span><span class="ab" style="background:#98B0E4" title="color4 #98B0E4"></span><span class="ab" style="background:#B8A6E0" title="color5 #B8A6E0"></span><span class="ab" style="background:#8DC9D2" title="color6 #8DC9D2"></span><span class="ab" style="background:#B8B4C0" title="color7 #B8B4C0"></span><span class="ab" style="background:#8E8A98" title="color8 #8E8A98"></span><span class="ab" style="background:#F2A0AE" title="color9 #F2A0AE"></span><span class="ab" style="background:#BFD9AB" title="color10 #BFD9AB"></span><span class="ab" style="background:#E9DBAD" title="color11 #E9DBAD"></span><span class="ab" style="background:#B1C3EB" title="color12 #B1C3EB"></span><span class="ab" style="background:#CBBDE9" title="color13 #CBBDE9"></span><span class="ab" style="background:#A9D7DE" title="color14 #A9D7DE"></span><span class="ab" style="background:#ECE9F0" title="color15 #ECE9F0"></span></span></pre>
+</div>
+<div class="win win-inactive">
+  <div class="win-title">nvim — hyprland.lua</div>
+  <pre class="code"><span class="cl"></span><span class="t-com">-- ~/.config/hypr/theme/colors.lua is generated from the palette</span>
+<span class="t-kw">local</span> <span class="t-field">c</span> <span class="t-op">=</span> <span class="t-bi">require</span>(<span class="t-str">&quot;theme.colors&quot;</span>)
+
+<span class="t-bi">hl</span>.<span class="t-bi">config</span>({
+    <span class="t-field">general</span> <span class="t-op">=</span> {
+        <span class="t-field">gaps_in</span>     <span class="t-op">=</span> <span class="t-num">6</span>,
+        <span class="t-field">border_size</span> <span class="t-op">=</span> <span class="t-num">2</span>,
+        <span class="t-field">col</span> <span class="t-op">=</span> {
+            <span class="t-field">active_border</span>   <span class="t-op">=</span> { <span class="t-field">colors</span> <span class="t-op">=</span> { c.cyan, c.purple }, <span class="t-field">angle</span> <span class="t-op">=</span> <span class="t-num">45</span> },
+            <span class="t-field">inactive_border</span> <span class="t-op">=</span> c.surface1,
+        },
+    },
+    <span class="t-field">decoration</span> <span class="t-op">=</span> { <span class="t-field">rounding</span> <span class="t-op">=</span> <span class="t-num">10</span>, <span class="t-field">active_opacity</span> <span class="t-op">=</span> <span class="t-num">1.0</span> },
+})
+
+<span class="t-kw">for</span> <span class="t-field">i</span> <span class="t-op">=</span> <span class="t-num">1</span>, <span class="t-num">9</span> <span class="t-kw">do</span>
+    <span class="t-bi">hl</span>.<span class="t-bi">bind</span>(<span class="t-str">&quot;SUPER + &quot;</span> <span class="t-op">..</span> i, <span class="t-bi">hl</span>.<span class="t-bi">dsp</span>.<span class="t-fn">focus</span>({ <span class="t-field">workspace</span> <span class="t-op">=</span> i }))
+<span class="t-kw">end</span></pre>
+</div></div>
+    </div>
+    <div class="ramps">
+      <div class="ramp"><h3>Base ramp</h3><div class="sws"><div class="sw" style="--sw:#17161B"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#17161B</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#1C1B21"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#1C1B21</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#212026"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#212026</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#2A2930"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#2A2930</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#323139"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#323139</code><span class="sw-cr">1.3</span></div><div class="sw" style="--sw:#47454F"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#47454F</code><span class="sw-cr">1.7</span></div><div class="sw" style="--sw:#8E8A98"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#8E8A98</code><span class="sw-cr">4.8</span></div><div class="sw" style="--sw:#B8B4C0"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#B8B4C0</code><span class="sw-cr">7.9</span></div><div class="sw" style="--sw:#DCD8E1"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#DCD8E1</code><span class="sw-cr">11.5</span></div><div class="sw" style="--sw:#ECE9F0"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#ECE9F0</code><span class="sw-cr">13.5</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws"><div class="sw" style="--sw:#EC8597"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#EC8597</code><span class="sw-cr">6.4</span></div><div class="sw" style="--sw:#E6A684"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#E6A684</code><span class="sw-cr">7.8</span></div><div class="sw" style="--sw:#E0CD90"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E0CD90</code><span class="sw-cr">10.2</span></div><div class="sw" style="--sw:#AACC90"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#AACC90</code><span class="sw-cr">9.0</span></div><div class="sw" style="--sw:#8DC9D2"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#8DC9D2</code><span class="sw-cr">8.8</span></div><div class="sw" style="--sw:#98B0E4"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#98B0E4</code><span class="sw-cr">7.4</span></div><div class="sw" style="--sw:#B8A6E0"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#B8A6E0</code><span class="sw-cr">7.4</span></div><div class="sw" style="--sw:#DE9EC6"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#DE9EC6</code><span class="sw-cr">7.6</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws"><div class="sw" style="--sw:#F2A0AE"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#F2A0AE</code><span class="sw-cr">8.0</span></div><div class="sw" style="--sw:#EDBBA0"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#EDBBA0</code><span class="sw-cr">9.4</span></div><div class="sw" style="--sw:#E9DBAD"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E9DBAD</code><span class="sw-cr">11.7</span></div><div class="sw" style="--sw:#BFD9AB"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BFD9AB</code><span class="sw-cr">10.6</span></div><div class="sw" style="--sw:#A9D7DE"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#A9D7DE</code><span class="sw-cr">10.4</span></div><div class="sw" style="--sw:#B1C3EB"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#B1C3EB</code><span class="sw-cr">9.1</span></div><div class="sw" style="--sw:#CBBDE9"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#CBBDE9</code><span class="sw-cr">9.2</span></div><div class="sw" style="--sw:#E7B7D5"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#E7B7D5</code><span class="sw-cr">9.3</span></div></div></div>
+    </div>
+    <p class="cr-note">Numbers are WCAG contrast against <code>base</code> #212026.
+      Body text 11.5:1 · comments 4.8:1 · weakest accent
+      <code>red</code> 6.4:1.</p>
+    <details class="kitty">
+      <summary>Try it in kitty now</summary>
+      <div class="kitty-body">
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>, then press <kbd>Ctrl+Shift+F5</kbd> to reload.</p>
+        <pre id="kitty-event-horizon"># Event Horizon (proposal) - paste into kitty.conf to try it
+foreground #DCD8E1
+background #212026
+selection_foreground #DCD8E1
+selection_background #323139
+cursor #B8B4C0
+cursor_text_color #212026
+url_color #98B0E4
+active_border_color #B8A6E0
+inactive_border_color #47454F
+active_tab_foreground #17161B
+active_tab_background #B8A6E0
+inactive_tab_foreground #B8B4C0
+inactive_tab_background #1C1B21
+tab_bar_background #17161B
+color0 #323139
+color1 #EC8597
+color2 #AACC90
+color3 #E0CD90
+color4 #98B0E4
+color5 #B8A6E0
+color6 #8DC9D2
+color7 #B8B4C0
+color8 #8E8A98
+color9 #F2A0AE
+color10 #BFD9AB
+color11 #E9DBAD
+color12 #B1C3EB
+color13 #CBBDE9
+color14 #A9D7DE
+color15 #ECE9F0</pre>
+        <button type="button" class="copy" id="copy-event-horizon" data-target="kitty-event-horizon">Copy kitty colors</button>
+      </div>
+    </details>
+  </div>
+</section>
+<section class="prop" id="pulsar" style="--p-crust:#0C0B11;--p-mantle:#110F17;--p-base:#16151D;--p-surface0:#201E2A;--p-surface1:#2A2837;--p-surface2:#3C3950;--p-overlay:#85819C;--p-subtext:#BDB9CD;--p-text:#EEEBF4;--p-bright:#FBFAFD;--p-red:#FF5E95;--p-orange:#FD971F;--p-yellow:#E6DB74;--p-green:#A6E22E;--p-cyan:#66D9EF;--p-blue:#6FA3FF;--p-purple:#AE81FF;--p-pink:#FF6AC1;--pb-red:#FF7AA6;--pb-orange:#FFAE52;--pb-yellow:#EEE59A;--pb-green:#BCEB63;--pb-cyan:#8DE3F3;--pb-blue:#96BBFF;--pb-purple:#C4A3FF;--pb-pink:#FF8FD0;--p-g0:#FF6AC1;--p-g1:#FD971F;--p-cursor:#E6DB74">
+  <div class="prop-in">
+    <header class="prop-head">
+      <div>
+        <h2>Pulsar</h2>
+        <p class="tag">Classic Monokai saturation on near-black space. Punchiest; least &#x27;soft&#x27;.</p>
+      </div>
+      
+    </header>
+    <div class="desk">
+      
+<div class="bar">
+  <div class="bar-l"><span class="ws">1</span><span class="ws ws-on">2</span><span class="ws">3</span><span class="ws">4</span><span class="ws">5</span></div>
+  <div class="bar-c">kitty — ~/claude-RICE-hyprland</div>
+  <div class="bar-r">
+    <span class="c-cyan">CPU 12%</span><span class="c-purple">MEM 3.1G</span>
+    <span class="c-green">VOL 45%</span><span class="c-yellow">BAT 82%</span>
+    <span class="clock">23:41</span>
+  </div>
+</div>
+      <div class="wins">
+<div class="win win-active">
+  <div class="win-title">kitty — ~/claude-RICE-hyprland</div>
+  <pre class="term"><span class="c-blue">~/claude-RICE-hyprland</span> <span class="c-purple">on  main</span> <span class="c-green">✓</span>
+<span class="c-green">❯</span> ls
+<span class="c-blue">colors</span>  <span class="c-blue">docs</span>  <span class="c-blue">tools</span>  CLAUDE.md  README.md  <span class="c-green">install.sh</span>
+<span class="c-green">❯</span> git log --oneline -3
+<span class="c-yellow">3f9c2e1</span> (<span class="c-cyan">HEAD -&gt; main</span>) colors: add palette proposals
+<span class="c-yellow">a07d4b8</span> docs: knowledge base for Hyprland 0.57 Lua config
+<span class="c-yellow">0c11e92</span> Initial commit
+<span class="c-green">❯</span> sudo pacman -S kitty
+<span class="c-red">error:</span> target not found: kity  <span class="c-orange">warning:</span> 2 packages held
+<span class="c-green">❯</span> hyprctl ver<span class="c-sugg">sion | head -n1</span><span class="cur"> </span>
+<span class="ansi"><span class="ab" style="background:#2A2837" title="color0 #2A2837"></span><span class="ab" style="background:#FF5E95" title="color1 #FF5E95"></span><span class="ab" style="background:#A6E22E" title="color2 #A6E22E"></span><span class="ab" style="background:#E6DB74" title="color3 #E6DB74"></span><span class="ab" style="background:#6FA3FF" title="color4 #6FA3FF"></span><span class="ab" style="background:#AE81FF" title="color5 #AE81FF"></span><span class="ab" style="background:#66D9EF" title="color6 #66D9EF"></span><span class="ab" style="background:#BDB9CD" title="color7 #BDB9CD"></span><span class="ab" style="background:#85819C" title="color8 #85819C"></span><span class="ab" style="background:#FF7AA6" title="color9 #FF7AA6"></span><span class="ab" style="background:#BCEB63" title="color10 #BCEB63"></span><span class="ab" style="background:#EEE59A" title="color11 #EEE59A"></span><span class="ab" style="background:#96BBFF" title="color12 #96BBFF"></span><span class="ab" style="background:#C4A3FF" title="color13 #C4A3FF"></span><span class="ab" style="background:#8DE3F3" title="color14 #8DE3F3"></span><span class="ab" style="background:#FBFAFD" title="color15 #FBFAFD"></span></span></pre>
+</div>
+<div class="win win-inactive">
+  <div class="win-title">nvim — hyprland.lua</div>
+  <pre class="code"><span class="cl"></span><span class="t-com">-- ~/.config/hypr/theme/colors.lua is generated from the palette</span>
+<span class="t-kw">local</span> <span class="t-field">c</span> <span class="t-op">=</span> <span class="t-bi">require</span>(<span class="t-str">&quot;theme.colors&quot;</span>)
+
+<span class="t-bi">hl</span>.<span class="t-bi">config</span>({
+    <span class="t-field">general</span> <span class="t-op">=</span> {
+        <span class="t-field">gaps_in</span>     <span class="t-op">=</span> <span class="t-num">6</span>,
+        <span class="t-field">border_size</span> <span class="t-op">=</span> <span class="t-num">2</span>,
+        <span class="t-field">col</span> <span class="t-op">=</span> {
+            <span class="t-field">active_border</span>   <span class="t-op">=</span> { <span class="t-field">colors</span> <span class="t-op">=</span> { c.cyan, c.purple }, <span class="t-field">angle</span> <span class="t-op">=</span> <span class="t-num">45</span> },
+            <span class="t-field">inactive_border</span> <span class="t-op">=</span> c.surface1,
+        },
+    },
+    <span class="t-field">decoration</span> <span class="t-op">=</span> { <span class="t-field">rounding</span> <span class="t-op">=</span> <span class="t-num">10</span>, <span class="t-field">active_opacity</span> <span class="t-op">=</span> <span class="t-num">1.0</span> },
+})
+
+<span class="t-kw">for</span> <span class="t-field">i</span> <span class="t-op">=</span> <span class="t-num">1</span>, <span class="t-num">9</span> <span class="t-kw">do</span>
+    <span class="t-bi">hl</span>.<span class="t-bi">bind</span>(<span class="t-str">&quot;SUPER + &quot;</span> <span class="t-op">..</span> i, <span class="t-bi">hl</span>.<span class="t-bi">dsp</span>.<span class="t-fn">focus</span>({ <span class="t-field">workspace</span> <span class="t-op">=</span> i }))
+<span class="t-kw">end</span></pre>
+</div></div>
+    </div>
+    <div class="ramps">
+      <div class="ramp"><h3>Base ramp</h3><div class="sws"><div class="sw" style="--sw:#0C0B11"><span class="sw-chip"></span><span class="sw-name">crust</span><code class="sw-hex">#0C0B11</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#110F17"><span class="sw-chip"></span><span class="sw-name">mantle</span><code class="sw-hex">#110F17</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#16151D"><span class="sw-chip"></span><span class="sw-name">base</span><code class="sw-hex">#16151D</code><span class="sw-cr">1.0</span></div><div class="sw" style="--sw:#201E2A"><span class="sw-chip"></span><span class="sw-name">surface0</span><code class="sw-hex">#201E2A</code><span class="sw-cr">1.1</span></div><div class="sw" style="--sw:#2A2837"><span class="sw-chip"></span><span class="sw-name">surface1</span><code class="sw-hex">#2A2837</code><span class="sw-cr">1.3</span></div><div class="sw" style="--sw:#3C3950"><span class="sw-chip"></span><span class="sw-name">surface2</span><code class="sw-hex">#3C3950</code><span class="sw-cr">1.6</span></div><div class="sw" style="--sw:#85819C"><span class="sw-chip"></span><span class="sw-name">overlay</span><code class="sw-hex">#85819C</code><span class="sw-cr">4.8</span></div><div class="sw" style="--sw:#BDB9CD"><span class="sw-chip"></span><span class="sw-name">subtext</span><code class="sw-hex">#BDB9CD</code><span class="sw-cr">9.5</span></div><div class="sw" style="--sw:#EEEBF4"><span class="sw-chip"></span><span class="sw-name">text</span><code class="sw-hex">#EEEBF4</code><span class="sw-cr">15.4</span></div><div class="sw" style="--sw:#FBFAFD"><span class="sw-chip"></span><span class="sw-name">bright</span><code class="sw-hex">#FBFAFD</code><span class="sw-cr">17.4</span></div></div></div>
+      <div class="ramp"><h3>Accents</h3><div class="sws"><div class="sw" style="--sw:#FF5E95"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF5E95</code><span class="sw-cr">6.3</span></div><div class="sw" style="--sw:#FD971F"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FD971F</code><span class="sw-cr">8.3</span></div><div class="sw" style="--sw:#E6DB74"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#E6DB74</code><span class="sw-cr">12.7</span></div><div class="sw" style="--sw:#A6E22E"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#A6E22E</code><span class="sw-cr">11.7</span></div><div class="sw" style="--sw:#66D9EF"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#66D9EF</code><span class="sw-cr">11.0</span></div><div class="sw" style="--sw:#6FA3FF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#6FA3FF</code><span class="sw-cr">7.2</span></div><div class="sw" style="--sw:#AE81FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#AE81FF</code><span class="sw-cr">6.4</span></div><div class="sw" style="--sw:#FF6AC1"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FF6AC1</code><span class="sw-cr">7.0</span></div></div></div>
+      <div class="ramp"><h3>Bright accents (ANSI 9–14)</h3><div class="sws"><div class="sw" style="--sw:#FF7AA6"><span class="sw-chip"></span><span class="sw-name">red</span><code class="sw-hex">#FF7AA6</code><span class="sw-cr">7.4</span></div><div class="sw" style="--sw:#FFAE52"><span class="sw-chip"></span><span class="sw-name">orange</span><code class="sw-hex">#FFAE52</code><span class="sw-cr">9.9</span></div><div class="sw" style="--sw:#EEE59A"><span class="sw-chip"></span><span class="sw-name">yellow</span><code class="sw-hex">#EEE59A</code><span class="sw-cr">14.1</span></div><div class="sw" style="--sw:#BCEB63"><span class="sw-chip"></span><span class="sw-name">green</span><code class="sw-hex">#BCEB63</code><span class="sw-cr">13.1</span></div><div class="sw" style="--sw:#8DE3F3"><span class="sw-chip"></span><span class="sw-name">cyan</span><code class="sw-hex">#8DE3F3</code><span class="sw-cr">12.4</span></div><div class="sw" style="--sw:#96BBFF"><span class="sw-chip"></span><span class="sw-name">blue</span><code class="sw-hex">#96BBFF</code><span class="sw-cr">9.4</span></div><div class="sw" style="--sw:#C4A3FF"><span class="sw-chip"></span><span class="sw-name">purple</span><code class="sw-hex">#C4A3FF</code><span class="sw-cr">8.7</span></div><div class="sw" style="--sw:#FF8FD0"><span class="sw-chip"></span><span class="sw-name">pink</span><code class="sw-hex">#FF8FD0</code><span class="sw-cr">8.7</span></div></div></div>
+    </div>
+    <p class="cr-note">Numbers are WCAG contrast against <code>base</code> #16151D.
+      Body text 15.4:1 · comments 4.8:1 · weakest accent
+      <code>red</code> 6.3:1.</p>
+    <details class="kitty">
+      <summary>Try it in kitty now</summary>
+      <div class="kitty-body">
+        <p>Append to <code>~/.config/kitty/kitty.conf</code>, then press <kbd>Ctrl+Shift+F5</kbd> to reload.</p>
+        <pre id="kitty-pulsar"># Pulsar (proposal) - paste into kitty.conf to try it
+foreground #EEEBF4
+background #16151D
+selection_foreground #EEEBF4
+selection_background #2A2837
+cursor #E6DB74
+cursor_text_color #16151D
+url_color #6FA3FF
+active_border_color #FF6AC1
+inactive_border_color #3C3950
+active_tab_foreground #0C0B11
+active_tab_background #FF6AC1
+inactive_tab_foreground #BDB9CD
+inactive_tab_background #110F17
+tab_bar_background #0C0B11
+color0 #2A2837
+color1 #FF5E95
+color2 #A6E22E
+color3 #E6DB74
+color4 #6FA3FF
+color5 #AE81FF
+color6 #66D9EF
+color7 #BDB9CD
+color8 #85819C
+color9 #FF7AA6
+color10 #BCEB63
+color11 #EEE59A
+color12 #96BBFF
+color13 #C4A3FF
+color14 #8DE3F3
+color15 #FBFAFD</pre>
+        <button type="button" class="copy" id="copy-pulsar" data-target="kitty-pulsar">Copy kitty colors</button>
+      </div>
+    </details>
+  </div>
+</section>
+<div class="wrap"><p class="foot">Generated by <code>tools/preview.py</code> from
+<code>colors/proposals/*.toml</code>. Edit the TOML, re-run, and the page follows.</p></div>
+<script>
+document.querySelectorAll('.copy').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const pre = document.getElementById(btn.dataset.target);
+    const done = msg => { const o = btn.textContent; btn.textContent = msg; setTimeout(() => btn.textContent = o, 1600); };
+    const select = () => { const r = document.createRange(); r.selectNodeContents(pre);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r); done('Selected; press Ctrl+C'); };
+    try {
+      navigator.clipboard.writeText(pre.textContent).then(() => done('Copied'), select);
+    } catch (e) { select(); }
+  });
+});
+</script>
+</body></html>

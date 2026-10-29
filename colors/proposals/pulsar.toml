@@ -1,0 +1,37 @@
+[meta]
+name = "Pulsar"
+tagline = "Classic Monokai saturation on near-black space. Punchiest; least 'soft'."
+border_gradient = ["pink", "orange"]
+cursor = "yellow"
+
+[base]
+crust    = "#0C0B11"
+mantle   = "#110F17"
+base     = "#16151D"
+surface0 = "#201E2A"
+surface1 = "#2A2837"
+surface2 = "#3C3950"
+overlay  = "#85819C"
+subtext  = "#BDB9CD"
+text     = "#EEEBF4"
+bright   = "#FBFAFD"
+
+[accent]
+red    = "#FF5E95"
+orange = "#FD971F"
+yellow = "#E6DB74"
+green  = "#A6E22E"
+cyan   = "#66D9EF"
+blue   = "#6FA3FF"
+purple = "#AE81FF"
+pink   = "#FF6AC1"
+
+[accent_bright]
+red    = "#FF7AA6"
+orange = "#FFAE52"
+yellow = "#EEE59A"
+green  = "#BCEB63"
+cyan   = "#8DE3F3"
+blue   = "#96BBFF"
+purple = "#C4A3FF"
+pink   = "#FF8FD0"

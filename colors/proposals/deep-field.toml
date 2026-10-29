@@ -1,0 +1,37 @@
+[meta]
+name = "Deep Field"
+tagline = "Cool navy-black, cooler accents, highest contrast of the set. Hubble deep field."
+border_gradient = ["blue", "cyan"]
+cursor = "yellow"
+
+[base]
+crust    = "#0A0D18"
+mantle   = "#0E1220"
+base     = "#131727"
+surface0 = "#1B2036"
+surface1 = "#262C47"
+surface2 = "#38405F"
+overlay  = "#8189AC"
+subtext  = "#B2BAD8"
+text     = "#E2E7F5"
+bright   = "#F4F6FC"
+
+[accent]
+red    = "#FF7891"
+orange = "#FFA46E"
+yellow = "#F5D67B"
+green  = "#8EDB95"
+cyan   = "#6FD9E4"
+blue   = "#7DABFF"
+purple = "#A99CFF"
+pink   = "#F28FCB"
+
+[accent_bright]
+red    = "#FF97AA"
+orange = "#FFBA90"
+yellow = "#F9E4A3"
+green  = "#ABE6B0"
+cyan   = "#97E5EC"
+blue   = "#A0C2FF"
+purple = "#C1B7FF"
+pink   = "#F6AED9"

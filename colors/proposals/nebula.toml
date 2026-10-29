@@ -1,0 +1,37 @@
+[meta]
+name = "Nebula"
+tagline = "Monokai Pro accents on a violet-tinted deep-space base. Balanced default."
+border_gradient = ["cyan", "purple"]
+cursor = "cyan"
+
+[base]
+crust    = "#121119"
+mantle   = "#17161F"
+base     = "#1C1B26"
+surface0 = "#252433"
+surface1 = "#302E42"
+surface2 = "#423F59"
+overlay  = "#8A86A6"
+subtext  = "#B8B4CC"
+text     = "#E4E1EE"
+bright   = "#F4F2F9"
+
+[accent]
+red    = "#FF6E8A"
+orange = "#FA9D6B"
+yellow = "#F2D57E"
+green  = "#A9DC7A"
+cyan   = "#7FD7E6"
+blue   = "#86ACFF"
+purple = "#B79CF7"
+pink   = "#F590CF"
+
+[accent_bright]
+red    = "#FF8DA3"
+orange = "#FFB38A"
+yellow = "#F8E3A2"
+green  = "#BFE899"
+cyan   = "#A0E4EF"
+blue   = "#A5C1FF"
+purple = "#CAB6FA"
+pink   = "#F8AEDC"
