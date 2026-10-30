@@ -23,3 +23,8 @@ jobs:
       - run: dnf -y -q install git > /dev/null
       - uses: actions/checkout@v4
       - run: tests/platforms/probe-fedora.sh
+  tags:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: tests/platforms/tags.sh

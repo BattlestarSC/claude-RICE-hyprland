@@ -46,6 +46,8 @@ summary() {
     local rc=$?
     section "installer warnings"
     grep -h '^  ! ' /tmp/run1.log /tmp/run2.log 2> /dev/null | sort | uniq -c || echo "(none)"
+    section "Quickshell under Xvfb (see above)"
+    cat /tmp/qs-summary.txt 2> /dev/null || echo "(not run)"
     section "size"
     grep -h '^first run:' /tmp/full-install-time 2> /dev/null || true
     du -sxh /usr /opt /var/cache/pacman/pkg /var/cache/apt/archives "/home/${user}" 2> /dev/null || true
@@ -71,7 +73,7 @@ as_user 'export XDG_RUNTIME_DIR=$(mktemp -d) DISPLAY=:99 QT_QPA_PLATFORM=xcb
     sleep 2
     timeout 25 dbus-run-session -- quickshell > /tmp/qs.log 2>&1 || true
     kill $xpid 2> /dev/null || true' || true
-grep -E '\.qml:[0-9]+|ReferenceError|TypeError|is not a type|is not installed|Cannot assign|Type .* unavailable|failed to load|ERROR' /tmp/qs.log | sort | uniq -c | head -n 60 || echo "(no QML errors in the log)"
+{ grep -E '\.qml:[0-9]+|ReferenceError|TypeError|is not a type|is not installed|Cannot assign|Type .* unavailable|failed to load|ERROR' /tmp/qs.log | sort | uniq -c | head -n 60 || echo "(no QML errors in the log)"; } | tee /tmp/qs-summary.txt
 
 section "install.sh --yes (second run: must change nothing)"
 as_user 'cd ~/rice && ./install.sh --yes' 2>&1 | tee /tmp/run2.log
