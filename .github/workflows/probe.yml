@@ -1,0 +1,25 @@
+# Package-name facts for the non-Arch installers, from the real distribution images (the build
+# environment cannot reach their mirrors). Output: one line per candidate name.
+name: probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - tests/platforms/**
+      - .github/workflows/probe.yml
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-24.04
+    container: ubuntu:26.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: tests/platforms/probe-ubuntu.sh
+  fedora:
+    runs-on: ubuntu-24.04
+    container: fedora:latest
+    steps:
+      - run: dnf -y -q install git > /dev/null
+      - uses: actions/checkout@v4
+      - run: tests/platforms/probe-fedora.sh
