@@ -25,16 +25,16 @@ code
 thunderbird
 
 # Viewers: images (imv), PDF (Zathura with the MuPDF backend, which also opens EPUB and XPS)
-?imv
-?zathura
-?zathura-pdf-mupdf
+imv
+zathura
+zathura-pdf-mupdf
 
 # Music and podcasts: Strawberry (library), Amberol (opens single files and folders; the default
 # for audio files), Kasts (podcasts, gpodder sync). All three speak MPRIS: the bar's media pill
 # and the media keys control them.
-?strawberry
-?amberol
-?kasts
+strawberry
+amberol
+kasts
 # GStreamer codecs: optional dependencies of the players above, without which most formats
 # (MP3, AAC, Opus in some containers) do not play
 gst-plugins-base

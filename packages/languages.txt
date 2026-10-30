@@ -7,9 +7,9 @@ haskell-language-server
 # SWI-Prolog (lsp_server pack: rice-lsp-setup)
 swi-prolog
 # Scala on OpenJDK 25 LTS: the newest JDK that Scala 3 LTS, sbt, scala-cli and Metals all
-# support (D42; docs.scala-lang.org/overviews/jdk-compatibility). Metals: rice-lsp-setup.
+# support (D42; docs.scala-lang.org/overviews/jdk-compatibility). Scala itself (scala, scalac,
+# scala-cli) and Metals are not in Arch's repositories: rice-lsp-setup installs them with Coursier.
 jdk25-openjdk
-scala
 sbt
 # OCaml (ocaml-lsp-server via opam: rice-lsp-setup)
 ocaml

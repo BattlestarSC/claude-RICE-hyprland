@@ -2,6 +2,17 @@
 -- and D-Bus's activation environments, so user services (hyprpolkitagent, portals) see them.
 -- Variable names: hyprland-wiki configuring/core/environment-variables.md.
 
+-- ~/.local/bin (rice-menu, rice-monitors, language servers) on PATH for everything Hyprland
+-- starts. greetd launches the session through /bin/sh with /etc/profile and ~/.profile only
+-- (greetd session/worker.rs), so zsh's .zshenv never runs there. Added once, also on reloads.
+do
+    local bin = (os.getenv("HOME") or "") .. "/.local/bin"
+    local path = os.getenv("PATH") or "/usr/local/bin:/usr/bin"
+    if not (":" .. path .. ":"):find(":" .. bin .. ":", 1, true) then
+        hl.env("PATH", bin .. ":" .. path)
+    end
+end
+
 -- Toolkits: Wayland first, X11 (XWayland) as fallback.
 hl.env("GDK_BACKEND", "wayland,x11,*")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")

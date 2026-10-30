@@ -55,6 +55,7 @@ jobs:
           pacman -S --noconfirm --needed greetd
           tests/installer/pam_keyring.sh /etc/pam.d/greetd
       - name: Package facts (temporary probe)
+        if: always()
         run: |
           for p in jdk-openjdk jdk25-openjdk jdk27-openjdk jdk26-openjdk jdk21-openjdk scala scala-cli sbt metals coursier erlang erlang-nox elixir \
                    gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav dbus amberol kasts strawberry; do

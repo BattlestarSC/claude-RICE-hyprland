@@ -12,7 +12,7 @@
 #   elixir    ElixirLS v0.31.1       GitHub release zip                ~/.local/share/rice/elixir-ls
 #   haskell   haskell-language-server pacman (checked only)            /usr/bin
 #   prolog    lsp_server pack         swipl pack install               SWI-Prolog's user pack dir
-#   scala     Metals                  Coursier (cs, downloaded if absent) ~/.local/bin
+#   scala     scala, scalac, scala-cli, Metals  Coursier (cs, downloaded if absent) ~/.local/bin
 #   ocaml     ocaml-lsp-server        opam (current switch)            ~/.opam; wrapper in ~/.local/bin
 #   fortran   fortls                  pipx (PyPI)                      ~/.local/bin
 #   vis-lspc  vis LSP plugin @9d0f7a0 git (gitlab.com/muhq/vis-lspc)   ~/.config/vis/plugins
@@ -71,7 +71,7 @@ show_status() {
     status_line haskell "$(have haskell-language-server-wrapper && echo yes || echo no)" \
         'haskell-language-server-wrapper (pacman: haskell-language-server ghc)'
     status_line prolog "$(prolog_pack_ok && echo yes || echo no)" 'swipl + lsp_server pack (pacman: swi-prolog)'
-    status_line scala "$(have metals && echo yes || echo no)" 'metals (needs jdk25-openjdk from pacman)'
+    status_line scala "$(have scala && have metals && echo yes || echo no)" 'scala, scalac, scala-cli, metals (need jdk25-openjdk from pacman)'
     status_line ocaml "$(have ocamllsp && echo yes || echo no)" 'ocamllsp (pacman: opam ocaml)'
     status_line fortran "$(have fortls && echo yes || echo no)" 'fortls (pacman: python-pipx gcc-fortran)'
     status_line latex "$(have texlab && echo yes || echo no)" 'texlab (pacman: texlab, installed with the office group)'
@@ -142,7 +142,9 @@ setup_scala() {
         fi
     fi
     run mkdir -p -- "${bin_dir}"
-    run "${cs}" install --install-dir "${bin_dir}" metals
+    # Scala itself is not in Arch's repositories: the official route is Coursier, which installs
+    # the scala runner (scala-cli based since Scala 3.5), scalac and scala-cli next to Metals.
+    run "${cs}" install --install-dir "${bin_dir}" scala scalac scala-cli metals
 }
 
 setup_ocaml() {
