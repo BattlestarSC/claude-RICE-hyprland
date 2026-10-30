@@ -17,9 +17,9 @@ themes/<palette>/
   ├── hypr/colors.conf          → hyprlang $vars for hyprlock / hypridle / hyprtoolkit
   ├── kitty/theme.conf, foot/theme.ini ([colors-dark])
   ├── code-oss/extension/      → Code - OSS theme extension (editor.md)
-  ├── zsh/theme.zsh             → syntax-highlight styles, FZF_DEFAULT_OPTS
+  ├── zsh/theme.zsh             → syntax-highlight, autosuggest, substring-search, completion menu, FZF_DEFAULT_OPTS
   ├── waybar/colors.css         → @define-color ...
-  ├── starship/palette.toml
+  ├── starship/starship.toml    → the whole prompt config with an inline [palettes.rice]
   ├── art/*.svg                 → tools/spacegen.py: wallpaper, panel starfield, planets, ASCII scene (seeded)
   ├── gtk/colors.css            → GTK3/4 @define-color overrides (libadwaita-compatible names)
   ├── quickshell/common/Theme.qml  → QML singleton: palette (`qcolor`), glass tints, fonts, sizes
@@ -40,7 +40,8 @@ time. Whether gdk-pixbuf in rofi loads SVG directly: [TODO-verify]; rasterizing 
 
 Template filters (`tools/render_theme.py`): `hex` `#rrggbb`, `hexa:A` `#rrggbbaa`, `rgba:A`
 `rgba(r,g,b,a)`, `bare` `rrggbb`, `vec3` `vec3(r, g, b)` (floats 0–1, for GLSL), `qcolor:A`
-`#AARRGGBB` (Qt's alpha-first order; `#rrggbbaa` would be misread by QML), `rgbcsv` `r,g,b`
+`#AARRGGBB` (Qt's alpha-first order; `#rrggbbaa` would be misread by QML), `sgr` `r;g;b` (ANSI
+truecolor parameters), `rgbcsv` `r,g,b`
 (KDE schemes), `cssrgba:A` `rgba(r, g, b, a)` (GTK3 has no 8-digit hex).
 
 Shaders are the one generated output that needs a build step on the target: Qt Quick loads `.qsb`

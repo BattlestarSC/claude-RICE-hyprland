@@ -5,9 +5,9 @@
   "workbench.colorTheme": "Rice",
   "window.titleBarStyle": "native",
   "window.menuBarVisibility": "toggle",
-  "editor.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+  "editor.fontFamily": "'JetBrains Mono', 'Symbols Nerd Font Mono', monospace",
   "editor.fontSize": 14,
   "editor.fontLigatures": true,
   "editor.cursorBlinking": "solid",
-  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'"
+  "terminal.integrated.fontFamily": "'JetBrains Mono', 'Symbols Nerd Font Mono'"
 }

@@ -59,9 +59,9 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 | Role | Choice | Notes |
 | --- | --- | --- |
 | Compositor | Hyprland ≥ 0.57 | Lua config, split into modules; mild gaps (6/3 px), 2 px gradient border, 6 px rounding |
-| Terminal | **kitty** (primary), **foot** (secondary) | both themed from the palette; kitty auto-reloads its config |
+| Terminal | **kitty** (primary), **foot** (secondary) | JetBrains Mono with ligatures + Nerd Font icons; both themed from the palette |
 | Editor | **Code - OSS** (`code`, open-source VS Code) | telemetry, experiments and AI features off; palette theme | 
-| Shell | zsh + starship | no framework; autosuggestions, syntax highlighting, fzf, zoxide |
+| Shell | zsh + **starship** two-line rainbow prompt | full git status, exit code with signal name, meaning and pipeline status; fish-style Tab menu, autosuggestions, syntax highlighting, Up/Down history search, fzf, zoxide |
 | Lock / idle | hyprlock (themed, PAM, crash-safe session lock), hypridle | lock at 10 min, monitors off at 11 min, no auto-suspend |
 | Wallpaper | **live ASCII Earth + Moon** (Quickshell, two GPU shader passes, 4 fps, both monitors in sync; animates only on empty workspaces) · or the same scene as a still · or your own image (installer question) | [D15](docs/decisions.md#d15-wallpaper-live-ascii-earth-and-moon-gpu-shaders-in-quickshell-owner-2026-10-30) |
 | Login | greetd + ReGreet, inside Hyprland | same monitor config as the desktop; no X server |
@@ -138,7 +138,8 @@ tools/                    dev only (Python 3.11+); the installer never uses thes
 tests/                    rofi-render.sh (real rofi screenshots), lua/ (Hyprland API stub, bind tests),
                           quickshell/ (bar render, mock services), sky/ (ASCII sky frames + timing),
                           browsers/ (policy names checked against Mozilla's and Chromium's sources),
-                          terminals/ (kitty keys), vscode/ (theme colors and settings vs VS Code)
+                          terminals/ (kitty keys), vscode/ (theme colors and settings vs VS Code),
+                          prompt/ (starship options vs its source), zsh/ (loads the config in real zsh)
 ```
 
 The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout-target-create-directories-as-phases-need-them).

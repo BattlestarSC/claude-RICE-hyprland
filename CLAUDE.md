@@ -26,7 +26,8 @@ Present beyond docs: theme generator + templates, generated `themes/quasar/`, `c
 `config/quickshell/` (bar, services, sky), `config/hypr/conf/{binds,monitors,layers,look,session}.lua`,
 `config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,kitty,foot,code-oss}/`,
 `bin/rice-menu`, `bin/rice-sky-atlas`, `bin/rice-browser-setup`, `bin/rice-code-setup`, tests.
-**Not yet present:** `install.sh`, the Hyprland entry point, window rules, autostart, zsh,
+Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
+**Not yet present:** `install.sh`, the Hyprland entry point, window rules, autostart,
 greeter files. Quickshell code is render-tested
 with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
 `shell.qml` and `services/` as unverified. Decided and open questions are in
@@ -104,9 +105,11 @@ python3 tools/render_theme.py colors/quasar.toml           # templates/ -> theme
 python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed themes are stale
 lua5.4 tests/lua/run.lua config/hypr/conf/*.lua            # dispatchers, modifiers, duplicate keys, hl.config option names
 python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
-shellcheck -x bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup tests/rofi-render.sh
+shellcheck -x bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup tests/rofi-render.sh tests/zsh/run.sh
 python3 tests/terminals/check_kitty.py <kitty checkout>/kitty/options/definition.py   # kitty keys
 python3 tests/vscode/check_theme.py <vscode checkout>            # theme colors + settings (see docstring)
+python3 tests/prompt/check_starship.py <starship v1.25.1 checkout>   # starship options, palette names
+tests/zsh/run.sh                                           # loads the zsh config in real zsh; needs zsh (+ plugins)
 python3 tests/browsers/check_policies.py <policy-templates checkout> <chromium policies.yaml>   # see its docstring
 # Quickshell (needs PySide6 + PySide6-Addons, an X server or Xvfb, IBM Plex + Symbols Nerd Font):
 python3 tests/quickshell/render.py /tmp/bar.png --background frame.png   # real bar QML + mocks; fails on any QML warning
@@ -201,5 +204,10 @@ in an `archlinux:latest` container or on hardware.
 - Code - OSS ships a Copilot `defaultChatAgent` even in the OSS build; `chat.disableAIFeatures`
   is what hides it. VS Code `settings.json` is JSONC: never rewrite one jq cannot parse.
 - A VS Code extension folder copied into `~/.vscode-oss/extensions` is not picked up; install a VSIX.
+- zsh plugin order is fixed: theme vars before plugins, syntax-highlighting last but one,
+  history-substring-search after it. Keep `NO_FLOW_CONTROL` (Ctrl+S searches the Tab menu).
+- starship's directory segment ends differently inside git work trees (`repo_root_format`); if you
+  touch the directory or git modules, keep the arrow hand-over intact (zsh.md#prompt-starship).
+- The starship config is fully generated (one file, inline palette): edit the template.
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.

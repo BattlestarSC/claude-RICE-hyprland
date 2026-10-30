@@ -75,7 +75,15 @@ Every key checked against `kitty/options/definition.py` @ 02b2b10 (2026-10-29) b
 
 - `include theme.conf` (generated: `themes/<palette>/kitty/theme.conf`: colors, tab bar, marks,
   `cursor_trail_color`, ANSI 0–15 per the palette's ANSI map).
-- Font `JetBrainsMono Nerd Font` 11 pt, ligatures off under the cursor.
+- Font **JetBrains Mono** (unpatched, `ttf-jetbrains-mono` 2.304 in extra [S]) 11 pt with
+  **ligatures everywhere** (`disable_ligatures never`; JetBrains Mono's ligatures are its `calt`
+  feature, on by default).
+- **Nerd Font icons** via `symbol_map` to `Symbols Nerd Font Mono` (`ttf-nerd-fonts-symbols-mono`
+  3.4.0 in extra [S]): ranges are the private-use blocks actually present in Nerd Fonts 3.4.0's
+  symbol font plus U+23FB–23FE, U+2665, U+26A1, U+2B58 (read from the font's cmap with fontTools).
+  Single-cell icons regardless of the text font; kitty's own bundled Nerd symbols stay as a last
+  fallback [V: kitty changelog]. foot gets the same font pair as a fallback list (foot renders no
+  ligatures [BK]).
 - Block cursor, no blink, `cursor_trail 3` (the trail follows jumps after the cursor rested 3 ms;
   purple), `cursor_trail_decay 0.1 0.3`.
 - 10 000 lines scrollback, curly URL underlines, no copy-on-select, `strip_trailing_spaces smart`.

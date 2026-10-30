@@ -223,6 +223,15 @@ search and update checks; preferences (theme, fonts) are defaults the user can c
 Theme: generated local extension installed as a VSIX. Details:
 [knowledge-base/editor.md](knowledge-base/editor.md).
 
+### D26. Shell: zsh with a starship "rainbow" prompt and a fish-style Tab selector (owner, 2026-10-30)
+
+Owner asked for the powerlevel10k-style rainbow prompt with full git integration, full exit-code
+details, and a fish-like scrolling Tab selector. Prompt: starship (in `extra`, maintained), since
+powerlevel10k declares itself unmaintained and is AUR-only. Tab: zsh's built-in complist menu
+selection, themed (fzf-tab is AUR-only). Plus autosuggestions, syntax highlighting, history
+substring search, fzf, zoxide. kitty: JetBrains Mono with all ligatures + Symbols Nerd Font Mono
+for icons. Details: [knowledge-base/zsh.md](knowledge-base/zsh.md).
+
 ## Open
 
 ### ~~O5. Notifications~~ → D20 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22

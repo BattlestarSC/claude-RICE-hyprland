@@ -70,14 +70,14 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Compositor + hypr stack | `hyprland` [V wiki], `xdg-desktop-portal-hyprland` [V wiki], `xdg-desktop-portal-gtk`, `hyprlock`, `hypridle`, `hyprpaper`, `hyprpolkitagent`, `hyprlauncher`, `hyprshutdown`, `hyprsunset`, `hyprpicker` |
 | Qt/GTK integration | `qt5-wayland`, `qt6-wayland` [V wiki must-have], `hyprqt6engine` or `qt6ct`, `nwg-look` |
 | Audio / media | `pipewire`, `wireplumber` [V wiki], `pipewire-pulse`, `pipewire-alsa`, `pipewire-jack`, `pavucontrol`, `playerctl`, `brightnessctl` |
-| Terminal + shell | `kitty`, `foot`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-completions`, `starship`, `fzf`, `zoxide`, `eza`, `bat` |
+| Terminal + shell | `kitty`, `foot`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-history-substring-search`, `zsh-completions` [S: extra], `starship` [S: extra 1.25.1], `fzf`, `zoxide`, `eza`, `bat` |
 | Bar / wallpaper / notifications | `quickshell` [S], `qt6-shadertools` (`qsb`, compiles the sky shaders at install) [BK], `mako` or `swaync` (O5) |
 | Bluetooth | `bluez`, `bluez-utils` [BK]; enabling `bluetooth.service` is a prompted system change |
 | Launcher / menus | `rofi` (≥ 2.0 for native Wayland), `jq`, `libnotify`, `librsvg` (`rsvg-convert` rasterizes generated art at install) |
 | Login | `greetd`, `greetd-regreet` (greeter runs inside Hyprland; no X server) |
 | GPU (AMD) | `mesa`, `vulkan-radeon`; opt-in Blender GPU step: `hip-runtime-amd`, `hiprt` [S: Arch blender optdepends] |
 | Clipboard / screenshots | `wl-clipboard`, `cliphist`, `grim`, `slurp`, `satty` (verify repo) |
-| Fonts / icons / cursor | `ttf-jetbrains-mono-nerd`, `ttf-ibm-plex` (bar text) [BK], `ttf-nerd-fonts-symbols` (bar icons) [BK], `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
+| Fonts / icons / cursor | `ttf-jetbrains-mono` (terminal/editor text) [S: extra], `ttf-nerd-fonts-symbols-mono` (terminal icons) [S: extra 3.4.0], `ttf-ibm-plex` (bar text) [BK], `ttf-nerd-fonts-symbols` (bar icons) [BK], `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
 | Network (only if none present) | `networkmanager`, `network-manager-applet` |
 | File managers | `thunar`, `thunar-volman`, `thunar-archive-plugin`, `xarchiver`, `tumbler`, `ffmpegthumbnailer`, `gvfs`, `gvfs-mtp`, `udisks2`; `dolphin`, `kio-extras`, `ffmpegthumbs`, `breeze` (Qt widget style Dolphin falls back to), `archlinux-xdg-menu`; theme `adw-gtk-theme` [S: extra 6.5-1] [others BK / TODO-verify] |
 | Editor | `code` (Code - OSS) [S: extra], `jq` (settings merge); `bsdtar` from `libarchive` (pacman dependency) [BK] |

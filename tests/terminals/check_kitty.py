@@ -22,7 +22,7 @@ def main(argv: list[str]) -> int:
     if len(argv) != 2:
         print(__doc__, file=sys.stderr)
         return 2
-    defined = set(re.findall(r"^\s*'(\w+)',?\s*$", Path(argv[1]).read_text(), re.M))
+    defined = set(re.findall(r"^\s*'\+?(\w+)',?\s*$", Path(argv[1]).read_text(), re.M))
     defined |= set(re.findall(r"^opt\('\+?(\w+)'", Path(argv[1]).read_text(), re.M))
     errors = []
     for f in FILES:
