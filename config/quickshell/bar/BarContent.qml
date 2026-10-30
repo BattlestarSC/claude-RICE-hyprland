@@ -85,11 +85,11 @@ Item {
             Ring { value: 100 * System.memUsed / System.memTotal; color: Theme.mem; anchors.verticalCenter: parent.verticalCenter }
             Label { text: "mem"; color: Theme.subtext; font.pixelSize: Theme.smallSize; anchors.verticalCenter: parent.verticalCenter }
             Label { text: "load"; color: Theme.subtext; font.pixelSize: Theme.smallSize; anchors.verticalCenter: parent.verticalCenter }
-            Label { text: System.load1.toFixed(2); mono: true; anchors.verticalCenter: parent.verticalCenter }
+            Label { text: (System.load1 ?? 0).toFixed(2); mono: true; anchors.verticalCenter: parent.verticalCenter }
         }
         Pill {                                           // one ring per drive
             id: diskPill
-            visible: root.primary && System.disks.length > 0
+            visible: root.primary && (System.disks?.length ?? 0) > 0
             active: root.openPanel === "system"
             onClicked: root.panelRequested("system", diskPill)
             Repeater {
@@ -122,7 +122,7 @@ Item {
             Glyph { text: !Bluetooth.enabled ? Icons.bluetoothOff : Bluetooth.connectedCount > 0 ? Icons.bluetoothConnected : Icons.bluetooth
                     color: Bluetooth.enabled ? Theme.bt : Theme.overlay; anchors.verticalCenter: parent.verticalCenter }
             Label {
-                readonly property var first: Bluetooth.devices.find(d => d.connected)
+                readonly property var first: (Bluetooth.devices ?? []).find(d => d.connected)
                 visible: Bluetooth.enabled && first !== undefined
                 text: first ? (first.battery >= 0 ? Math.round(first.battery * 100) + "%" : first.name) : ""
                 mono: first !== undefined && first.battery >= 0

@@ -121,6 +121,15 @@ module, and **fails on any QML warning**. Quickshell-only types (PanelWindow, Po
 Bluetooth, Hyprland) are therefore kept out of `BarContent` and the panels; only `Bar.qml`,
 `Wallpaper.qml`, `shell.qml` and `services/` touch them and are untested off-hardware.
 
+**In real Quickshell** (2026-10-30): the full-install CI starts the deployed shell with Arch's
+Quickshell under Xvfb (X11, so no layer shell, Hyprland IPC or Pipewire) and reports its log. Every
+QML file parsed and instantiated (no import or type errors). Expected under X11: "Could not create
+attached properties object WlrLayershell". Found and fixed: four TypeErrors at the first binding
+evaluation (`System.load1`, `System.disks`, `Bluetooth.devices`, `Notifications.popups` read as
+undefined while the lazily created singletons were still being built; the mocks are eager, so
+render.py never showed it). Such reads now use `?.`/`??`. Wayland itself (layer shell, IPC,
+Pipewire) is still unverified.
+
 Pitfalls found that way: a custom property named `top` collides with Item's anchor line
 ("Cannot override FINAL property"); `implicitHeight` is read-only on `Row`/`Column`; a `Row` inside a
 `RowLayout` collapses to its tallest child unless given `Layout.preferredHeight`.

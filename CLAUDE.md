@@ -38,8 +38,9 @@ home, and for real (`./install.sh --yes` as a sudo user, then `verify-install.sh
 idempotent re-run) by the `full-install` workflow in an `archlinux:latest` container, which cannot
 start Hyprland, greetd or any GUI. **Not yet present:** `uninstall.sh`, a theme
 switcher. Quickshell code is render-tested
-with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
-`shell.qml`, `OsdWindow.qml` and `services/` as unverified. Decided and open questions are in
+with PySide6 and mocks, and the real shell loads in real Quickshell under Xvfb (CI, X11: no layer
+shell, Hyprland IPC or Pipewire), but has **never run on Wayland**; treat the window, IPC and
+Pipewire parts of `Bar.qml`, `Wallpaper.qml`, `shell.qml`, `OsdWindow.qml` and `services/` as unverified. Decided and open questions are in
 [docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
 owner or implement behind an obvious, documented default.
 
@@ -164,7 +165,8 @@ Round-1 palettes fail the APCA rules by design (they predate them); only round 2
 the color math or blend constants, change both and confirm the dial's default output still equals
 `quasar.toml` (same hex values).
 
-Planned (add here when they exist): `Hyprland --verify-config -c <file>`. When the target Hyprland version changes, refresh the
+`Hyprland --verify-config -c <file>` parses a Lua config with the real Hyprland (needs
+`XDG_RUNTIME_DIR`); verify-install.sh runs it on both configs. When the target Hyprland version changes, refresh the
 dispatcher list in `tests/lua/hl_stub.lua` from `src/config/lua/bindings/LuaBindingsDispatchers.cpp`.
 
 Regenerate `docs/colors/preview.html` and `docs/launcher/concepts.html` whenever a palette or a
@@ -252,6 +254,8 @@ in an `archlinux:latest` container or on hardware.
   rewrites it), `colors/rice.conf` is generated. Zathura's `include local` and imv's config are
   generated (`HEADER_BY_NAME` gives the extensionless files a `#` header).
 - `Quickshell.screens` order is not "left first"; use `Screens.primary`.
+- Real Quickshell creates singletons lazily: a binding's first read of a service property can be
+  `undefined`. Guard with `?.`/`??` where a method is called on it (the mocks are eager and hide this).
 - foot ≥ 1.26 uses `[colors-dark]`; 1.28 refuses to start with the old `[colors]`. Most foot
   examples online (and the gitlab mirror) are older. foot comments are `#` only.
 - foot/kitty includes: a missing `include` is an error in both; kitty's `globinclude` is not.

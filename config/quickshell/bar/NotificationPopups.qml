@@ -20,7 +20,7 @@ PanelWindow {
     implicitWidth: Theme.panelWidth
     implicitHeight: Math.max(1, stack.implicitHeight)
     color: "transparent"
-    visible: Notifications.popups.length > 0
+    visible: (Notifications.popups?.length ?? 0) > 0
 
     Column {
         id: stack
