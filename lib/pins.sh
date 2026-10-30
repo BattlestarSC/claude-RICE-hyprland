@@ -27,9 +27,13 @@ declare -ga HYPR_STACK=(
     "hyprshutdown|https://github.com/hyprwm/hyprshutdown|v0.1.1|cmake|"
 )
 
-# Built only where the packaged version is older than Hyprland 0.57 requires (>= 1.49).
+# Built only where the packaged version is older than Hyprland 0.57 requires (>= 1.49). Its newer
+# XML fails wayland-scanner 1.24's --strict validation, so a current scanner comes first (the
+# scanner alone: the system's libwayland stays). Latest tags 2026-10-30 (tests/platforms/tags.sh).
 # shellcheck disable=SC2034
-declare -g WAYLAND_PROTOCOLS_PIN="wayland-protocols|https://gitlab.freedesktop.org/wayland/wayland-protocols.git|1.49|meson|-Dtests=false"
+declare -g WAYLAND_SCANNER_PIN="wayland-scanner|https://gitlab.freedesktop.org/wayland/wayland.git|1.26.0|meson|-Dlibraries=false -Dscanner=true -Ddocumentation=false -Dtests=false"
+# shellcheck disable=SC2034
+declare -g WAYLAND_PROTOCOLS_PIN="wayland-protocols|https://gitlab.freedesktop.org/wayland/wayland-protocols.git|1.50|meson|-Dtests=false"
 # shellcheck disable=SC2034
 declare -g QUICKSHELL_PIN="quickshell|https://github.com/quickshell-mirror/quickshell|v0.3.2|cmake|-DCRASH_HANDLER=OFF -DDISTRIBUTOR=rice-installer"
 # shellcheck disable=SC2034

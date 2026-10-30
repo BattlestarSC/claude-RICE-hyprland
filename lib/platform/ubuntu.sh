@@ -69,10 +69,10 @@ plat_install() {
 plat_extras() {
     step "Building what Ubuntu does not package (first run: 30-60 minutes)"
     extras_env
-    # Hyprland 0.57 needs wayland-protocols >= 1.49; Ubuntu 26.04 has 1.47.
-    if ! pkg-config --atleast-version=1.49 wayland-protocols 2> /dev/null; then
-        extras_build "${WAYLAND_PROTOCOLS_PIN}"
-    fi
+    # Hyprland 0.57 needs wayland-protocols >= 1.49; Ubuntu 26.04 has 1.47, and its
+    # wayland-scanner 1.24 rejects the newer protocol XML (found by the Ubuntu full-install CI).
+    extras_build "${WAYLAND_SCANNER_PIN}"
+    extras_build "${WAYLAND_PROTOCOLS_PIN}"
     extras_hypr_stack
     extras_build "${QUICKSHELL_PIN}"
     extras_build "${REGREET_PIN}"
