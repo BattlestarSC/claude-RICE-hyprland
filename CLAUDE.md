@@ -16,15 +16,19 @@ Visual goal: a soft dark, space-themed palette with Monokai-style accents and me
 
 ## Current state
 
-Phase 0 (foundation), design round 2. Present: knowledge base, palette proposals + tooling
-(contrast checker, OKLCH blender, preview generators), launcher concepts, README, this file.
-**Not yet present:** `install.sh`, dotfiles, generated themes. Decided and open questions are in
+Phase 1 started. Decided: palette Quasar (`colors/quasar.toml`), i3 default keymap, rofi with the
+Orbit (apps) and Flight Deck (menus) themes, greetd + ReGreet login. Present beyond docs: theme
+generator + templates, generated `themes/quasar/`, `config/rofi/`, `config/hypr/conf/binds.lua`,
+`bin/rice-menu`, tests. **Not yet present:** `install.sh`, the rest of the Hyprland config
+(entry point, monitors, look, rules, autostart), kitty, zsh, bar, lock/idle, greeter files. Decided and open questions are in
 [docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
 owner or implement behind an obvious, documented default.
 
-Primary target machine (D8): AMD GPU, two 27" 4K ASUS ProArt panels through a KVM that
+Primary target machine (D8): AMD RX 6000 / Navi 21 (gfx1030), two 27" 4K ASUS ProArt panels through a KVM that
 **removes the outputs when switched away**, Blender with HIP/ROCm, SDDM login. Every
 monitor-related change must consider hot-unplug; see [hardware.md](docs/knowledge-base/hardware.md).
+Keybindings follow i3's defaults ([docs/keybindings.md](docs/keybindings.md)); do not repurpose an
+i3 default key, and give every new bind a `description` (it feeds the in-session cheat sheet).
 
 ## Read before changing anything
 
@@ -37,6 +41,7 @@ monitor-related change must consider hot-unplug; see [hardware.md](docs/knowledg
 | kitty / zsh | [docs/knowledge-base/kitty.md](docs/knowledge-base/kitty.md), [docs/knowledge-base/zsh.md](docs/knowledge-base/zsh.md) |
 | Monitors, GPU, ROCm, SDDM | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
 | rofi, launcher, scripted menus | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) |
+| Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
 ## Hard rules
 
@@ -69,17 +74,23 @@ packages/                   package lists, one name per line, comments allowed
 config/                     files deployed under ~/.config (hypr/, kitty/, zsh/, waybar/, ...)
 home/                       files deployed directly under ~ (.zshenv, .zprofile, .zshrc)
 colors/                     palettes; proposals/ now, the chosen palette as colors/<name>.toml later
-templates/                  per-app theme templates consumed by the generator
+templates/                  per-app theme templates ({{ role | filter }}), rendered by tools/render_theme.py
 themes/<palette>/           generated app themes (committed; never hand-edit)
+bin/                        user commands deployed to ~/.local/bin (rice-menu)
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
-tests/                      container-based tests
+tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind tests)
 docs/                       knowledge-base/, colors/, decisions.md
 ```
 
 ## Commands
 
 ```sh
-python3 tools/palette.py check  colors/proposals/round2/*.toml   # 42 WCAG + APCA rules; must pass
+python3 tools/render_theme.py colors/quasar.toml           # templates/ -> themes/quasar/
+python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed themes are stale
+lua5.4 tests/lua/run.lua config/hypr/conf/binds.lua        # dispatcher names, modifiers, duplicate keys
+shellcheck -x bin/rice-menu tests/rofi-render.sh
+tests/rofi-render.sh /tmp/rofi-shots                       # needs Xvfb, rofi, rsvg-convert, hsetroot, imagemagick, Papirus
+python3 tools/palette.py check  colors/quasar.toml colors/proposals/round2/*.toml   # 42 WCAG + APCA rules; must pass
 python3 tools/palette.py report colors/proposals/round2/*.toml   # per-role WCAG / APCA table
 python3 tools/blend.py colors/proposals/round1/pulsar.toml colors/proposals/round1/event-horizon.toml \
     --bg 0.3 --fg 0.55 --accent 0.4 --name Quasar --gradient red purple --cursor yellow   # regenerates quasar.toml
@@ -93,8 +104,9 @@ Round-1 palettes fail the APCA rules by design (they predate them); only round 2
 the color math or blend constants, change both and confirm the dial's default output still equals
 `quasar.toml` (same hex values).
 
-Planned (add here when they exist): `shellcheck -x install.sh lib/*.sh`, Lua syntax check with a
-Lua 5.5 `luac -p`, `Hyprland --verify-config -c <file>`, package resolution in `archlinux:latest`.
+Planned (add here when they exist): `shellcheck -x install.sh lib/*.sh`, `Hyprland --verify-config -c <file>`,
+package resolution in `archlinux:latest`. When the target Hyprland version changes, refresh the
+dispatcher list in `tests/lua/hl_stub.lua` from `src/config/lua/bindings/LuaBindingsDispatchers.cpp`.
 
 Regenerate `docs/colors/preview.html` and `docs/launcher/concepts.html` whenever a palette or a
 generator changes, in the same commit.
@@ -140,4 +152,7 @@ in an `archlinux:latest` container or on hardware.
 - rofi's Wayland surface covers the whole output (namespace `rofi`): a blur layer rule without
   `ignore_alpha` blurs the entire screen.
 - rofi cannot combine a gradient frame with a translucent body; see launcher.md.
-- SDDM's default greeter needs `xorg-server` even on a Wayland desktop.
+- rofi: a missing `@import` file is fatal (shown in place of the menu); `configuration {}` set in
+  one theme persists into others loaded with `-theme`.
+- The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
+  copied under `/etc/greetd/`, not referenced from `~`.

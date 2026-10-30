@@ -64,18 +64,35 @@ Verified against `davatorium/rofi` master on 2026-10-29 unless noted.
 - **Window switcher mode** on Hyprland (needs foreign-toplevel protocol): [TODO-verify]; fallback
   is a script over `hyprctl -j clients` (`-j` = JSON output [V: wiki using-hyprctl.md]).
 
-## Config layout (planned)
+## Verified by rendering (2026-10-30)
+
+`tests/rofi-render.sh` renders the real themes with rofi 1.7.5 (X11, Xvfb) and screenshots them.
+The rasi language is the same in 2.x; what X11 cannot show is Hyprland's blur and the
+translucent corners (no compositor in the test, so they render black). Findings:
+
+- **A missing `@import` file is fatal**: rofi shows the error in place of the menu. The installer
+  must create `~/.config/rofi/local.rasi` (empty) so the user-override import always resolves.
+- **`configuration {}` blocks inside a theme are honored and persist across `-theme`**: Orbit's
+  `eh: 2` leaked into Flight Deck menus until `deck.rasi` reset `eh: 1`.
+- Two-line rows work: `eh: 2` + `drun-display-format` with `\n` and Pango markup.
+- `~` expands in an `icon-*` widget's `filename`.
+- **Hard offset shadow via nested boxes works** (Flight Deck). Resolves the earlier [TODO-verify].
+- `linear-gradient(to right, #RRGGBBAA, ...)` with alpha works for the selected-row fill.
+- Showing `{comment}` requires `comment` in `drun-match-fields`, so descriptions are searched too.
+  With fuzzy matching that produced noisy hits; `matching: "normal"` (substring, like dmenu) fixed it.
+
+## Config layout
 
 ```text
 ~/.config/rofi/
-├── config.rasi          # behavior: modes, terminal, icon theme, drun format; @theme "apps"
+├── config.rasi          # behavior: modes, terminal, icon theme, matching; @theme "orbit"
 ├── colors.rasi          # generated from the palette
-├── apps.rasi            # chosen app-launcher concept (glass or rim), @import "colors.rasi"
-├── horizon.rasi         # dmenu strip for scripts, @import "colors.rasi"
-└── local.rasi           # user overrides, @import-ed last if present
+├── orbit.rasi           # app launcher theme (generated)
+├── deck.rasi            # Flight Deck theme for every scripted menu (generated)
+└── local.rasi           # user overrides; created empty by the installer, never overwritten
 ~/.local/share/<rice>/art/                 # spacegen.py output rasterized by rsvg-convert at install:
                                            #   starfield.png (panel), planet.png, wallpaper-3840x2160.png
-~/.local/bin/rice-menu-*                    # scripted menus: power, clipboard, screenshot, monitors, keys
+~/.local/bin/rice-menu                      # scripted menus: session, clipboard, windows, keys, screenshot, monitors
 ```
 
 ## Alternatives considered

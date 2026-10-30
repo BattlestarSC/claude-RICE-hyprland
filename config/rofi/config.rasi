@@ -1,0 +1,22 @@
+/* rofi behavior. Look lives in the generated themes (orbit.rasi, deck.rasi). */
+configuration {
+    modi:               "drun,run,window";
+    terminal:           "kitty";
+    icon-theme:         "Papirus-Dark";
+    display-drun:       "apps";
+    display-run:        "run";
+    display-window:     "windows";
+    drun-show-actions:  false;
+    disable-history:    false;
+    sort:               true;
+    sorting-method:     "normal";
+    matching:           "normal";   /* substring, like dmenu; fuzzy also matched descriptions */
+    scroll-method:      0;
+    kb-cancel:          "Escape,Control+g,Control+bracketleft";
+}
+
+@theme "orbit"
+
+/* Personal overrides. The installer creates local.rasi empty (rofi errors on a missing import)
+   and never overwrites it. */
+@import "local.rasi"

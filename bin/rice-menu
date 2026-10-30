@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# Scripted menus in the Flight Deck rofi theme.
+#
+#   rice-menu session | clipboard | windows | keys | screenshot | monitors
+#
+# Each menu is one function; all of them render through deck() so they look the same.
+# Bound in ~/.config/hypr/conf/binds.lua. Runtime deps (official repos): rofi, jq,
+# cliphist, wl-clipboard, grim, slurp, hyprshutdown (falls back to hl.dsp.exit()).
+set -Eeuo pipefail
+
+deck() { # deck PROMPT [MESSAGE] < entries  ->  selected line on stdout
+  local prompt=$1 mesg=${2:-}
+  local args=(-dmenu -i -p "$prompt" -theme deck -no-custom)
+  [[ -n $mesg ]] && args+=(-mesg "$mesg")
+  rofi "${args[@]}"
+}
+
+notify() {
+  if command -v notify-send >/dev/null; then notify-send -a rice-menu "$@"; fi
+}
+
+menu_session() {
+  local up choice
+  up=$(uptime -p | sed 's/^up //')
+  choice=$(printf '%s\n' \
+    "  lock" "󰍃  log out" "󰤄  suspend" "  reboot" "  shut down" |
+    deck session "up $up") || exit 0
+  case $choice in
+    *lock)      loginctl lock-session ;;
+    *"log out") graceful_exit ;;
+    *suspend)   systemctl suspend ;;
+    *reboot)    graceful_exit "Restarting..." "systemctl reboot" ;;
+    *"shut down") graceful_exit "Shutting down..." "systemctl poweroff" ;;
+  esac
+}
+
+graceful_exit() { # [label] [post-command]
+  if command -v hyprshutdown >/dev/null; then
+    local args=()
+    [[ -n ${1:-} ]] && args+=(-t "$1")
+    [[ -n ${2:-} ]] && args+=(--post-cmd "$2")
+    hyprshutdown "${args[@]}"
+  else
+    [[ -n ${2:-} ]] && { sh -c "$2"; return; }
+    hyprctl dispatch 'hl.dsp.exit()'
+  fi
+}
+
+menu_clipboard() {
+  local pick
+  pick=$(cliphist list | deck clipboard "enter copies · history from cliphist") || exit 0
+  printf '%s' "$pick" | cliphist decode | wl-copy
+}
+
+menu_windows() {
+  local pick address
+  # "workspace  class  title<TAB>address"; rofi shows everything before the tab.
+  pick=$(hyprctl -j clients | jq -r '
+      sort_by(.workspace.id)[] | select(.mapped)
+      | "\(.workspace.name)\t\(.class)\t\(.title)\t\(.address)"' |
+    awk -F'\t' '{ printf "%-4s %-18.18s %s\t%s\n", $1, $2, $3, $4 }' |
+    deck windows "workspace · class · title") || exit 0
+  address=${pick##*$'\t'}
+  [[ $address == 0x* ]] || exit 0
+  hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
+}
+
+menu_keys() {
+  # Binds that carry a description (set in binds.lua). modmask bits are the xkb ones:
+  # SHIFT 1, CTRL 4, ALT 8, SUPER 64.
+  hyprctl -j binds | jq -r '
+      .[] | select(.has_description)
+      | ([if (.modmask / 64 | floor) % 2 == 1 then "Super" else empty end,
+          if (.modmask / 4  | floor) % 2 == 1 then "Ctrl"  else empty end,
+          if (.modmask / 8  | floor) % 2 == 1 then "Alt"   else empty end,
+          if .modmask % 2 == 1 then "Shift" else empty end, .key] | join("+")) as $k
+      | "\($k)\t\(.description)"' |
+    awk -F'\t' '{ printf "%-26s %s\n", $1, $2 }' |
+    deck keys "i3 default keymap · descriptions from binds.lua" >/dev/null || true
+}
+
+menu_screenshot() {
+  local choice dir file geom
+  dir=${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots
+  mkdir -p "$dir"
+  file="$dir/$(date +%Y-%m-%d_%H-%M-%S).png"
+  choice=$(printf '%s\n' "󰩭  region → clipboard" "󰩭  region → file" "  window → file" "󰍹  monitor → file" |
+    deck screenshot "files go to $dir") || exit 0
+  sleep 0.2 # let the menu close before capturing
+  case $choice in
+    *"region → clipboard") geom=$(slurp) || exit 0; grim -g "$geom" - | wl-copy; notify "Screenshot copied" ;;
+    *"region → file")      geom=$(slurp) || exit 0; grim -g "$geom" "$file"; notify "Saved" "$file" ;;
+    *window*)              geom=$(hyprctl -j activewindow | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
+                           grim -g "$geom" "$file"; notify "Saved" "$file" ;;
+    *monitor*)             grim -o "$(hyprctl -j monitors | jq -r '.[] | select(.focused) | .name')" "$file"
+                           notify "Saved" "$file" ;;
+  esac
+}
+
+menu_monitors() {
+  # KVM helpers arrive with the monitor configuration (Phase 1). See docs/knowledge-base/hardware.md.
+  rofi -e "Monitor menu: not implemented yet (Phase 1)." -theme deck
+}
+
+case ${1:-} in
+  session|clipboard|windows|keys|screenshot|monitors) "menu_$1" ;;
+  *) echo "usage: rice-menu {session|clipboard|windows|keys|screenshot|monitors}" >&2; exit 2 ;;
+esac

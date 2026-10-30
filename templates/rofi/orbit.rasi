@@ -1,0 +1,99 @@
+/*
+ * Orbit: the app launcher (Super+D). Frosted panel, search pill, large icons with a
+ * description line, category tabs, a generated planet in the header.
+ * Blur comes from Hyprland (layer rule on namespace "rofi"), not from rofi.
+ */
+@import "colors.rasi"
+
+configuration {
+    show-icons:          true;
+    drun-match-fields:   "name,generic,exec,categories,keywords,comment";
+    drun-display-format: "<b>{name}</b>\n<span size='small' foreground='{{ overlay }}'>{comment}</span>";
+    markup-rows:         true;
+    eh:                  2;
+}
+
+* {
+    font:             "JetBrainsMono Nerd Font 12";
+    background-color: transparent;
+    text-color:       @text;
+}
+
+window {
+    location:         center;
+    width:            640px;
+    border:           1px;
+    border-color:     @glass-edge;
+    border-radius:    18px;
+    background-color: @glass;
+    transparency:     "real";
+}
+
+mainbox {
+    children: [ header, mode-switcher, listview ];
+    spacing:  0;
+    padding:  0 0 10px 0;
+}
+
+header {
+    orientation: horizontal;
+    children:    [ inputbar, icon-planet ];
+    expand:      false;
+    spacing:     10px;
+    padding:     14px 16px 6px 16px;
+}
+
+inputbar {
+    expand:           true;
+    children:         [ textbox-search, entry ];
+    spacing:          10px;
+    padding:          9px 14px;
+    border-radius:    999px;
+    background-color: @glass-field;
+}
+textbox-search { content: "⌕"; expand: false; text-color: @subtext; vertical-align: 0.5; }
+entry          { expand: true; placeholder: "Search"; placeholder-color: @overlay; cursor-color: @yellow; vertical-align: 0.5; }
+
+icon-planet {
+    filename: "~/.local/share/rice/art/planet.png";
+    size:     64px;
+    expand:   false;
+}
+
+mode-switcher { expand: false; spacing: 6px; padding: 4px 16px 8px 16px; }
+button {
+    expand:        false;
+    padding:       3px 10px;
+    border:        1px;
+    border-color:  @surface2;
+    border-radius: 999px;
+    text-color:    @subtext;
+}
+button selected { background-color: @red; border-color: @red; text-color: @crust; }
+
+listview {
+    lines:        6;
+    fixed-height: true;
+    scrollbar:    false;
+    spacing:      0;
+    padding:      0 8px;
+}
+
+element {
+    children:      [ element-icon, element-text ];
+    spacing:       12px;
+    padding:       8px 10px;
+    border:        0 0 1px 0;
+    border-color:  @surface1;
+    border-radius: 0;
+}
+element normal.normal, element alternate.normal { background-color: transparent; }
+element selected.normal {
+    background-image: linear-gradient(to right, {{ red | hexa:0.28 }}, {{ purple | hexa:0.12 }});
+    border:           0 0 0 3px;
+    border-color:     @red;
+    border-radius:    8px;
+}
+element-icon { size: 34px; vertical-align: 0.5; }
+element-text { vertical-align: 0.5; text-color: inherit; highlight: bold {{ yellow }}; }
+element selected.normal element-text { text-color: @bright; }

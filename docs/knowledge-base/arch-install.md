@@ -72,8 +72,8 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Audio / media | `pipewire`, `wireplumber` [V wiki], `pipewire-pulse`, `pipewire-alsa`, `pipewire-jack`, `pavucontrol`, `playerctl`, `brightnessctl` |
 | Terminal + shell | `kitty`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-completions`, `starship`, `fzf`, `zoxide`, `eza`, `bat` |
 | Bar / notifications | `quickshell` or `waybar` (decision O3), `mako` or `swaync` |
-| Launcher / menus | `rofi` (≥ 2.0 for native Wayland), `jq` |
-| Login | `sddm`, `xorg-server` (SDDM's default greeter is X11) |
+| Launcher / menus | `rofi` (≥ 2.0 for native Wayland), `jq`, `libnotify`, `librsvg` (`rsvg-convert` rasterizes generated art at install) |
+| Login | `greetd`, `greetd-regreet` (greeter runs inside Hyprland; no X server) |
 | GPU (AMD) | `mesa`, `vulkan-radeon`; opt-in Blender GPU step: `hip-runtime-amd`, `hiprt` [S: Arch blender optdepends] |
 | Clipboard / screenshots | `wl-clipboard`, `cliphist`, `grim`, `slurp`, `satty` (verify repo) |
 | Fonts / icons / cursor | `ttf-jetbrains-mono-nerd`, `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
@@ -90,8 +90,8 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 
 [V: wiki master-tutorial.md, uwsm.md, 2026-10-29]
 
-**Decided: SDDM** (D7 in [decisions.md](../decisions.md)); see
-[hardware.md](hardware.md#sddm). The TTY method below is kept as reference for users of this repo
+**Decided: greetd + ReGreet inside Hyprland** (D7 in [decisions.md](../decisions.md)); see
+[hardware.md](hardware.md#login-greetd--regreet). The TTY method below is kept as reference for users of this repo
 who prefer no display manager; the installer will not set it up by default.
 
 ```sh

@@ -41,13 +41,18 @@ would make us revisit it. Open entries list a recommendation; they need the owne
   translucency are for chrome (bar, launcher, notifications). Motion blur off. Wobble off.
 - **Revisit if:** the owner wants a showier default; effects stay one toggle away either way.
 
-### D7. Session start: SDDM (owner's call, 2026-10-29)
+### D7. Login: greetd + ReGreet, running inside Hyprland (2026-10-30; replaces SDDM)
 
-- Graphical login via SDDM. Greeter on X11 in v1 (SDDM's default, most tested; requires
-  `xorg-server`), Wayland greeter via weston documented as an option (upstream still calls it
-  experimental). Space-themed SDDM QML theme is a Phase 3 sub-project.
-  Details: [knowledge-base/hardware.md](knowledge-base/hardware.md#sddm).
-- **Consequence:** the TTY auto-start in `~/.zprofile` is dropped; enabling SDDM is a prompted system change.
+- Owner asked for a graphical login and allowed replacing SDDM if something fits better.
+  greetd + ReGreet (both in Arch `extra`) runs the greeter in a minimal Hyprland session, so:
+  the greeter uses **the same monitor config** (EDID match, scale 1.5) and the same KVM
+  hot-unplug handling as the desktop; no X server is installed; it is themed with GTK4 CSS
+  generated from the palette and uses the generated wallpaper. ReGreet's README documents a
+  Hyprland 0.57 Lua greeter config.
+- SDDM was the original pick (2026-10-29). Against it: its default greeter needs `xorg-server`,
+  its Wayland greeter is still "experimental", and theming is a separate QML project.
+- **Consequence:** the TTY auto-start in `~/.zprofile` is dropped; enabling greetd is a prompted
+  system change. Details: [knowledge-base/hardware.md](knowledge-base/hardware.md#login-greetd--regreet).
 
 ### D8. Primary hardware target (owner's machine, 2026-10-29)
 
@@ -72,14 +77,31 @@ would make us revisit it. Open entries list a recommendation; they need the owne
 - Next step: promote it to `colors/quasar.toml` as the single source of truth when the theme
   generator lands (Phase 1). Fine-tuning stays possible via the blend dial.
 
+### D11. Keymap: i3 defaults (owner's call, 2026-10-30)
+
+i3's default bindings with `$mod = Super` and `j k l ;` movement; Hyprland extras only on keys
+i3 leaves free. Full mapping and the few gaps (no `focus parent`, no stacked layout):
+[keybindings.md](keybindings.md).
+
+### D12. Launcher: Orbit for apps, Flight Deck for scripted menus, engine rofi (2026-10-30)
+
+Owner liked Orbit and Flight Deck. Orbit is the `drun` launcher (`$mod+d`); Flight Deck is the
+theme for every `rofi -dmenu` menu (`bin/rice-menu`: session, clipboard, windows, keys,
+screenshot). Both rendered with real rofi (`tests/rofi-render.sh`). The launcher no longer
+forces a bar engine, so O3 is independent again.
+
 ## Open
 
-### O3. Status bar: Quickshell vs waybar (next topic)
+### O3. Status bar: Quickshell vs waybar (next topic, now independent of the launcher)
 
 The owner is interested in Quickshell. Inputs so far: Arch `extra` ships `quickshell` 0.3.1 [S];
 per-screen instances suit the KVM hotplug case [BK]; it is a QML framework, so the bar is written
 rather than configured. waybar is the configured alternative with a weaker hotplug record [BK].
 To be researched properly before deciding.
+
+### ~~O4. Launcher~~ → D12
+
+<details><summary>History</summary>
 
 ### O4. Launcher: concept pending (round 2: six concepts)
 
@@ -90,6 +112,8 @@ Halo, Orbit, Mission Control (no retro); Terminal Vision, Flight Deck, Waypoint 
 the bar is Quickshell too, settling O3); the others are rofi. `rofi -dmenu` stays for scripts regardless.
 Recommendation: **Waypoint** if staying on rofi (it is the requested middle ground); **Mission Control**
 if the bar goes Quickshell. Details: [knowledge-base/launcher.md](knowledge-base/launcher.md).
+
+</details>
 
 ### O5. Notifications
 
@@ -119,17 +143,9 @@ neovim/btop/fastfetch themes, Blender UI theme from the palette.
 No license yet. Without one, the repo is "all rights reserved" by default. MIT is the common
 choice for dotfiles.
 
-### O11. Keymap: i3-compatible?
+### O12. Hardware details still needed
 
-Coming from i3, the proposal is i3's defaults where Hyprland has an equivalent: `Super+Enter`
-terminal, `Super+D` launcher, `Super+Shift+Q` close, `Super+Shift+E` power menu,
-`Super+1..0` / `Super+Shift+1..0` workspaces, `Super+H/J/K/L` (and arrows) focus,
-`Super+Shift+H/J/K/L` move, `Super+F` fullscreen, `Super+Shift+Space` float. Did you use
-i3's `jkl;` or vim `hjkl`? Any custom i3 binds to carry over?
+GPU answered: RX 6000 series, Navi 21 (gfx1030), 16 GB. Still open: exact ProArt model (10-bit,
+gamut, refresh), KVM model, DisplayPort or HDMI, and whether a dock/MST hub is in the chain.
 
-### O12. Hardware details needed
-
-AMD GPU model (ROCm/HIP RT support), exact ProArt model (10-bit, gamut, refresh), KVM model and
-whether it is DisplayPort, and whether a dock/MST hub is in the chain.
-
-Closed: O1 → D10, O2 → D7, O7 → D8.
+Closed: O1 → D10, O2 → D7, O4 → D12, O7 → D8, O11 → D11.

@@ -1,0 +1,31 @@
+/* {{ name }} palette as rasi variables. Used by orbit.rasi and deck.rasi via @import. */
+* {
+    crust:    {{ crust }};
+    mantle:   {{ mantle }};
+    base:     {{ base }};
+    surface0: {{ surface0 }};
+    surface1: {{ surface1 }};
+    surface2: {{ surface2 }};
+    overlay:  {{ overlay }};
+    subtext:  {{ subtext }};
+    text:     {{ text }};
+    bright:   {{ bright }};
+
+    red:      {{ red }};
+    orange:   {{ orange }};
+    yellow:   {{ yellow }};
+    green:    {{ green }};
+    cyan:     {{ cyan }};
+    blue:     {{ blue }};
+    purple:   {{ purple }};
+    pink:     {{ pink }};
+
+    /* Translucent variants (rasi has no color-mix, so alpha is baked here). */
+    glass:        {{ base | hexa:0.78 }};
+    glass-edge:   {{ bright | hexa:0.12 }};
+    glass-field:  {{ crust | hexa:0.70 }};
+    sel-start:    {{ red | hexa:0.28 }};
+    sel-end:      {{ purple | hexa:0.12 }};
+    deck-sel:     {{ purple | hexa:0.30 }};
+    deck-shadow:  {{ surface2 }};
+}

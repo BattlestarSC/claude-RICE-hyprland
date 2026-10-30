@@ -6,9 +6,9 @@ The owner's machine. The rice must work well here first; other hardware is best-
 | --- | --- | --- |
 | Displays | 2 × ASUS ProArt 27" 4K | exact model (10-bit? wide gamut? refresh?) |
 | Connection | through a KVM; **outputs disappear when the KVM switches away** | KVM model; DP or HDMI; any MST hub |
-| GPU | AMD | model (decides ROCm/HIP support and HIP RT) |
+| GPU | AMD RX 6000 series, Navi 21 (gfx1030), 16 GB VRAM | exact SKU (6800 / 6800 XT / 6900 XT / 6950 XT) does not change anything below |
 | Compute | HIP / ROCm for Blender Cycles | |
-| Login | SDDM (graphical) | |
+| Login | greetd + ReGreet inside Hyprland (D7) | |
 
 ## Displays
 
@@ -83,7 +83,7 @@ Other components under hotplug:
 | Bar | waybar has a long history of hotplug issues [BK]; Quickshell creates per-screen instances dynamically [BK] | weighs toward Quickshell (decision O3) |
 | hyprlock | session locked while monitors gone, then monitors return: lock surfaces must appear on new outputs [TODO-verify] | test on hardware before shipping |
 | hypridle | unaffected (input-idle based) | none |
-| SDDM (X11 greeter) | X server handles hotplug via RandR; greeter may not re-layout [BK] | acceptable at login |
+| Greeter (greetd + ReGreet in Hyprland) | same fallback/return logic as the desktop, since it is Hyprland | test a KVM switch at the login screen |
 
 **Hardware alternative:** a KVM with EDID emulation (or DP EDID-emulator dongles) keeps outputs
 "connected" while switched away, which avoids every item above. Worth knowing if the software
@@ -102,7 +102,11 @@ mitigations prove flaky.
 - Arch `blender` (5.2.2 at time of search) lists **`hip-runtime-amd`** as the optional dependency
   for Cycles HIP rendering and **`hiprt`** for hardware ray tracing (RDNA2 / RX 6000 and newer).
 - ArchWiki: GFX9, CDNA and RDNA GPUs supported; **HIP has known issues in the Cycles 3D
-  viewport**, final renders (F12) work. Older reports of ROCm/Blender version mismatches crashing
+  viewport**, final renders (F12) work.
+- **This GPU (Navi 21) is gfx1030**, which ROCm builds for natively; the
+  `HSA_OVERRIDE_GFX_VERSION=10.3.0` workaround seen in guides is for gfx1031/1032 cards
+  (RX 6700/6600), not this one. [S: several guides via search; BK] RDNA2 qualifies for
+  hardware ray tracing through `hiprt`. 16 GB VRAM is ample for Cycles GPU rendering. Older reports of ROCm/Blender version mismatches crashing
   exist (ROCm 6.0 + Blender 4.0); current status unknown.
 - ROCm userspace is large (several GB). Install it as an **opt-in installer step** ("Blender GPU
   rendering"), not in the core package set.
@@ -111,22 +115,45 @@ mitigations prove flaky.
 - Verify: `rocminfo | grep -i gfx` lists the GPU; Blender → Preferences → System → Cycles Render
   Devices → HIP shows it.
 
-## SDDM
+## Login: greetd + ReGreet
 
-[V: sddm source `src/common/Configuration.h`, ChangeLog @ 2026-10-20] [V: Hyprland `example/hyprland.desktop.in`]
+[V: ReGreet README @ 2026-10-29 (rharish101/ReGreet)] [S: Arch `extra` has `greetd` 0.10.3 and `greetd-regreet` 0.5.0]
 
-- Hyprland installs a session file whose `Exec` is `start-hyprland`; SDDM lists it automatically.
-- SDDM's greeter runs on **X11 by default** (`[General] DisplayServer=x11`), which means
-  `xorg-server` must be installed even though the desktop is Wayland.
-- A Wayland greeter exists (`DisplayServer=wayland`, `[Wayland] CompositorCommand`, default
-  `weston --shell=kiosk`), still labelled **experimental** in the 0.20/0.21 changelogs, and
-  keyboard layout switching is not implemented there.
-- HiDPI: `EnableHiDPI=true` is the default for both greeters. At 4K/27" verify the greeter is
-  readable; if not, set `GreeterEnvironment=QT_SCREEN_SCALE_FACTORS=1.5` (X11) [BK].
-- Themes are QML; SDDM 0.21 lets a theme declare its Qt version. A space-themed SDDM theme in
-  the palette is its own sub-project (Phase 3).
-- Enabling it is a system change: `sudo systemctl enable sddm.service`. The installer prompts.
-- Display managers usually ship PAM config that unlocks GNOME Keyring at login, so the TTY PAM
-  edit from [arch-install.md](arch-install.md#starting-the-session) is not needed. [V: wiki uwsm.md note]
+How it fits together:
 
-Plan: X11 greeter in v1 (most tested path), Wayland greeter via weston as a documented option.
+```text
+greetd (system service, runs as root)
+└── default_session, as user "greeter":
+    dbus-run-session start-hyprland -- -c /etc/greetd/hyprland.lua
+        └── hyprland.lua: monitors (same desc: rules, scale 1.5), no binds except VT switch,
+            then exec "regreet; hyprctl dispatch 'hl.dsp.exit()'"
+                └── ReGreet (GTK4): /etc/greetd/regreet.toml + /etc/greetd/regreet.css
+```
+
+- `/etc/greetd/config.toml` `[default_session]`: `command = "dbus-run-session start-hyprland -- -c /etc/greetd/hyprland.lua"`, `user = "greeter"`. [V: README]
+- Upstream's Lua greeter config sets `misc.disable_hyprland_logo`, `disable_splash_rendering`,
+  `disable_hyprland_guiutils_check` and starts ReGreet from `hl.on("hyprland.start", ...)`. [V: README]
+- **Shared monitor config:** the installer copies the user's `monitors.lua` to
+  `/etc/greetd/monitors.lua` (the greeter user cannot read `~/.config`), so the login screen has the
+  same layout and scale. Re-run when monitors change.
+- **ReGreet is single-monitor:** it draws on one output; the other shows the greeter
+  Hyprland's background. Set that background to the generated wallpaper so both screens look intentional.
+- Theming: `regreet.toml` (`[background] path/fit`, `[GTK] application_prefer_dark_theme,
+  font_name, icon_theme_name, cursor_theme_name`, clock widget, greeting) and `regreet.css`
+  (GTK4 CSS) — both generated from the palette. Key names are from the README on `master`;
+  check them against the 0.5.0 package's `regreet.sample.toml` [TODO-verify].
+- Background formats depend on the build (README mentions Glycin and GStreamer); a PNG from
+  `rsvg-convert` is the safe choice.
+- Enabling it is a system change: `sudo systemctl enable greetd.service` (and disabling any
+  other display manager). The installer prompts.
+- No `xorg-server` needed. Keyring auto-unlock: greetd ships a PAM file; whether it includes
+  `pam_gnome_keyring` on Arch: [TODO-verify].
+
+### Why not the alternatives
+
+| Option | Verdict |
+| --- | --- |
+| SDDM | default greeter needs `xorg-server`; Wayland greeter still experimental; QML theming is a separate project |
+| greetd + ReGreet under `cage` | simpler compositor, but no per-monitor scale/position by EDID description; hotplug handled by cage, not our config |
+| greetd + tuigreet / ly | text-mode greeters: robust and fast, but limited theming; viable fallback if ReGreet misbehaves |
+| GDM / plasma-login-manager | pull in large parts of GNOME / Plasma |
