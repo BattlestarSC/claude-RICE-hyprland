@@ -1,0 +1,9 @@
+/* {{ name }} for Firefox and LibreWolf (internal pages). Deployed to <profile>/chrome/userContent.css.
+ * Removes the white flash of blank and new-tab pages; websites are untouched (they follow
+ * prefers-color-scheme: dark). */
+@-moz-document url("about:blank"), url("about:newtab"), url("about:home"), url("about:privatebrowsing") {
+    html, body {
+        background-color: {{ base }} !important;
+        color: {{ text }} !important;
+    }
+}

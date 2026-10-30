@@ -1,0 +1,151 @@
+# {{ name }} as a KDE color scheme: Dolphin and other KDE/Qt apps (via hyprqt6engine's
+# theme:color_scheme). Deployed to ~/.local/share/color-schemes/{{ name }}.colors.
+# Structure follows Breeze Dark (KDE/breeze colors/BreezeDark.colors).
+
+[ColorEffects:Disabled]
+Color={{ surface1 | rgbcsv }}
+ColorAmount=0
+ColorEffect=0
+ContrastAmount=0.65
+ContrastEffect=1
+IntensityAmount=0.1
+IntensityEffect=2
+
+[ColorEffects:Inactive]
+ChangeSelectionColor=true
+Color={{ surface2 | rgbcsv }}
+ColorAmount=0.025
+ColorEffect=2
+ContrastAmount=0.1
+ContrastEffect=2
+Enable=false
+IntensityAmount=0
+IntensityEffect=0
+
+[Colors:Window]
+BackgroundAlternate={{ base | rgbcsv }}
+BackgroundNormal={{ mantle | rgbcsv }}
+DecorationFocus={{ purple | rgbcsv }}
+DecorationHover={{ red | rgbcsv }}
+ForegroundActive={{ purple | rgbcsv }}
+ForegroundInactive={{ overlay | rgbcsv }}
+ForegroundLink={{ blue | rgbcsv }}
+ForegroundNegative={{ red | rgbcsv }}
+ForegroundNeutral={{ yellow | rgbcsv }}
+ForegroundNormal={{ text | rgbcsv }}
+ForegroundPositive={{ green | rgbcsv }}
+ForegroundVisited={{ purple | rgbcsv }}
+
+[Colors:View]
+BackgroundAlternate={{ mantle | rgbcsv }}
+BackgroundNormal={{ base | rgbcsv }}
+DecorationFocus={{ purple | rgbcsv }}
+DecorationHover={{ red | rgbcsv }}
+ForegroundActive={{ purple | rgbcsv }}
+ForegroundInactive={{ overlay | rgbcsv }}
+ForegroundLink={{ blue | rgbcsv }}
+ForegroundNegative={{ red | rgbcsv }}
+ForegroundNeutral={{ yellow | rgbcsv }}
+ForegroundNormal={{ text | rgbcsv }}
+ForegroundPositive={{ green | rgbcsv }}
+ForegroundVisited={{ purple | rgbcsv }}
+
+[Colors:Button]
+BackgroundAlternate={{ surface1 | rgbcsv }}
+BackgroundNormal={{ surface0 | rgbcsv }}
+DecorationFocus={{ purple | rgbcsv }}
+DecorationHover={{ red | rgbcsv }}
+ForegroundActive={{ purple | rgbcsv }}
+ForegroundInactive={{ overlay | rgbcsv }}
+ForegroundLink={{ blue | rgbcsv }}
+ForegroundNegative={{ red | rgbcsv }}
+ForegroundNeutral={{ yellow | rgbcsv }}
+ForegroundNormal={{ text | rgbcsv }}
+ForegroundPositive={{ green | rgbcsv }}
+ForegroundVisited={{ purple | rgbcsv }}
+
+[Colors:Selection]
+BackgroundAlternate={{ pink | rgbcsv }}
+BackgroundNormal={{ purple | rgbcsv }}
+DecorationFocus={{ purple | rgbcsv }}
+DecorationHover={{ red | rgbcsv }}
+ForegroundActive={{ crust | rgbcsv }}
+ForegroundInactive={{ surface1 | rgbcsv }}
+ForegroundLink={{ crust | rgbcsv }}
+ForegroundNegative={{ crust | rgbcsv }}
+ForegroundNeutral={{ crust | rgbcsv }}
+ForegroundNormal={{ crust | rgbcsv }}
+ForegroundPositive={{ crust | rgbcsv }}
+ForegroundVisited={{ crust | rgbcsv }}
+
+[Colors:Tooltip]
+BackgroundAlternate={{ mantle | rgbcsv }}
+BackgroundNormal={{ surface0 | rgbcsv }}
+DecorationFocus={{ purple | rgbcsv }}
+DecorationHover={{ red | rgbcsv }}
+ForegroundActive={{ purple | rgbcsv }}
+ForegroundInactive={{ overlay | rgbcsv }}
+ForegroundLink={{ blue | rgbcsv }}
+ForegroundNegative={{ red | rgbcsv }}
+ForegroundNeutral={{ yellow | rgbcsv }}
+ForegroundNormal={{ text | rgbcsv }}
+ForegroundPositive={{ green | rgbcsv }}
+ForegroundVisited={{ purple | rgbcsv }}
+
+[Colors:Complementary]
+BackgroundAlternate={{ mantle | rgbcsv }}
+BackgroundNormal={{ crust | rgbcsv }}
+DecorationFocus={{ purple | rgbcsv }}
+DecorationHover={{ red | rgbcsv }}
+ForegroundActive={{ purple | rgbcsv }}
+ForegroundInactive={{ overlay | rgbcsv }}
+ForegroundLink={{ blue | rgbcsv }}
+ForegroundNegative={{ red | rgbcsv }}
+ForegroundNeutral={{ yellow | rgbcsv }}
+ForegroundNormal={{ text | rgbcsv }}
+ForegroundPositive={{ green | rgbcsv }}
+ForegroundVisited={{ purple | rgbcsv }}
+
+[Colors:Header]
+BackgroundAlternate={{ crust | rgbcsv }}
+BackgroundNormal={{ mantle | rgbcsv }}
+DecorationFocus={{ purple | rgbcsv }}
+DecorationHover={{ red | rgbcsv }}
+ForegroundActive={{ purple | rgbcsv }}
+ForegroundInactive={{ overlay | rgbcsv }}
+ForegroundLink={{ blue | rgbcsv }}
+ForegroundNegative={{ red | rgbcsv }}
+ForegroundNeutral={{ yellow | rgbcsv }}
+ForegroundNormal={{ text | rgbcsv }}
+ForegroundPositive={{ green | rgbcsv }}
+ForegroundVisited={{ purple | rgbcsv }}
+
+[Colors:Header][Inactive]
+BackgroundAlternate={{ mantle | rgbcsv }}
+BackgroundNormal={{ crust | rgbcsv }}
+DecorationFocus={{ purple | rgbcsv }}
+DecorationHover={{ red | rgbcsv }}
+ForegroundActive={{ purple | rgbcsv }}
+ForegroundInactive={{ overlay | rgbcsv }}
+ForegroundLink={{ blue | rgbcsv }}
+ForegroundNegative={{ red | rgbcsv }}
+ForegroundNeutral={{ yellow | rgbcsv }}
+ForegroundNormal={{ subtext | rgbcsv }}
+ForegroundPositive={{ green | rgbcsv }}
+ForegroundVisited={{ purple | rgbcsv }}
+
+[General]
+ColorScheme={{ name }}
+Name={{ name }}
+shadeSortColumn=true
+
+[KDE]
+contrast=4
+
+[WM]
+activeBackground={{ mantle | rgbcsv }}
+activeBlend={{ text | rgbcsv }}
+activeForeground={{ text | rgbcsv }}
+inactiveBackground={{ crust | rgbcsv }}
+inactiveBlend={{ overlay | rgbcsv }}
+inactiveForeground={{ overlay | rgbcsv }}

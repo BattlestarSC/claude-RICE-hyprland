@@ -72,6 +72,34 @@ sky/                 Wallpaper (Background layer), AsciiSky (two ShaderEffect pa
   driven through Quickshell's own modules. Network uses `/proc/net/route` + `/sys/class/net` +
   `ip -j -4 addr`, so it works without NetworkManager.
 
+### Notifications (D20)
+
+- `services/Notifications.qml`: `NotificationServer` with `keepOnReload`, `persistenceSupported`,
+  `actionsSupported`, `imageSupported`; body markup, hyperlinks and body images **not**
+  advertised. Each new notification is `tracked` (kept after its popup), added to `history`
+  (max 50; the oldest is expired), and shown as a popup unless do-not-disturb or the screensaver
+  holds it (critical always shows). `lastGeneration` ones (re-emitted after a shell reload) go to
+  history only. `transient` ones are never kept: expired when their popup closes.
+- API facts [V: quickshell `src/services/notifications/*.hpp`, 9b0f339]: `expireTimeout` is in
+  **seconds**; setting `tracked = false` equals `dismiss()`; the object is destroyed right after
+  `closed` handlers return; apps may send markup even when it is not advertised, so every text
+  uses `textFormat: Text.PlainText`.
+- UI: `bar/NotificationCard.qml` (shared by popups and history), `bar/NotificationPopups.qml`
+  (Overlay layer, namespace `rice-notifications`, sized to its stack so it never blocks clicks),
+  `bar/NotificationsPanel.qml` (history, Quiet toggle, Clear all), bell pill with count.
+- Primary monitor = leftmost screen (`services/Screens.qml`); `Quickshell.screens` order is not
+  stable across KVM switches.
+
+### Screensaver (D21)
+
+`sky/SaverWindow.qml`, one per screen, hidden until `services/Screensaver.qml` is active
+(`qs ipc call screensaver start|stop|toggle|isActive`; hypridle starts it at 5 min). Overlay
+layer, exclusive keyboard focus (the dismissing key never reaches an app), opaque. AsciiSky with
+the whole globe (radius 0.30 × height) and the canvas offset panning on a Lissajous path
+(18 % × 12 % of the screen, 900 s loop), a clock on a separate 1300 s path, `saverFps` 8. It
+votes in SkyClock, so it animates even in `still`/`image` wallpaper mode.
+`tests/sky/render.py --saver` renders its framing.
+
 ### Testing without a compositor
 
 `tests/quickshell/render.py OUT.png [--background frame.png]` loads the real bar QML through PySide6

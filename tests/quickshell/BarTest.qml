@@ -2,6 +2,7 @@
 import QtQuick
 import qs.common
 import qs.bar
+import qs.services
 
 Rectangle {
     id: root
@@ -17,7 +18,7 @@ Rectangle {
                   leftMargin: Theme.screenGap; rightMargin: Theme.screenGap }
         height: Theme.barHeight
         title: "kitty — ~/claude-RICE-hyprland"
-        openPanel: "audio"
+        openPanel: "notifications"
         now: new Date(2026, 9, 30, 0, 42)
         workspaces: [{ id: 1, active: false, occupied: true }, { id: 2, active: false, occupied: true },
                      { id: 3, active: true, occupied: true }, { id: 4, active: false, occupied: false },
@@ -30,5 +31,16 @@ Rectangle {
         NetworkPanel {}
         BluetoothPanel {}
         AudioPanel {}
+        NotificationsPanel {}
+    }
+    // Popups as NotificationPopups.qml stacks them (that file itself needs Quickshell's PanelWindow).
+    Column {
+        anchors { top: parent.top; left: parent.left; topMargin: Theme.barHeight + 2 * Theme.gap; leftMargin: Theme.gap }
+        width: Theme.panelWidth
+        spacing: 8
+        Repeater {
+            model: Notifications.popups
+            NotificationCard { required property var modelData; notification: modelData; width: Theme.panelWidth }
+        }
     }
 }

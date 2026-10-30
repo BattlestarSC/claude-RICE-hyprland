@@ -1,0 +1,23 @@
+{
+  "BrowserThemeColor": "#BEA0FE",
+  "MetricsReportingEnabled": false,
+  "UrlKeyedAnonymizedDataCollectionEnabled": false,
+  "SearchSuggestEnabled": false,
+  "AlternateErrorPagesEnabled": false,
+  "SpellCheckServiceEnabled": false,
+  "TranslateEnabled": false,
+  "NetworkPredictionOptions": 2,
+  "BlockThirdPartyCookies": true,
+  "HttpsOnlyMode": "force_balanced_enabled",
+  "PrivacySandboxPromptEnabled": false,
+  "PrivacySandboxAdTopicsEnabled": false,
+  "PrivacySandboxSiteEnabledAdsEnabled": false,
+  "PrivacySandboxAdMeasurementEnabled": false,
+  "GenAiDefaultSettings": 2,
+  "ShoppingListEnabled": false,
+  "PromotionsEnabled": false,
+  "BackgroundModeEnabled": false,
+  "DefaultBrowserSettingEnabled": false,
+  "BrowserSignin": 0,
+  "SyncDisabled": true
+}

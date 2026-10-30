@@ -22,12 +22,14 @@ Singleton {
     property real cloudAngle: 0
     property real moonAngle: 0
     property real twinkle: 0
+    property real seconds: 0                    // wall clock, seconds into the day
     signal ticked()
 
     function angle(t, period) { return 2 * Math.PI * ((t % period) / period); }
 
     function tick() {
         const t = (Date.now() / 1000) % 86400;
+        seconds = t;
         earthAngle = angle(t, Config.earthPeriod);
         cloudAngle = angle(t, Config.cloudPeriod);
         moonAngle = angle(t, Config.moonPeriod);
@@ -38,9 +40,10 @@ Singleton {
     Component.onCompleted: tick()               // angles for "still" mode and the first frame
 
     Timer {
-        interval: 1000 / Config.skyFps
+        interval: 1000 / (Screensaver.active ? Config.saverFps : Config.skyFps)
         repeat: true
-        running: Config.skyMode === "animated" && root.animating > 0 && !root.paused
+        // The screensaver animates even in "still"/"image" wallpaper mode.
+        running: (Config.skyMode === "animated" || Screensaver.active) && root.animating > 0 && !root.paused
         onTriggered: root.tick()
     }
 

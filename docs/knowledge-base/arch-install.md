@@ -79,6 +79,8 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Clipboard / screenshots | `wl-clipboard`, `cliphist`, `grim`, `slurp`, `satty` (verify repo) |
 | Fonts / icons / cursor | `ttf-jetbrains-mono-nerd`, `ttf-ibm-plex` (bar text) [BK], `ttf-nerd-fonts-symbols` (bar icons) [BK], `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
 | Network (only if none present) | `networkmanager`, `network-manager-applet` |
+| File managers | `thunar`, `thunar-volman`, `thunar-archive-plugin`, `xarchiver`, `tumbler`, `ffmpegthumbnailer`, `gvfs`, `gvfs-mtp`, `udisks2`; `dolphin`, `kio-extras`, `ffmpegthumbs`, `breeze` (Qt widget style Dolphin falls back to), `archlinux-xdg-menu`; theme `adw-gtk-theme` [S: extra 6.5-1] [others BK / TODO-verify] |
+| Browsers | `librewolf` [S: extra], `firefox`; optional AUR: `ungoogled-chromium`(-bin), `zen-browser-bin` [TODO-verify] |
 
 ## Installer questions (beyond packages)
 
@@ -86,6 +88,8 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | --- | --- | --- |
 | Wallpaper | animated ASCII Earth/Moon (default) · still ASCII (no animation, zero cost) · your own image (path; e.g. a NASA Earth photo) | `~/.config/rice/settings.json` (`skyMode`, `skyImage`), written only if the file does not exist |
 | Wallpaper layout (two monitors) | mirror (default) · span | same file (`skyLayout`) |
+| Browser policies (system files) | write `/etc/firefox/policies/policies.json` (and `/etc/chromium/policies/managed/rice.json` if ungoogled-chromium is installed)? | prompt; root; see browsers.md |
+| Optional AUR browsers | ungoogled-chromium, Zen | prompt; off by default (D2) |
 
 NASA imagery is generally not copyrighted [S: search summary of NASA's media guidelines;
 nasa.gov unreachable from the build environment], but the installer does not download it by

@@ -1,0 +1,41 @@
+/* {{ name }} for Firefox and LibreWolf (browser chrome). Deployed by bin/rice-browser-setup to
+ * <profile>/chrome/userChrome.css; needs toolkit.legacyUserProfileCustomizations.stylesheets.
+ * Overrides the CSS variables Firefox's theme engine sets (LightweightThemeConsumer.sys.mjs and
+ * browser-colors.css/tabs.css on Firefox main, 2026-10-30), on top of the built-in dark theme.
+ * These are Firefox internals: if a release renames one, that part silently falls back to the
+ * dark theme; nothing breaks. */
+:root {
+    --lwt-accent-color: {{ crust }} !important;                 /* tab strip */
+    --lwt-text-color: {{ text }} !important;
+    --toolbox-background-color: {{ crust }} !important;
+    --toolbox-background-color-inactive: {{ crust }} !important;
+    --toolbox-text-color: {{ text }} !important;
+    --toolbox-text-color-inactive: {{ overlay }} !important;
+
+    --toolbar-background-color: {{ mantle }} !important;        /* navigation bar */
+    --toolbar-text-color: {{ text }} !important;
+    --toolbarbutton-icon-fill: {{ subtext }} !important;
+    --toolbarbutton-icon-fill-attention: {{ purple }} !important;
+
+    --toolbar-field-background-color: {{ base }} !important;    /* address bar */
+    --toolbar-field-text-color: {{ text }} !important;
+    --toolbar-field-border-color: {{ surface1 }} !important;
+    --toolbar-field-background-color-focus: {{ base }} !important;
+    --toolbar-field-text-color-focus: {{ bright }} !important;
+    --toolbar-field-border-color-focus: {{ purple }} !important;
+    --lwt-toolbar-field-highlight: {{ purple }} !important;      /* selected text, highlighted result */
+    --lwt-toolbar-field-highlight-text: {{ crust }} !important;
+
+    --tab-background-color-selected: {{ mantle }} !important;
+    --tab-text-color-selected: {{ bright }} !important;
+    --lwt-tab-line-color: {{ purple }} !important;              /* selected tab outline */
+
+    --panel-background-color: {{ surface0 }} !important;        /* menus and popups */
+    --panel-text-color: {{ text }} !important;
+    --panel-border-color: {{ surface1 }} !important;
+    --focus-outline-color: {{ purple }} !important;
+
+    --newtab-background-color: {{ base }} !important;
+    --newtab-background-color-secondary: {{ surface0 }} !important;
+    --newtab-text-primary-color: {{ text }} !important;
+}

@@ -12,6 +12,14 @@ Singleton {
     }
     function rate(n) { return bytes(n) + "/s"; }
     function pct(x) { return Math.round(x) + "%"; }
+    // "now", "5m", "2h", "3d" since a Date.
+    function ago(date) {
+        const s = Math.max(0, (Date.now() - date.getTime()) / 1000);
+        if (s < 60) return "now";
+        if (s < 3600) return Math.floor(s / 60) + "m";
+        if (s < 86400) return Math.floor(s / 3600) + "h";
+        return Math.floor(s / 86400) + "d";
+    }
     function duration(s) {
         s = Math.max(0, Math.floor(s));
         const m = Math.floor(s / 60), r = s % 60;

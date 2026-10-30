@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Render ASCII sky frames through real Qt Quick (PySide6), outside any compositor. Dev-only.
 
-    python tests/sky/render.py OUTDIR [--size 1920x1080] [--dpr 1.0] [--frames 24] [--span]
+    python tests/sky/render.py OUTDIR [--size 1920x1080] [--dpr 1.0] [--frames 24] [--span | --saver]
 
 Needs PySide6 with the Addons wheel (for qsb) and an OpenGL driver (Mesa llvmpipe is fine;
 timings are then CPU-rendered and NOT representative of the GPU). Steps: render the shader
@@ -48,6 +48,7 @@ def main() -> int:
     ap.add_argument("--cell", default="8x16", help="logical cell size")
     ap.add_argument("--frames", type=int, default=24)
     ap.add_argument("--span", action="store_true", help="render the right half of a two-monitor canvas")
+    ap.add_argument("--saver", action="store_true", help="screensaver framing (whole globe, drifted view)")
     a = ap.parse_args()
 
     w, h = (int(v) for v in a.size.split("x"))
@@ -85,6 +86,12 @@ def main() -> int:
         sky.setProperty("earthRadius", lh * 0.55)
         sky.setProperty("moonRadius", lh * 0.55 * 0.27)
         sky.setProperty("moonOrbit", lh * 0.55 * 2.4)
+    if a.saver:                                # mirrors config/quickshell/sky/SaverWindow.qml
+        sky.setProperty("offset", QPointF(lw * 0.18 * math.sin(1.0), lh * 0.12 * math.sin(2.7)))
+        sky.setProperty("earthCenter", QPointF(lw * 0.5, lh * 0.52))
+        sky.setProperty("earthRadius", lh * 0.30)
+        sky.setProperty("moonRadius", lh * 0.30 * 0.27)
+        sky.setProperty("moonOrbit", lh * 0.30 * 1.75)
     view.show()
 
     times = []

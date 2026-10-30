@@ -4,7 +4,7 @@
 // from its questions and never overwrites it; edit it any time, the shell picks changes up live.
 // Missing keys fall back to the defaults below. Example:
 //   { "skyMode": "animated", "skyLayout": "mirror", "skyFps": 4,
-//     "skyAnimateWithWindows": false, "skyImage": "" }
+//     "skyAnimateWithWindows": false, "skyImage": "", "saverFps": 8 }
 pragma Singleton
 import QtQuick
 import Quickshell
@@ -37,6 +37,11 @@ Singleton {
     readonly property real moonPeriod: 1800      // one orbit every 30 minutes
     readonly property real twinklePeriod: 9
 
+    // ---- Screensaver (sky/SaverWindow.qml; hypridle starts it) ----
+    // Smoother than the wallpaper because the whole scene pans (anti burn-in) and nothing covers it.
+    readonly property real saverFps: Math.max(1, Math.min(30, settings.saverFps))
+    readonly property real saverDriftPeriod: 900  // seconds for one full drift loop of the scene
+
     // ---- Bar ----
     readonly property int workspacesPerMonitor: 5  // left monitor 1-5, right 6-10 (Twin layout)
 
@@ -53,6 +58,7 @@ Singleton {
             property real skyFps: 4
             property bool skyAnimateWithWindows: false
             property string skyImage: ""
+            property real saverFps: 8
         }
     }
 }

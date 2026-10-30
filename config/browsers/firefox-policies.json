@@ -1,0 +1,81 @@
+{
+  "policies": {
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DisableFeedbackCommands": true,
+    "DontCheckDefaultBrowser": true,
+    "SkipTermsOfUse": true,
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+    "GenerativeAI": {
+      "Enabled": false,
+      "Chatbot": false,
+      "LinkPreviews": false,
+      "TabGroups": false,
+      "Locked": false
+    },
+    "FirefoxHome": {
+      "SponsoredTopSites": false,
+      "SponsoredPocket": false,
+      "SponsoredStories": false,
+      "Pocket": false,
+      "Stories": false,
+      "Snippets": false,
+      "Locked": false
+    },
+    "FirefoxSuggest": {
+      "WebSuggestions": false,
+      "SponsoredSuggestions": false,
+      "ImproveSuggest": false,
+      "Locked": false
+    },
+    "UserMessaging": {
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "UrlbarInterventions": false,
+      "SkipOnboarding": true,
+      "MoreFromMozilla": false,
+      "FirefoxLabs": false,
+      "Locked": false
+    },
+    "EnableTrackingProtection": {
+      "Value": true,
+      "Category": "strict",
+      "Cryptomining": true,
+      "Fingerprinting": true,
+      "EmailTracking": true,
+      "SuspectedFingerprinting": true,
+      "Locked": false
+    },
+    "HttpsOnlyMode": "enabled",
+    "ExtensionSettings": {
+      "{73a6fe31-595d-460b-a920-fcc0f8843232}": {
+        "installation_mode": "normal_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/{73a6fe31-595d-460b-a920-fcc0f8843232}/latest.xpi",
+        "default_area": "navbar"
+      },
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "normal_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/uBlock0@raymondhill.net/latest.xpi",
+        "default_area": "navbar"
+      }
+    },
+    "Preferences": {
+      "toolkit.legacyUserProfileCustomizations.stylesheets": { "Value": true, "Status": "default" },
+      "layout.css.prefers-color-scheme.content-override": { "Value": 0, "Status": "default" },
+      "privacy.globalprivacycontrol.enabled": { "Value": true, "Status": "default" },
+      "datareporting.policy.dataSubmissionEnabled": { "Value": false, "Status": "locked" },
+      "browser.discovery.enabled": { "Value": false, "Status": "default" },
+      "extensions.getAddons.showPane": { "Value": false, "Status": "default" },
+      "extensions.htmlaboutaddons.recommendations.enabled": { "Value": false, "Status": "default" },
+      "browser.ml.chat.enabled": { "Value": false, "Status": "default" },
+      "browser.ml.linkPreview.enabled": { "Value": false, "Status": "default" },
+      "network.prefetch-next": { "Value": false, "Status": "default" },
+      "network.dns.disablePrefetch": { "Value": true, "Status": "default" },
+      "network.http.speculative-parallel-limit": { "Value": 0, "Status": "default" },
+      "browser.urlbar.speculativeConnect.enabled": { "Value": false, "Status": "default" },
+      "browser.places.speculativeConnect.enabled": { "Value": false, "Status": "default" },
+      "media.peerconnection.ice.default_address_only": { "Value": true, "Status": "default" }
+    }
+  }
+}

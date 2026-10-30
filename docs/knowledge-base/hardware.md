@@ -4,7 +4,7 @@ The owner's machine. The rice must work well here first; other hardware is best-
 
 | Component | Detail | Still unknown |
 | --- | --- | --- |
-| Displays | 2 × ASUS ProArt 27" 4K | exact model (10-bit? wide gamut? refresh?) |
+| Displays | 2 × ASUS ProArt 27" 4K, **IPS** (owner, 2026-10-30) | exact model (10-bit? wide gamut? refresh?) |
 | Connection | Level1Techs dual-monitor DisplayPort 1.4 KVM: two DP links per PC, **outputs disappear when switched away** (no EDID emulation, confirmed by the vendor) | ProArt exact model |
 | GPU | AMD RX 6000 series, Navi 21 (gfx1030), 16 GB VRAM | exact SKU (6800 / 6800 XT / 6900 XT / 6950 XT) does not change anything below |
 | Compute | HIP / ROCm for Blender Cycles | |

@@ -95,7 +95,8 @@ Design points:
 - Hooks used here: `on_lock_cmd` / `on_unlock_cmd` (fire when a session-lock client locks or
   unlocks) pause and resume the animated wallpaper over Quickshell IPC.
 - This rice (`config/hypr/hypridle.conf`): lock at 10 min, DPMS off at 11 min, **no automatic
-  suspend** (Blender renders do not inhibit idle). The screensaver slot at 5 min is pending (O14).
+  suspend** (Blender renders do not inhibit idle). At 5 min `qs ipc call screensaver start`
+  (on-resume `… stop`) shows the ASCII screensaver (D21).
 
 ## hyprpaper
 

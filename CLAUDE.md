@@ -19,12 +19,15 @@ Visual goal: a soft dark, space-themed palette with Monokai-style accents and me
 Phase 1 started. Decided: palette Quasar (`colors/quasar.toml`), i3 default keymap, rofi with the
 Orbit (apps) and Flight Deck (menus) themes, greetd + ReGreet login, Quickshell bar (Orbit Glass),
 live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-user
-`~/.config/rice/settings.json`), 10-bit output, mild gaps + rounding, hyprlock + hypridle.
+`~/.config/rice/settings.json`), 10-bit output, mild gaps + rounding, hyprlock + hypridle,
+Quickshell notifications, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
+ungoogled-chromium, Zen) with privacy policies.
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
 `config/quickshell/` (bar, services, sky), `config/hypr/conf/{binds,monitors,layers,look,session}.lua`,
-`config/hypr/{hyprlock,hypridle}.conf`, `bin/rice-menu`, `bin/rice-sky-atlas`, tests.
+`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers}/`,
+`bin/rice-menu`, `bin/rice-sky-atlas`, `bin/rice-browser-setup`, tests.
 **Not yet present:** `install.sh`, the Hyprland entry point, window rules, autostart, kitty, zsh,
-greeter files, notifications, screensaver. Quickshell code is render-tested
+greeter files. Quickshell code is render-tested
 with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
 `shell.qml` and `services/` as unverified. Decided and open questions are in
 [docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
@@ -47,7 +50,9 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | kitty / zsh | [docs/knowledge-base/kitty.md](docs/knowledge-base/kitty.md), [docs/knowledge-base/zsh.md](docs/knowledge-base/zsh.md) |
 | Monitors, GPU, ROCm, SDDM | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
 | rofi, launcher, scripted menus | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) |
-| Status bar, telemetry sources, Quickshell, ASCII sky wallpaper | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) |
+| Status bar, telemetry sources, Quickshell, notifications, ASCII sky, screensaver | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) |
+| GTK/Qt app theming, file managers | [docs/knowledge-base/theming.md](docs/knowledge-base/theming.md) |
+| Browsers (policies, prefs, userChrome) | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
 | Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
 ## Hard rules
@@ -84,7 +89,7 @@ home/                       files deployed directly under ~ (.zshenv, .zprofile,
 colors/                     palettes; proposals/ now, the chosen palette as colors/<name>.toml later
 templates/                  per-app theme templates ({{ role | filter }}), rendered by tools/render_theme.py
 themes/<palette>/           generated app themes (committed; never hand-edit)
-bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas)
+bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup)
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
 tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind tests),
                             quickshell/ (bar render with mocks), sky/ (ASCII sky frames + timing)
@@ -98,7 +103,8 @@ python3 tools/render_theme.py colors/quasar.toml           # templates/ -> theme
 python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed themes are stale
 lua5.4 tests/lua/run.lua config/hypr/conf/*.lua            # dispatchers, modifiers, duplicate keys, hl.config option names
 python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
-shellcheck -x bin/rice-menu bin/rice-sky-atlas tests/rofi-render.sh
+shellcheck -x bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup tests/rofi-render.sh
+python3 tests/browsers/check_policies.py <policy-templates checkout> <chromium policies.yaml>   # see its docstring
 # Quickshell (needs PySide6 + PySide6-Addons, an X server or Xvfb, IBM Plex + Symbols Nerd Font):
 python3 tests/quickshell/render.py /tmp/bar.png --background frame.png   # real bar QML + mocks; fails on any QML warning
 python3 tests/sky/render.py /tmp/sky --size 3840x2160 --dpr 1.5 --frames 24  # --size is PHYSICAL px
@@ -137,7 +143,7 @@ generator changes, in the same commit.
 - **User override hooks** exist for every major config (`local.lua`, `local.zsh`, kitty
   `include local.conf` if present). The installer never touches them.
 - **Commits:** `area: imperative summary` (e.g. `hypr: add workspace binds`, `installer: back up existing configs`).
-  Areas: `hypr`, `kitty`, `zsh`, `bar`, `theme`, `colors`, `installer`, `docs`, `tools`, `ci`.
+  Areas: `hypr`, `kitty`, `zsh`, `bar`, `theme`, `colors`, `apps` (browsers, file managers, other app configs), `installer`, `docs`, `tools`, `ci`.
 
 ## Verifying facts (environment notes)
 
@@ -180,5 +186,11 @@ in an `archlinux:latest` container or on hardware.
 - hypridle/hyprlock `source` `~/.config/hypr/theme/colors.conf`; deploy it first.
 - The wallpaper must stay cheap: anything that changes AsciiSky properties every frame on a
   frozen monitor defeats the freeze (Wallpaper.qml copies angles only while `animating`).
+- Firefox on Linux reads `/etc/<app>/policies/policies.json` **instead of** the install's
+  `distribution/policies.json`: never write `/etc/librewolf/...` or `/etc/zen/...` (it would
+  discard LibreWolf's/Zen's own policies).
+- Firefox theme CSS variables are internals and get renamed; check `LightweightThemeConsumer.sys.mjs`.
+- Notification text must stay `Text.PlainText`; apps send markup regardless of advertised caps.
+- `Quickshell.screens` order is not "left first"; use `Screens.primary`.
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.

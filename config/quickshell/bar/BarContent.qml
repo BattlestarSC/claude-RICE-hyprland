@@ -3,7 +3,7 @@
 //
 //   left:   workspaces · window title
 //   center: clock
-//   right:  CPU/memory/load · drives · network · Bluetooth · volume · media · power
+//   right:  CPU/memory/load · drives · network · Bluetooth · volume · media · notifications · power
 import QtQuick
 import qs.common
 import qs.services
@@ -145,6 +145,18 @@ Item {
             Glyph { text: Media.playing ? Icons.pause : Icons.play; color: Theme.bright; anchors.verticalCenter: parent.verticalCenter
                     TapHandler { onTapped: Media.playPause() } }
             Label { text: Media.title; width: Math.min(implicitWidth, 200); anchors.verticalCenter: parent.verticalCenter }
+        }
+        Pill {                                           // notifications: count, do-not-disturb
+            id: notifyPill
+            active: root.openPanel === "notifications"
+            onClicked: root.panelRequested("notifications", notifyPill)
+            Glyph {
+                text: Notifications.dnd ? Icons.bellOff : (Notifications.count > 0 ? Icons.bellBadge : Icons.bell)
+                color: Notifications.dnd ? Theme.overlay : (Notifications.count > 0 ? Theme.purple : Theme.subtext)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            Label { visible: Notifications.count > 0; text: Notifications.count; mono: true
+                    anchors.verticalCenter: parent.verticalCenter }
         }
         Pill {                                           // power: session menu (lock ... shut down)
             id: powerPill

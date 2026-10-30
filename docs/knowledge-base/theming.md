@@ -23,6 +23,9 @@ themes/<palette>/
   ├── gtk/colors.css            → GTK3/4 @define-color overrides (libadwaita-compatible names)
   ├── quickshell/common/Theme.qml  → QML singleton: palette (`qcolor`), glass tints, fonts, sizes
   ├── quickshell/sky/*.frag     → GLSL 440 for the ASCII sky; palette baked in as `vec3` constants
+  ├── gtk-3.0/gtk.css, gtk-4.0/gtk.css, kde/scheme.colors   → see "GTK and file managers"
+  ├── firefox/userChrome.css, userContent.css                → browsers.md
+  ├── chromium/policies.json   → managed policies incl. BrowserThemeColor
   └── ...                       (mako/swaync, btop, nvim, bat as they get added)
         │
         │  install.sh           (install time; no generation, only linking)
@@ -36,7 +39,8 @@ time. Whether gdk-pixbuf in rofi loads SVG directly: [TODO-verify]; rasterizing 
 
 Template filters (`tools/render_theme.py`): `hex` `#rrggbb`, `hexa:A` `#rrggbbaa`, `rgba:A`
 `rgba(r,g,b,a)`, `bare` `rrggbb`, `vec3` `vec3(r, g, b)` (floats 0–1, for GLSL), `qcolor:A`
-`#AARRGGBB` (Qt's alpha-first order; `#rrggbbaa` would be misread by QML).
+`#AARRGGBB` (Qt's alpha-first order; `#rrggbbaa` would be misread by QML), `rgbcsv` `r,g,b`
+(KDE schemes), `cssrgba:A` `rgba(r, g, b, a)` (GTK3 has no 8-digit hex).
 
 Shaders are the one generated output that needs a build step on the target: Qt Quick loads `.qsb`
 files, so the installer compiles `themes/<palette>/quickshell/sky/*.frag` with `qsb` from
@@ -74,10 +78,45 @@ A `rice-theme <name>` script swaps the symlinks, then:
   `gtk-4.0/settings.ini` [BK]. libadwaita apps ignore custom themes except via `gtk-4.0/gtk.css`
   color overrides; generate that file from the palette. `nwg-look` is the GUI the wiki recommends. [V wiki master-tutorial]
 - **Qt:** `hyprqt6engine` (wiki-recommended) or `qt6ct` with `QT_QPA_PLATFORMTHEME`. [V wiki]
+  hyprqt6engine is **AUR-only** [S: search 2026-10-30], so it is not on the default path (D2);
+  its `theme:color_scheme` takes an absolute path (no `~` expansion [V: source d0ce29c]) to a
+  qt6ct scheme or a KDE `.colors` file, which would theme every Qt app with the same file.
 - **Cursor:** set via `hl.env("XCURSOR_THEME", ...)`, `XCURSOR_SIZE`, `HYPRCURSOR_*`, and
   `hyprctl setcursor <theme> <size>` at runtime; also `gsettings ... cursor-theme` for GTK. [V wiki env vars]
 - **Fonts:** a Nerd Font for terminal/bar glyphs; `noto-fonts` as the sans fallback (the wiki
   warns that without a sans-serif font text renders as boxes). [V wiki must-have]
+
+## GTK and file managers
+
+Generated per palette (`templates/gtk-3.0/gtk.css`, `templates/gtk-4.0/gtk.css`,
+`templates/kde/scheme.colors`); deployed as below.
+
+| Target | File | Mechanism |
+| --- | --- | --- |
+| GTK3 (Thunar, GTK3 file pickers) | `~/.config/gtk-3.0/gtk.css` + `settings.ini` (`gtk-theme-name=adw-gtk3-dark`) | `@define-color` overrides of adw-gtk3's named colors (`window_bg_color`, `view_bg_color`, `accent_bg_color`, `sidebar_*`, `headerbar_*`, `card_*`, `popover_*`, … [V: adw-gtk3 source 47922ed]) |
+| GTK4 / libadwaita | `~/.config/gtk-4.0/gtk.css` | `:root { --window-bg-color: …; }` CSS variables. libadwaita's `@define-color` names are "compatibility colors" that **don't pick up overridden colors** [V: libadwaita `doc/css-variables.md` f2e30ed] |
+| Dolphin (and KDE apps) | `~/.local/share/color-schemes/Quasar.colors`; `dolphinrc [UiSettings] ColorScheme=Quasar` | KColorSchemeManager reads `[UiSettings] ColorScheme` from the app's own config and applies it, also outside Plasma [V: kcolorscheme `kcolorschememanager.cpp` 8bb948c; Dolphin `dolphinmainwindow.cpp` 11f42e6 creates the manager and a "Window Color Scheme" menu]. Format follows Breeze Dark [V: KDE/breeze `colors/BreezeDark.colors`] |
+
+Role mapping (both GTK files and the KDE scheme): sidebar `crust`, window/header bar `mantle`,
+file view `base`, cards/popovers/dialogs `surface0`, accent and selection **purple with `crust`
+text** (8.8:1; every accent passes the 7:1 pill rule with `crust`), destructive/error red,
+warning yellow, success green.
+
+Also set by the installer (they are user files, so merged, not overwritten):
+- `gsettings set org.gnome.desktop.interface color-scheme prefer-dark`, `gtk-theme adw-gtk3-dark`,
+  `icon-theme Papirus-Dark`, `font-name 'IBM Plex Sans 11'`: under Wayland GTK reads these
+  (via the settings portal) before `settings.ini` [BK].
+- `kwriteconfig6 --file dolphinrc --group UiSettings --key ColorScheme Quasar` and
+  `kwriteconfig6 --file kdeglobals --group Icons --key Theme Papirus-Dark` [BK tool; ships with
+  KConfig, a Dolphin dependency].
+- `xdg-mime default thunar.desktop inode/directory` (Thunar opens folders; Dolphin stays
+  available from the launcher and "Open with").
+- Dolphin's "Open with" is empty outside Plasma unless a menu file exists: package
+  `archlinux-xdg-menu`, `XDG_MENU_PREFIX=arch-` in the session environment, then
+  `kbuildsycoca6 --noincremental` [S: forum/blog reports 2024-2026; Arch wiki unreachable].
+- `~/.config/xfce4/helpers.rc`: `TerminalEmulator=kitty`: Thunar's "Open Terminal Here" runs
+  `exo-open`/`xfce-open --launch TerminalEmulator`, which reads that key and runs the named
+  program from `PATH` [V: exo 4.20.0 `exo-execute.c`, libxfce4ui main `xfce-execute.c`].
 
 ## Readability rules that constrain every app theme
 

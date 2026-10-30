@@ -1,0 +1,58 @@
+/* {{ name }} for GTK4 / libadwaita apps: libadwaita reads CSS variables (its @define-color
+ * names are compatibility aliases that ignore overrides). Deployed to ~/.config/gtk-4.0/gtk.css. */
+
+:root {
+    --accent-bg-color: {{ purple }};
+    --accent-fg-color: {{ crust }};
+    --accent-color: {{ purple }};
+
+    --destructive-bg-color: {{ red }};
+    --destructive-fg-color: {{ crust }};
+    --destructive-color: {{ red }};
+    --success-bg-color: {{ green }};
+    --success-fg-color: {{ crust }};
+    --success-color: {{ green }};
+    --warning-bg-color: {{ yellow }};
+    --warning-fg-color: {{ crust }};
+    --warning-color: {{ yellow }};
+    --error-bg-color: {{ red }};
+    --error-fg-color: {{ crust }};
+    --error-color: {{ red }};
+
+    --window-bg-color: {{ mantle }};
+    --window-fg-color: {{ text }};
+    --view-bg-color: {{ base }};
+    --view-fg-color: {{ text }};
+    --headerbar-bg-color: {{ mantle }};
+    --headerbar-fg-color: {{ text }};
+    --headerbar-border-color: {{ surface1 }};
+    --headerbar-backdrop-color: {{ mantle }};
+    --headerbar-shade-color: {{ crust | cssrgba:0.36 }};
+    --headerbar-darker-shade-color: {{ crust | cssrgba:0.9 }};
+    --sidebar-bg-color: {{ crust }};
+    --sidebar-fg-color: {{ text }};
+    --sidebar-backdrop-color: {{ crust }};
+    --sidebar-shade-color: {{ crust | cssrgba:0.36 }};
+    --sidebar-border-color: {{ surface0 }};
+    --secondary-sidebar-bg-color: {{ mantle }};
+    --secondary-sidebar-fg-color: {{ text }};
+    --secondary-sidebar-backdrop-color: {{ mantle }};
+    --secondary-sidebar-shade-color: {{ crust | cssrgba:0.36 }};
+    --secondary-sidebar-border-color: {{ surface0 }};
+    --card-bg-color: {{ surface0 }};
+    --card-fg-color: {{ text }};
+    --card-shade-color: {{ crust | cssrgba:0.36 }};
+    --dialog-bg-color: {{ surface0 }};
+    --dialog-fg-color: {{ text }};
+    --popover-bg-color: {{ surface0 }};
+    --popover-fg-color: {{ text }};
+    --popover-shade-color: {{ crust | cssrgba:0.36 }};
+    --overview-bg-color: {{ crust }};
+    --overview-fg-color: {{ text }};
+    --thumbnail-bg-color: {{ surface0 }};
+    --thumbnail-fg-color: {{ text }};
+    --active-toggle-bg-color: {{ surface2 }};
+    --active-toggle-fg-color: {{ bright }};
+    --shade-color: {{ crust | cssrgba:0.36 }};
+    --scrollbar-outline-color: {{ crust | cssrgba:0.5 }};
+}

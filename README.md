@@ -14,7 +14,7 @@ A complete, soft-dark, space-themed Hyprland desktop for **vanilla Arch Linux**,
 | --- | --- | --- |
 | 0. Foundation | knowledge base, `CLAUDE.md`, README, palette + contrast tooling, launcher concepts | **done** |
 | 1. Core | `install.sh` (preflight, packages, backup, deploy), Hyprland Lua config, kitty, zsh, theme generator | **in progress**: theme generator, rofi themes, keybindings, menu script, monitors, layer rules, window look (gaps, borders, rounding) done |
-| 2. Desktop | bar, launcher, notifications, hyprlock, hypridle, wallpaper, screenshots, clipboard | **started**: Quickshell bar (Orbit Glass, power button) and ASCII sky written and render-tested off-hardware, not yet run in a real Quickshell; hyprlock + hypridle configs written |
+| 2. Desktop | bar, launcher, notifications, hyprlock, hypridle, wallpaper, screenshots, clipboard | **started**: Quickshell bar (Orbit Glass, power button, notifications), ASCII sky and screensaver written and render-tested off-hardware, not yet run in a real Quickshell; hyprlock + hypridle; Thunar/Dolphin theming; browser privacy configs |
 | 3. Polish | GTK/Qt theming, cursor, theme switcher, uninstaller, CI in an Arch container | planned |
 
 ## Planned usage
@@ -68,7 +68,10 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 | Launcher + menus | rofi 2.x: **Orbit** (apps, `$mod+d`) and **Flight Deck** (all scripted menus) | [concepts](docs/launcher/concepts.html) |
 | Keybindings | i3 defaults (`$mod` = Super, `j k l ;`) | [docs/keybindings.md](docs/keybindings.md) |
 | Static art | generated from the palette (`tools/spacegen.py`), incl. an Orbiter-style ASCII scene | lock and login screens |
-| Notifications | Quickshell notification server recommended, mako as the simple option | [O5](docs/decisions.md#o5-notifications-owner-considering-dunst-2026-10-30) |
+| Notifications | Quickshell's own server: Orbit Glass popups, history panel, do-not-disturb | [D20](docs/decisions.md#d20-notifications-quickshells-own-server-owner-2026-10-30) |
+| Screensaver | ASCII sky overlay at 5 min idle, whole scene drifts (anti burn-in), any input ends it | [D21](docs/decisions.md#d21-screensaver-ascii-overlay-burn-in-protection-on-ips-owner-2026-10-30) |
+| File managers | **Thunar** (default), **Dolphin** (secondary), both in the palette | [D22](docs/decisions.md#d22-file-managers-thunar-primary-dolphin-secondary-owner-2026-10-30) |
+| Browsers | **LibreWolf** (default), **Firefox** (telemetry off, NoScript + uBlock Origin), optional ungoogled-chromium and Zen | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
 | Blender GPU | ROCm / HIP (`hip-runtime-amd`, `hiprt`) | opt-in |
 | Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing, file picker |
 | Polkit | hyprpolkitagent | |
@@ -110,6 +113,7 @@ Pulsar (dark, saturated) and Event Horizon (soft), checked with two contrast mod
 CLAUDE.md                 guidance for AI-assisted development (rules, conventions, commands)
 bin/rice-menu             scripted menus (session, clipboard, windows, keys, screenshot)
 bin/rice-sky-atlas        renders the ASCII sky's glyph atlas at a monitor's exact cell size
+bin/rice-browser-setup    applies browser prefs and palette to every Firefox/LibreWolf/Zen profile
 colors/
 ├── quasar.toml           the palette: single source of truth for every app theme
 └── proposals/            design history (round 1 palettes, round 2 Quasar)
@@ -130,7 +134,8 @@ tools/                    dev only (Python 3.11+); the installer never uses thes
 ├── earthmask.py          Natural Earth GeoJSON → equirectangular land mask PNG
 └── render_theme.py       templates/ → themes/<palette>/ (with --check for drift)
 tests/                    rofi-render.sh (real rofi screenshots), lua/ (Hyprland API stub, bind tests),
-                          quickshell/ (bar render, mock services), sky/ (ASCII sky frames + timing)
+                          quickshell/ (bar render, mock services), sky/ (ASCII sky frames + timing),
+                          browsers/ (policy names checked against Mozilla's and Chromium's sources)
 ```
 
 The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout-target-create-directories-as-phases-need-them).
@@ -146,7 +151,8 @@ The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout
 | [docs/colors/proposals.md](docs/colors/proposals.md) | palette design and selection |
 | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) | dual 4K via KVM, AMD + ROCm, SDDM |
 | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) | rofi on Wayland: capabilities and limits |
-| [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) | Quickshell bar and ASCII sky: structure, data sources, tests |
+| [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) | Quickshell bar, notifications, ASCII sky and screensaver: structure, data sources, tests |
+| [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) | browser privacy settings and theming, and where each browser reads them |
 
 ## Development
 

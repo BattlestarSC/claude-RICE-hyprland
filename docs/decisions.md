@@ -122,8 +122,8 @@ in a Quickshell `Background` layer**, not a CPU program in any language.
   Earth texture from Natural Earth land polygons (public domain). Angles come from the wall clock,
   so both monitors (and restarts) stay in phase; 4 fps (was 10, see cost controls below); hidden when the monitor's workspace has a
   fullscreen window. Earth day 6 min, clouds 5 min, Moon orbit 30 min (`common/Config.qml`).
-- **Default `skyLayout: "mirror"`** (the full scene on each monitor); `"span"` treats both monitors
-  as one canvas with the Earth across the seam. Owner to confirm.
+- **Default `skyLayout: "mirror"`** (the full scene on each monitor), animated: confirmed by the
+  owner 2026-10-30. `"span"` treats both monitors as one canvas with the Earth across the seam.
 - **Static art** (`tools/spacegen.py`) stays for hyprlock and the login screen.
 - **Cost controls (2026-10-30, after the owner asked about overhead):** a monitor animates only
   while its workspace has **no windows** (tiled windows cover the sky; the frame freezes and costs
@@ -166,7 +166,51 @@ Idle: lock at 10 min, monitors off at 11 min, no automatic suspend. Details:
 Rightmost pill on every monitor's bar; opens the Flight Deck session menu (lock, log out,
 suspend, reboot, shut down) rather than shutting down on one click.
 
+### D20. Notifications: Quickshell's own server (owner, 2026-10-30)
+
+`services/Notifications.qml` (NotificationServer: actions, images, urgency, transient/resident,
+history kept across shell reloads), popups top-right of the primary monitor
+(`bar/NotificationPopups.qml`, Overlay layer, 6 s or the app's timeout, critical ones stay,
+hover holds), bell pill with count and a history panel with do-not-disturb (critical still
+shows) and clear-all. Text is always plain (apps may send markup regardless of what the server
+advertises; remote rich text and links are never rendered). No mako/dunst: only one daemon can
+own `org.freedesktop.Notifications`. IPC: `qs ipc call notifications dnd true|false`.
+
+### D21. Screensaver: ASCII overlay; burn-in protection on IPS (owner, 2026-10-30)
+
+Panels are IPS (model unknown). Permanent burn-in is not an IPS failure mode; image retention
+is temporary. Protection anyway, per the owner: at 5 min idle hypridle starts
+`sky/SaverWindow.qml` on every monitor (Overlay layer, exclusive keyboard so the first key is
+swallowed): whole globe, the entire scene pans on a 15-minute Lissajous path, the clock wanders
+on its own path, 8 fps; any input or hypridle's on-resume ends it; notification popups are held
+while it runs. Lock at 10 min, DPMS off at 11 min (the real protection: dark panels).
+Static UI that stays on screen for hours is the bar; on IPS that is not a concern (an OLED would
+need auto-hide or shifting).
+
+### D22. File managers: Thunar primary, Dolphin secondary (owner, 2026-10-30)
+
+Thunar (GTK3) themed by adw-gtk3-dark + generated `gtk-3.0/gtk.css` (adw-gtk3's named colors);
+libadwaita apps by generated `gtk-4.0/gtk.css` (CSS variables; libadwaita's named colors are
+compatibility aliases that ignore overrides [V: libadwaita docs]). Dolphin by a generated KDE
+color scheme applied through Dolphin's own KColorSchemeManager (`dolphinrc [UiSettings]
+ColorScheme`), so no AUR Qt platform theme is required (hyprqt6engine is AUR-only [S]). Thunar's
+"Open Terminal Here" uses kitty through `~/.config/xfce4/helpers.rc` [V: exo 4.20.0 and
+libxfce4ui main source]. Details: [knowledge-base/theming.md](knowledge-base/theming.md#gtk-and-file-managers).
+
+### D23. Browsers: LibreWolf, Firefox, ungoogled-chromium, Zen (owner, 2026-10-30)
+
+"IronWolf" does not exist as a desktop browser; LibreWolf (Arch `extra`) is taken as the
+intended primary (IronFox is Android-only). Firefox: system policies (telemetry/studies off,
+sponsored and AI features off, strict tracking protection, HTTPS-only, NoScript + uBlock Origin
+auto-installed) plus a `user.js` block; LibreWolf keeps its own hardening and gets only the
+look; ungoogled-chromium (AUR, optional) gets managed policies; Zen (AUR, optional) gets the
+privacy prefs only. Palette `userChrome.css` for Firefox and LibreWolf. Details:
+[knowledge-base/browsers.md](knowledge-base/browsers.md).
+- **Revisit if:** the owner meant a different browser by "IronWolf".
+
 ## Open
+
+### ~~O5. Notifications~~ → D20 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22
 
 ### ~~O3. Status bar~~ → D14
 
@@ -198,34 +242,12 @@ if the bar goes Quickshell. Details: [knowledge-base/launcher.md](knowledge-base
 
 </details>
 
-### O5. Notifications (owner considering dunst, 2026-10-30)
-
-**Recommendation: Quickshell's own notification server** (`Quickshell.Services.Notifications`,
-present in v0.3.2 source: actions, images, urgency, inline reply, resident/transient): popups in
-the Orbit Glass style, a bell pill with history and do-not-disturb in the bar. Simplest robust
-alternative: **mako**. dunst works on Wayland but several of its strengths are X11-era.
-Trade-offs in the chat reply of 2026-10-30; to be recorded here once decided.
-
 ### O6. Deploy method: symlink into the repo vs copy
 
 Symlinks make `git pull` an instant update and keep one source of truth, but break if the repo
 is moved or deleted. Copy is robust but makes updates explicit. **Blocked on** verifying that
 Hyprland's config watcher reacts to edits through symlinks ([knowledge-base/hyprland.md](knowledge-base/hyprland.md)).
 Leaning symlink, with the installer recording the repo path and warning if it moves.
-
-### O14. Screensaver (anti burn-in)
-
-Recommendation: hypridle at 5 min starts a **Quickshell overlay** that shows the ASCII sky
-full-screen in a drifting variant; any input dismisses it; lock follows at 10 min, DPMS off at
-11 min. Alternative: a full-screen kitty running a terminal animation. Note: a screensaver
-cannot run *behind* the lock screen (session lock draws only the locker), so after locking the
-monitors should go dark soon. Depends on the panel type (IPS vs OLED; O12).
-
-### O15. File manager
-
-Recommendation pending owner choice: Thunar (GTK3, light) or Nemo (GTK3, dual pane), themed with
-adw-gtk3 + generated `gtk.css` color overrides (same file serves libadwaita apps); Dolphin if
-KIO/power features matter more than dependencies. Details in the chat reply of 2026-10-30.
 
 ### O9. Scope beyond Hyprland + kitty + zsh for v1
 
@@ -237,7 +259,7 @@ neovim/btop/fastfetch themes, Blender UI theme from the palette.
 
 Answered: GPU RX 6000 / Navi 21 (gfx1030), 16 GB; KVM Level1Techs dual-monitor DisplayPort 1.4
 (two links per PC, no EDID emulation). Still open: exact ProArt model (true 10-bit or 8-bit+FRC,
-native gamut, refresh, **IPS or OLED**); it decides `cm` (see D16), whether 10-bit stays on, and
-how aggressive burn-in protection must be (O14).
+native gamut, refresh); it decides `cm` (see D16) and whether 10-bit stays on. Panel type
+answered 2026-10-30: **IPS** (D21).
 
-Closed: O1 → D10, O2 → D7, O3 → D14, O4 → D12, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
+Closed: O1 → D10, O2 → D7, O3 → D14, O4 → D12, O5 → D20, O14 → D21, O15 → D22, O7 → D8, O8 → D13, O10 → D13, O11 → D11.

@@ -26,6 +26,11 @@ Singleton {
     readonly property string down: "\u{f0045}"
     readonly property string up: "\u{f005d}"
     readonly property string check: "\u{f012c}"
+    readonly property string bell: "\u{f009a}"
+    readonly property string bellOff: "\u{f009b}"
+    readonly property string bellBadge: "\u{f116b}"
+    readonly property string close: "\u{f0156}"
+    readonly property string clearAll: "\u{f05e9}"
 
     // BlueZ device icon names -> glyphs.
     function forBluetooth(icon) {

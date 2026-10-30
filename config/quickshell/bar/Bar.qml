@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.common
+import qs.services
 
 PanelWindow {
     id: win
@@ -23,7 +24,7 @@ PanelWindow {
     color: "transparent"
 
     readonly property var monitor: Hyprland.monitorFor(screen)
-    readonly property bool primary: Quickshell.screens.length < 2 || screen === Quickshell.screens[0]
+    readonly property bool primary: screen === Screens.primary
 
     property string panel: ""
     property Item panelAnchor: null
@@ -69,6 +70,7 @@ PanelWindow {
         Loader {
             id: loader
             sourceComponent: ({ system: systemPanel, network: networkPanel, bluetooth: bluetoothPanel,
+                                notifications: notificationsPanel,
                                 audio: audioPanel })[win.panel] || null
         }
     }
@@ -76,4 +78,5 @@ PanelWindow {
     Component { id: networkPanel; NetworkPanel {} }
     Component { id: bluetoothPanel; BluetoothPanel {} }
     Component { id: audioPanel; AudioPanel {} }
+    Component { id: notificationsPanel; NotificationsPanel {} }
 }
