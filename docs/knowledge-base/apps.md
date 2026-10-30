@@ -88,8 +88,10 @@ not be checked from here.
   line and `session optional pam_gnome_keyring.so auto_start` after the last `session` line of
   `/etc/pam.d/greetd` (`lib/pam-keyring.awk`; a file that already mentions the module is left as
   is). The `login` keyring is then created with, and unlocked by, the login password.
-  Arch's file contents [TODO-verify: CI runs `tests/installer/pam_keyring.sh /etc/pam.d/greetd`
-  on the real package].
+  Arch's greetd 0.10.3 ships `auth required pam_securetty.so`, `auth requisite pam_nologin.so`,
+  `auth/account/session include system-local-login`; the edit adds exactly the two lines after
+  the last `auth` and `session` lines [V: CI `tests/installer/pam_keyring.sh /etc/pam.d/greetd`
+  on the real package, 2026-10-30; the full install then checks the result].
 - **Who uses it:** apps that store secrets through libsecret: Chromium (current Chromium sends
   unknown desktops such as Hyprland to the Secret Service [V: chromium
   `components/os_crypt/async/browser/freedesktop_secret_key_provider.cc`, main 2026-10-30]),
