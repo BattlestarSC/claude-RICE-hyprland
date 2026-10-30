@@ -114,7 +114,9 @@ expect "Code - OSS theme installed" "rice" code --list-extensions
 expect "Code - OSS uses the keyring" "gnome-libsecret" cat "${HOME}/.vscode-oss/argv.json"
 
 echo "== shell"
-check "zsh loads the config without errors" bash -c "out=\$(zsh -i -c 'print -r -- ok' 2>&1) && [[ \"\${out}\" == ok ]] || { printf '%s\n' \"\${out}\"; false; }"
+# Under a pseudo-terminal (script, util-linux), as in a real terminal: without one zle cannot start.
+zsh_out="$(script -qec "zsh -i -c 'print -r -- ok'" /dev/null 2>&1 | tr -d '\r' || true)"
+if [[ "${zsh_out}" == ok ]]; then pass "zsh loads the config without errors"; else fail "zsh loads the config without errors"; printf '%s\n' "${zsh_out}" | tail -n 15 | sed 's/^/     /'; fi
 
 echo "== desktop defaults"
 expect "images open in imv" "imv" xdg-mime query default image/png
@@ -122,7 +124,7 @@ expect "PDF opens in Zathura" "zathura" xdg-mime query default application/pdf
 expect "audio opens in Amberol" "Amberol" xdg-mime query default audio/mpeg
 expect "folders open in Thunar" "thunar" xdg-mime query default inode/directory
 expect "web pages open in LibreWolf" "librewolf" xdg-mime query default text/html
-expect "mail links open in Thunderbird" "thunderbird" xdg-mime query default x-scheme-handler/mailto
+expect "mail links open in Thunderbird" "hunderbird" xdg-mime query default x-scheme-handler/mailto   # org.mozilla.Thunderbird.desktop
 
 expect "GTK prefers dark (dconf persisted)" "prefer-dark" dbus-run-session -- gsettings get org.gnome.desktop.interface color-scheme
 expect "Dolphin uses the Quasar scheme" "Quasar" kreadconfig6 --file dolphinrc --group UiSettings --key ColorScheme

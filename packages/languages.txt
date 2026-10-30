@@ -4,6 +4,9 @@ erlang
 elixir
 # Haskell
 ghc
+# Arch's ghc ships only shared libraries: without ghc-static, `ghc Main.hs` and default cabal
+# builds fail with "Could not find module 'Prelude'" (found by the full-install CI).
+ghc-static
 cabal-install
 haskell-language-server
 # SWI-Prolog (lsp_server pack: rice-lsp-setup)

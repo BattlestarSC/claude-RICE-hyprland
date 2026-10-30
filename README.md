@@ -64,7 +64,12 @@ override files the installer never overwrites: `~/.config/hypr/local.lua`,
 ## Requirements
 
 - Arch Linux (vanilla install), x86_64, systemd.
-- A regular user with `sudo`.
+- A regular user with `sudo` (on Arch: in the `wheel` group with `%wheel ALL=(ALL:ALL) ALL`
+  enabled in `/etc/sudoers`, e.g. by `visudo`). The installer asks for the password once and keeps
+  sudo authorized until it finishes.
+- About 30 GB free on `/` (full TeX Live, LibreOffice, GHC and the Haskell language server are most of it).
+- Network access (Arch mirrors, plus GitHub, Maven Central, PyPI and the SWI-Prolog pack list for
+  the language servers that are not packaged).
 - A GPU with working DRM/KMS. Developed and tested on **AMD**; Intel should work. **NVIDIA**
   needs extra setup (the installer will detect and point you to it). **VMs** need 3D
   acceleration enabled, or Hyprland will not start.

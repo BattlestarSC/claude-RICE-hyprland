@@ -26,6 +26,17 @@ chown -R "${user}:${user}" "/home/${user}/rice"
 
 as_user() { su - "${user}" -c "$1"; }
 
+# Whatever happens, end with the installer's warnings (lines starting with "!"), so they are
+# in the last screen of a long CI log.
+summary() {
+    local rc=$?
+    section "installer warnings"
+    grep -h '^  ! ' /tmp/run1.log /tmp/run2.log 2> /dev/null | sort | uniq -c || echo "(none)"
+    df -h / 2> /dev/null | tail -n 1
+    return "${rc}"
+}
+trap summary EXIT
+
 section "install.sh --yes (first run)"
 start=${SECONDS}
 as_user 'cd ~/rice && ./install.sh --yes' 2>&1 | tee /tmp/run1.log
@@ -48,6 +59,4 @@ if grep -q 'replaced file(s) backed up' /tmp/run2.log; then
 fi
 echo "ok   second run: nothing written, nothing backed up (home and /etc)"
 
-section "disk"
-df -h / /var/cache/pacman/pkg 2> /dev/null || true
 echo "FULL INSTALL OK"
