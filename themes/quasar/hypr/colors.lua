@@ -23,4 +23,6 @@ return {
     pink     = "rgba(FB89CDFF)",
 
     shadow   = "rgba(0F0E1499)",
+    shadow_soft = "rgba(0F0E144C)",
+    none     = "rgba(0F0E1400)",
 }

@@ -22,4 +22,6 @@ return {
     pink     = "{{ pink | rgba }}",
 
     shadow   = "{{ crust | rgba:0.6 }}",
+    shadow_soft = "{{ crust | rgba:0.3 }}",
+    none     = "{{ crust | rgba:0 }}",
 }

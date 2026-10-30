@@ -7,6 +7,23 @@
 
 local M = { binds = {}, submaps = {}, errors = {} }
 
+-- Valid option paths for hl.config, generated from the wiki (tests/lua/gen_options.py).
+local options = require("options")
+
+-- Walks nested and dotted keys; a known option is a leaf (gradients are tables too).
+local function check_config(prefix, t)
+    for k, v in pairs(t) do
+        local path = prefix .. k
+        if options[path] then
+            -- ok
+        elseif type(v) == "table" then
+            check_config(path .. ".", v)
+        else
+            M.errors[#M.errors + 1] = ("unknown option '%s' in hl.config"):format(path)
+        end
+    end
+end
+
 local DSP = {
     _top     = { "exec_cmd", "exec_raw", "exit", "reload_config", "submap", "pass", "send_shortcut",
                  "send_key_state", "layout", "dpms", "event", "global", "force_renderer_reload",
@@ -79,7 +96,7 @@ local hl = {
     end,
     dispatch = function(d) assert(type(d) == "table" and d.dsp, "hl.dispatch: expects a dispatcher table") end,
     get_active_window = function() return M.active_window end,
-    config = function() end, env = function() end, monitor = function() end, on = function() end,
+    config = function(t) check_config("", t) end, env = function() end, monitor = function() end, on = function() end,
     window_rule = function() return {} end, layer_rule = function() return {} end,
     workspace_rule = function() return {} end, curve = function() end, animation = function() end,
     gesture = function() end, device = function() end, exec_cmd = function() end,

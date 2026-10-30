@@ -4,6 +4,8 @@
 
 package.path = "tests/lua/?.lua;" .. package.path
 local stub = require("hl_stub")
+-- `require("theme.colors")` in config files resolves to the generated palette.
+package.preload["theme.colors"] = function() return dofile("themes/quasar/hypr/colors.lua") end
 hl = stub.hl
 
 local failed = false
