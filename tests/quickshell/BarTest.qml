@@ -7,12 +7,14 @@ Rectangle {
     id: root
     color: Theme.crust
     property url background
+    // Instantiates Config (JSON settings through the Quickshell.Io stubs) so it is load-tested too.
+    readonly property string settings: Config.skyMode + " " + Config.skyLayout + " " + Config.skyFps
 
     Image { anchors.fill: parent; source: root.background; fillMode: Image.PreserveAspectCrop }
 
     BarContent {
-        anchors { top: parent.top; left: parent.left; right: parent.right; topMargin: Theme.gap / 2
-                  leftMargin: Theme.gap; rightMargin: Theme.gap }
+        anchors { top: parent.top; left: parent.left; right: parent.right; topMargin: Theme.screenGap
+                  leftMargin: Theme.screenGap; rightMargin: Theme.screenGap }
         height: Theme.barHeight
         title: "kitty — ~/claude-RICE-hyprland"
         openPanel: "audio"

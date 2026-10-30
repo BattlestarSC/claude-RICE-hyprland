@@ -3,7 +3,7 @@
 //
 //   left:   workspaces · window title
 //   center: clock
-//   right:  CPU/memory/load · drives · network · Bluetooth · volume · media
+//   right:  CPU/memory/load · drives · network · Bluetooth · volume · media · power
 import QtQuick
 import qs.common
 import qs.services
@@ -18,6 +18,7 @@ Item {
     property date now: new Date()
     signal workspaceClicked(int id)
     signal panelRequested(string name, Item anchor)
+    signal powerRequested()
 
     implicitHeight: Theme.barHeight
 
@@ -144,6 +145,11 @@ Item {
             Glyph { text: Media.playing ? Icons.pause : Icons.play; color: Theme.bright; anchors.verticalCenter: parent.verticalCenter
                     TapHandler { onTapped: Media.playPause() } }
             Label { text: Media.title; width: Math.min(implicitWidth, 200); anchors.verticalCenter: parent.verticalCenter }
+        }
+        Pill {                                           // power: session menu (lock ... shut down)
+            id: powerPill
+            onClicked: root.powerRequested()
+            Glyph { text: Icons.power; color: Theme.red; anchors.verticalCenter: parent.verticalCenter }
         }
     }
 }

@@ -15,9 +15,11 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "rice-bar"
     anchors { top: true; left: true; right: true }
-    margins { top: Theme.gap / 2; left: Theme.gap; right: Theme.gap }
+    // Same distance to the screen edge as windows (Hyprland gaps_out = Theme.screenGap); Hyprland
+    // adds gaps_out again below the reserved zone, so bar-to-window spacing matches too.
+    margins { top: Theme.screenGap; left: Theme.screenGap; right: Theme.screenGap }
     implicitHeight: Theme.barHeight
-    exclusiveZone: Theme.barHeight + Theme.gap / 2
+    exclusiveZone: Theme.barHeight + Theme.screenGap
     color: "transparent"
 
     readonly property var monitor: Hyprland.monitorFor(screen)
@@ -44,6 +46,8 @@ PanelWindow {
             return out;
         }
         onWorkspaceClicked: id => Hyprland.dispatch("hl.dsp.focus({ workspace = " + id + " })")
+        // Flight Deck session menu: lock, log out, suspend, reboot, shut down (bin/rice-menu).
+        onPowerRequested: { win.panel = ""; Quickshell.execDetached(["rice-menu", "session"]); }
         onPanelRequested: (name, anchor) => {
             win.panelAnchor = anchor;
             win.panel = win.panel === name ? "" : name;

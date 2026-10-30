@@ -52,7 +52,8 @@ Singleton {
 
     // Geometry (logical px)
     readonly property int barHeight: 34
-    readonly property int gap: 10               // matches Hyprland gaps_out
+    readonly property int gap: 10               // spacing between pills and inside panels
+    readonly property int screenGap: 6          // = Hyprland general.gaps_out (config/hypr/conf/look.lua)
     readonly property int pillPadding: 12
     readonly property int panelRadius: 16
     readonly property int panelWidth: 380
