@@ -56,7 +56,7 @@ extras_build() {
     case "${system}" in
         cmake)
             run cmake -S "${dir}" -B "${dir}/build" -G Ninja -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX="${EXTRAS_PREFIX}" -DCMAKE_INSTALL_LIBDIR=lib "${extra[@]}"
+                -DCMAKE_INSTALL_PREFIX="${EXTRAS_PREFIX}" -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF "${extra[@]}"
             run cmake --build "${dir}/build" -j "${EXTRAS_JOBS}"
             as_root cmake --install "${dir}/build"
             ;;
@@ -67,7 +67,8 @@ extras_build() {
             as_root meson install -C "${dir}/build"
             ;;
         cargo)
-            run cargo build --release --locked --manifest-path "${dir}/Cargo.toml" "${extra[@]}"
+            # ReGreet reads GREETD_CONFIG_DIR at compile time (FreeBSD: /usr/local/etc/greetd).
+            run env GREETD_CONFIG_DIR="${GREETD_DIR}" cargo build --release --locked --manifest-path "${dir}/Cargo.toml" "${extra[@]}"
             as_root install -D -m 0755 "${dir}/target/release/${name}" "${EXTRAS_PREFIX}/bin/${name}"
             ;;
         copy)

@@ -47,6 +47,16 @@ libxcb-errors-dev
 libudis86-dev
 libiniparser-dev
 libffi-dev
+# found by reading every pinned component's CMakeLists/meson.build (pkg_check_modules, dependency)
+libpugixml-dev
+libjpeg-dev
+libpng-dev
+libei-dev
+uuid-dev
+libreadline-dev
+libsystemd-dev
+libspa-0.2-dev
+libvulkan-dev
 libexpat1-dev
 libxml2-dev
 liblua5.5-dev

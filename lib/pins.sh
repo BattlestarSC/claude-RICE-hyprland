@@ -17,7 +17,7 @@ declare -ga HYPR_STACK=(
     "aquamarine|https://github.com/hyprwm/aquamarine|52ea11f06dd492f34b3cc0b39a9c805beecafcff|cmake|"
     "hyprland-protocols|https://github.com/hyprwm/hyprland-protocols|044a434ec371f985655389bcef09286b1af3d77c|meson|"
     "hyprwire|https://github.com/hyprwm/hyprwire|a546e42d45e161682f729ebf52375bd4800d7041|cmake|"
-    "hyprland|https://github.com/hyprwm/Hyprland|v0.57.0|cmake|-DBUILD_TESTING=OFF"
+    "hyprland|https://github.com/hyprwm/Hyprland|v0.57.0|cmake|"
     "hyprtoolkit|https://github.com/hyprwm/hyprtoolkit|2907e0d1f8a3a540737a0e738acc40d48ad7ba0d|cmake|"
     "hyprland-guiutils|https://github.com/hyprwm/hyprland-guiutils|204f39d6c7a4aca7042587d4638e19cdeccf63bc|cmake|"
     "xdg-desktop-portal-hyprland|https://github.com/hyprwm/xdg-desktop-portal-hyprland|0121b2e3f85c7ebf6280173f1054f7e5606262d1|cmake|"
