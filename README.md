@@ -67,7 +67,9 @@ override files the installer never overwrites: `~/.config/hypr/local.lua`,
 - A regular user with `sudo` (on Arch: in the `wheel` group with `%wheel ALL=(ALL:ALL) ALL`
   enabled in `/etc/sudoers`, e.g. by `visudo`). The installer asks for the password once and keeps
   sudo authorized until it finishes.
-- About 30 GB free on `/` (full TeX Live, LibreOffice, GHC and the Haskell language server are most of it).
+- About 30 GB free on `/`: measured in CI, 15 GB of programs without their documentation (TeX
+  Live's docs add several GB), 7 GB of downloaded packages in pacman's cache (`sudo pacman -Sc`
+  frees it afterwards), under 1 GB in your home. A first install took 7 minutes on a fast connection.
 - Network access (Arch mirrors, plus GitHub, Maven Central, PyPI and the SWI-Prolog pack list for
   the language servers that are not packaged).
 - A GPU with working DRM/KMS. Developed and tested on **AMD**; Intel should work. **NVIDIA**

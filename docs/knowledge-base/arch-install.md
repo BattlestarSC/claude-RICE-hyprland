@@ -219,6 +219,17 @@ For TTY login, GNOME Keyring auto-unlock needs `pam_gnome_keyring.so` lines in
   which also runs `install.sh --dry-run --yes` as a normal user).
 - Lua syntax: `luac -p` with a **5.5** compiler (Arch package name for Lua 5.5 [TODO-verify]).
   Semantic check: `Hyprland --verify-config -c <file>` if it runs headless [TODO-verify].
-- Full dry run: installer in an `archlinux` container with a `--dry-run` flag that prints every
-  action without executing it. Cannot exercise the compositor; a VM with virgl or real hardware
-  is required for that.
+- **Real install** (workflow `full-install`, `tests/installer/full-install.sh`): in a fresh
+  `archlinux:latest` container, a `wheel` user with sudo runs `./install.sh --yes` for real (the
+  whole package set, every post-install step, setup script and system change), then
+  `tests/installer/verify-install.sh` (every listed package installed; desktop, office and
+  language commands present; a program compiled and run in Elixir, Erlang, Haskell, SWI-Prolog,
+  Fortran, Java 25 and Scala; every language server; deployed and generated files; gsettings
+  persisted; default apps; greetd, PAM, login shell, services, policies), then a second
+  `./install.sh --yes` that must write and back up nothing. **Passed 2026-10-30** (runs
+  41127454900 and 41129657032; first install 421 s; 15 GB in `/usr` without docs, 6.9 GB pacman
+  cache, 0.9 GB home). Found on the way: `read` at EOF aborting `set_default_app`; `ghc` unusable
+  without `ghc-static`; `scala` not packaged; `jdk-openjdk` already JDK 27.
+- What no container shows: Hyprland, greetd/ReGreet, Quickshell or any GUI starting (no GPU, no
+  systemd as PID 1; `systemctl enable` works offline). A VM with virgl or real hardware is
+  needed for that; Blender + HIP (AMD only) is not part of the CI install.

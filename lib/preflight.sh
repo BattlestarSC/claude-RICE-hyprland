@@ -39,10 +39,12 @@ detect_display_manager() {
     fi
 }
 
-# Free space on / against the chosen package lists (rough sizes of what pacman downloads + unpacks).
+# Free space on / against the chosen package lists. Measured by the full-install CI (2026-10-30):
+# 15 GB under /usr without docs and man pages (the container skips them; TeX Live's docs are
+# several GB), 6.9 GB of downloaded packages in pacman's cache, 0.9 GB in the home directory.
 check_space() {
-    local need=16 free_gb
-    (( WANT_OFFICE )) && need=$((need + 8))
+    local need=18 free_gb
+    (( WANT_OFFICE )) && need=$((need + 12))
     free_gb=$(( $(df --output=avail -k / | tail -n 1) / 1024 / 1024 ))
     if (( free_gb < need )); then
         warn "only ${free_gb} GB free on /; this selection needs about ${need} GB"
