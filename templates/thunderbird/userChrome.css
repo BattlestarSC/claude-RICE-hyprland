@@ -1,0 +1,76 @@
+/* {{ name }} for Thunderbird. Deployed by bin/rice-browser-setup to <profile>/chrome/userChrome.css
+ * (needs toolkit.legacyUserProfileCustomizations.stylesheets, set in config/thunderbird/user.js),
+ * on top of the built-in Dark theme.
+ *
+ * Thunderbird draws its UI from design tokens (mail/themes/shared/mail/colors.css: --color-gray-*,
+ * the Bolt "--color-*-dark" set) and derives --layout-* from them in layout.css, which is applied
+ * to :root and again to every shadow root (:host). So the tokens are overridden here (they reach
+ * every pane by inheritance) and the derived --layout-* too (for the main document, where a few
+ * of them would otherwise land on the same token). Names: comm-central main, 2026-10-30; checked by
+ * tests/browsers/check_thunderbird.py. Internals: a renamed token silently falls back to the Dark
+ * theme. Email bodies are shown as their senders wrote them. */
+:root {
+    /* Gray scale as the Dark theme uses it: 90 darkest panel ... 50 lightest fill */
+    --color-gray-90: {{ mantle }} !important;
+    --color-gray-80: {{ base }} !important;
+    --color-gray-70: {{ surface0 }} !important;
+    --color-gray-60: {{ surface1 }} !important;
+    --color-gray-50: {{ surface2 }} !important;
+    --color-gray-40: {{ overlay }} !important;
+    --color-gray-30: {{ subtext }} !important;
+    --color-gray-20: {{ text }} !important;
+    --color-gray-10: {{ text }} !important;
+    --color-gray-05: {{ bright }} !important;
+    --color-neutral-200: {{ surface1 }} !important;
+
+    /* Bolt tokens, dark half */
+    --color-surface-base-dark: {{ base }} !important;
+    --color-surface-raised-dark: {{ surface0 }} !important;
+    --color-surface-subtle-dark: {{ mantle }} !important;
+    --color-surface-deep-dark: {{ surface1 }} !important;
+    --color-surface-border-dark: {{ surface2 }} !important;
+    --color-surface-border-intense-dark: {{ overlay }} !important;
+    --color-surface-lower-dark: {{ crust }} !important;
+    --color-primary-soft-dark: {{ surface1 }} !important;
+    --color-primary-default-dark: {{ purple }} !important;
+    --color-primary-hover-dark: {{ bright_purple }} !important;
+    --color-primary-pressed-dark: {{ purple }} !important;
+    --color-critical-default-dark: {{ red }} !important;
+    --color-critical-hover-dark: {{ bright_red }} !important;
+    --color-text-base-dark: {{ text }} !important;
+    --color-text-base-inverted-dark: {{ crust }} !important;
+    --color-text-secondary-dark: {{ subtext }} !important;
+    --color-text-muted-dark: {{ overlay }} !important;
+    --color-text-brand-dark: {{ purple }} !important;
+    --color-text-highlight-dark: {{ purple }} !important;
+    --color-text-warning-dark: {{ yellow }} !important;
+    --color-text-critical-dark: {{ red }} !important;
+    --color-text-success-dark: {{ green }} !important;
+    --color-text-disabled-dark: {{ surface2 }} !important;
+    --color-accent-teal-dark: {{ cyan }} !important;
+    --color-accent-blue-dark: {{ blue }} !important;
+    --color-accent-purple-dark: {{ purple }} !important;
+    --color-accent-orange-dark: {{ orange }} !important;
+    --color-accent-pink-dark: {{ pink }} !important;
+
+    /* Derived layout colors (main document) */
+    --layout-background-0: {{ base }} !important;      /* message list, reading pane chrome */
+    --layout-background-1: {{ mantle }} !important;    /* toolbars, folder pane */
+    --layout-background-2: {{ surface0 }} !important;
+    --layout-background-3: {{ surface1 }} !important;
+    --layout-background-4: {{ surface2 }} !important;
+    --layout-color-0: {{ bright }} !important;
+    --layout-color-1: {{ text }} !important;
+    --layout-color-2: {{ subtext }} !important;
+    --layout-color-3: {{ overlay }} !important;
+    --layout-border-0: {{ surface1 }} !important;
+    --layout-border-1: {{ surface2 }} !important;
+    --layout-border-2: {{ overlay }} !important;
+
+    /* Selection and accent: purple with dark text, as everywhere in the rice. The sidebar-highlight
+       pair is what --selected-item-color falls back through inside every pane. */
+    --sidebar-highlight-background-color: {{ purple }} !important;
+    --sidebar-highlight-text-color: {{ crust }} !important;
+    --selected-item-color: {{ purple }} !important;
+    --selected-item-text-color: {{ crust }} !important;
+}

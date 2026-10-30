@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# rice-browser-setup: apply the rice's browser prefs and palette to every existing profile of
-# Firefox and LibreWolf. Safe to re-run; runs as your user, never as root.
+# rice-browser-setup: apply the rice's prefs and palette to every existing profile of Firefox,
+# LibreWolf and Thunderbird (same Mozilla profile mechanics). Safe to re-run; runs as your user.
 #
 #   rice-browser-setup [SOURCE_DIR]      default: ~/.local/share/rice/browsers
 #
@@ -9,6 +9,7 @@
 #   librewolf.overrides.cfg    LibreWolf appearance prefs
 #   chrome/userChrome.css      palette for the browser UI (Firefox, LibreWolf)
 #   chrome/userContent.css     palette for blank/new-tab pages
+#   thunderbird/user.js, thunderbird/chrome/userChrome.css   Thunderbird prefs and palette (optional)
 #
 # What it changes, per profile (profiles are read from each browser's profiles.ini):
 #   user.js                 only the block between the "rice" markers; the rest is yours
@@ -82,18 +83,20 @@ profiles_in() {
     fi
 }
 
-# apply NAME PREFS_FILE(or "") WITH_CSS(0/1) BASE...
+# apply NAME PREFS_FILE(or "") CSS_DIR(or "") BASE...   CSS_DIR holds userChrome.css [userContent.css]
 apply() {
-    local name="$1" prefs="$2" with_css="$3"; shift 3
+    local name="$1" prefs="$2" css="$3"; shift 3
     local base profile found=0
     for base in "$@"; do
         while IFS= read -r profile; do
             [[ -d "${profile}" ]] || continue
             found=1
             if [[ -n "${prefs}" ]]; then write_block "${profile}/user.js" "${prefs}"; fi
-            if (( with_css )); then
-                install_css "${src}/chrome/userChrome.css" "${profile}/chrome/userChrome.css"
-                install_css "${src}/chrome/userContent.css" "${profile}/chrome/userContent.css"
+            if [[ -n "${css}" ]]; then
+                local sheet
+                for sheet in userChrome.css userContent.css; do
+                    if [[ -f "${css}/${sheet}" ]]; then install_css "${css}/${sheet}" "${profile}/chrome/${sheet}"; fi
+                done
             fi
             say "${name}: ${profile}"
             changed=$((changed + 1))
@@ -102,6 +105,7 @@ apply() {
     if (( ! found )) && command -v "${name}" > /dev/null; then
         say "${name}: no profile yet; start ${name} once, close it, and run rice-browser-setup again"
     fi
+    return 0
 }
 
 main() {
@@ -113,16 +117,23 @@ main() {
 
     printf 'Applying rice browser settings from %s\n' "${src}"
     # Firefox keeps ~/.mozilla/firefox when it exists, else uses $XDG_CONFIG_HOME/mozilla/firefox.
-    apply firefox "${src}/user.js" 1 "${HOME}/.mozilla/firefox" "${config_home}/mozilla/firefox"
+    apply firefox "${src}/user.js" "${src}/chrome" "${HOME}/.mozilla/firefox" "${config_home}/mozilla/firefox"
     # LibreWolf: prefs come from its overrides file, not user.js (LibreWolf's own hardening stays).
-    apply librewolf "" 1 "${HOME}/.librewolf" "${config_home}/librewolf/librewolf" "${config_home}/librewolf"
+    apply librewolf "" "${src}/chrome" "${HOME}/.librewolf" "${config_home}/librewolf/librewolf" "${config_home}/librewolf"
     if command -v librewolf > /dev/null || [[ -d "${HOME}/.librewolf" ]]; then
         mkdir -p -- "${HOME}/.librewolf"
         write_block "${HOME}/.librewolf/librewolf.overrides.cfg" "${src}/librewolf.overrides.cfg"
         say "librewolf: ${HOME}/.librewolf/librewolf.overrides.cfg"
     fi
 
-    printf 'Done: %d profile(s). Restart the browsers to apply.\n' "${changed}"
+    # Thunderbird keeps ~/.thunderbird when it exists, else uses $XDG_CONFIG_HOME/thunderbird
+    # (nsXREDirProvider, MOZ_APP_PROFILE=thunderbird).
+    if [[ -f "${src}/thunderbird/user.js" ]]; then
+        apply thunderbird "${src}/thunderbird/user.js" "${src}/thunderbird/chrome" \
+            "${HOME}/.thunderbird" "${config_home}/thunderbird"
+    fi
+
+    printf 'Done: %d profile(s). Restart the browsers and Thunderbird to apply.\n' "${changed}"
 }
 
 main "$@"

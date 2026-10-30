@@ -12,7 +12,8 @@ A missing name **without** `?` stops the installer before anything is installed.
 CI (`.github/workflows/ci.yml`) runs the same check in an `archlinux:latest` container, so a
 renamed package shows up as a failed check instead of a failed install. When CI confirms a `?`
 name, drop the `?`. As of 2026-10-30 (CI run 2) every name in these lists exists in Arch, so none
-carries a `?`; use it for new names that cannot be checked before CI runs.
+carries a `?`; use it for new names that cannot be checked before CI runs (currently: `man-db`,
+`man-pages`, `less`, `thunderbird`).
 
 | File | Installed |
 | --- | --- |

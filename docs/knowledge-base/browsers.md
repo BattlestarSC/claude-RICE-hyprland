@@ -120,6 +120,34 @@ chromium-launcher, which the ungoogled-chromium PKGBUILD also builds [V: PKGBUIL
 Extensions: no Chrome Web Store in ungoogled-chromium; uBlock Origin (MV2) no longer runs on
 current Chromium, uBlock Origin Lite (MV3) is installed by hand [BK].
 
+## Thunderbird
+
+Mail client (owner, 2026-10-30; D33). Package `thunderbird` (extra) [TODO-verify until CI].
+Gecko-based like Firefox, so the same three mechanisms apply; the same script sets it up.
+
+- Profiles: `~/.thunderbird` if it exists, else `$XDG_CONFIG_HOME/thunderbird` [V:
+  `nsXREDirProvider.cpp`, the same legacy-home rule as Firefox]. `rice-browser-setup` checks both.
+- Prefs (`config/thunderbird/user.js`, written as a marked block into each profile's `user.js`):
+  telemetry and data reporting off, no remote start page, remote images blocked (already the
+  default; stated so it stays), no default-client nag, userChrome on, built-in Dark theme
+  `thunderbird-compact-dark@mozilla.org` [V: `mail/themes/addons/dark/manifest.json`]. Pref
+  names [V: `mail/app/profile/all-thunderbird.js`, `mailnews/mailnews.js`, comm-central main
+  2026-10-30].
+- Theme (`templates/thunderbird/userChrome.css`): Thunderbird's UI draws from design tokens
+  (`mail/themes/shared/mail/colors.css`: `--color-gray-*`, the Bolt `--color-*-dark` set) and
+  derives `--layout-*` from them in `layout.css`, whose selector is `:host, :root` [V]. Because
+  every shadow root recomputes `--layout-*` from the tokens, overriding only `--layout-*` on
+  `:root` would miss the folder pane, message list and other custom elements. So the sheet
+  overrides the **tokens** (they inherit into shadow roots) and the derived `--layout-*` on
+  `:root`, all `!important` (the Dark theme sets them in the same cascade layer). 55 properties.
+  These are internals: a renamed token silently falls back to the stock Dark theme; the test
+  catches that against a checkout.
+- Message bodies are not themed (HTML mail is shown as sent).
+- Default mail client: `lib/desktop.sh` sets the Thunderbird desktop file (found by glob, name
+  [TODO-verify]) for `x-scheme-handler/mailto` and `message/rfc822`.
+- A profile is created at first start: run `rice-browser-setup` once more after the first launch
+  (the same as for the browsers). **Not run** in the build environment.
+
 ## Applying
 
 - System part (installer, prompted, root): Firefox `policies.json`, Chromium `rice.json`.
@@ -134,5 +162,6 @@ current Chromium, uBlock Origin Lite (MV3) is installed by hand [BK].
 
 ```sh
 python3 tests/browsers/check_policies.py <policy-templates checkout> <chromium policies.yaml>
+python3 tests/browsers/check_thunderbird.py <comm-central checkout>   # sparse; see its docstring
 shellcheck -x bin/rice-browser-setup
 ```

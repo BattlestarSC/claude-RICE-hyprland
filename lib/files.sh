@@ -20,6 +20,7 @@ deploy_user_files() {
     done < <(find "${REPO}/config/hypr" -type f -print0 | sort -z)
     deploy_file "${theme}/hypr/colors.lua" "${cfg}/hypr/theme/colors.lua"
     deploy_file "${theme}/hypr/colors.conf" "${cfg}/hypr/theme/colors.conf"
+    deploy_file "${theme}/hypr/hyprtoolkit.conf" "${cfg}/hypr/hyprtoolkit.conf"
 
     # Quickshell: bar, wallpaper, notifications, screensaver
     deploy_tree "${REPO}/config/quickshell" "${cfg}/quickshell"
@@ -81,6 +82,8 @@ deploy_user_files() {
     deploy_file "${theme}/firefox/userChrome.css" "${data}/rice/browsers/chrome/userChrome.css"
     deploy_file "${theme}/firefox/userContent.css" "${data}/rice/browsers/chrome/userContent.css"
     deploy_file "${REPO}/config/chromium-flags.conf" "${cfg}/chromium-flags.conf"
+    deploy_file "${REPO}/config/thunderbird/user.js" "${data}/rice/browsers/thunderbird/user.js"
+    deploy_file "${theme}/thunderbird/userChrome.css" "${data}/rice/browsers/thunderbird/chrome/userChrome.css"
 
     # Commands
     local cmd

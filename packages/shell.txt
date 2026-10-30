@@ -14,6 +14,11 @@ zoxide
 eza
 bat
 
+# Manual pages (not in Arch's base): man-db reads them, less shows them in the palette (theme.zsh)
+?man-db
+?man-pages
+?less
+
 # CLI tools
 htop
 btop

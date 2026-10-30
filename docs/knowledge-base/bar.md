@@ -100,6 +100,19 @@ the whole globe (radius 0.30 × height) and the canvas offset panning on a Lissa
 votes in SkyClock, so it animates even in `still`/`image` wallpaper mode.
 `tests/sky/render.py --saver` renders its framing.
 
+### Volume OSD (D34)
+
+`bar/OsdWindow.qml` (one, on `Screens.primary`) shows `bar/VolumeOsd.qml`: speaker glyph, a
+red → purple gradient bar (dimmed when muted), device name or "Muted", percentage. Overlay layer,
+namespace `rice-osd` (blurred with `ignore_alpha` in `layers.lua`), bottom center 96 px up,
+`mask: Region {}` so it never takes clicks, no keyboard focus. It reacts to `Audio`'s
+`volumeChanged`/`mutedChanged`, so it shows for the volume keys, `wpctl`, pavucontrol or the bar's
+scroll wheel alike; hides 1.5 s after the last change. It is **disarmed for 2 s** after start and
+after the default output changes: Pipewire's initial values arrive as change signals and would
+otherwise flash the OSD at login and on every KVM switch. No brightness OSD (owner, 2026-10-30).
+`VolumeOsd` is plain QtQuick and rendered by `tests/quickshell/render.py`; `OsdWindow` is not
+(PanelWindow) and is unverified.
+
 ### Testing without a compositor
 
 `tests/quickshell/render.py OUT.png [--background frame.png]` loads the real bar QML through PySide6

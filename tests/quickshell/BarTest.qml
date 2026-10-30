@@ -43,4 +43,11 @@ Rectangle {
             NotificationCard { required property var modelData; notification: modelData; width: Theme.panelWidth }
         }
     }
+    // The volume OSD as OsdWindow.qml shows it (bottom center).
+    VolumeOsd {
+        anchors { bottom: parent.bottom; horizontalCenter: parent.horizontalCenter; bottomMargin: 96 }
+        volume: Audio.volume
+        muted: Audio.muted
+        device: Audio.sinks.filter(s => s.active).map(s => s.name)[0] || ""
+    }
 }

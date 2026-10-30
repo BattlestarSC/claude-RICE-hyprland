@@ -33,6 +33,12 @@ desktop_defaults() {
         run xdg-mime default thunar.desktop inode/directory
         run xdg-mime default librewolf.desktop x-scheme-handler/http x-scheme-handler/https text/html
         run xdg-mime default nvim.desktop text/plain
+        # Thunderbird's desktop file name changed across releases; use whichever is installed.
+        local mail_desktop
+        mail_desktop="$(find /usr/share/applications -maxdepth 1 -iname '*thunderbird*.desktop' -printf '%f\n' 2> /dev/null | sort | head -n 1)"
+        if [[ -n "${mail_desktop}" ]]; then
+            run xdg-mime default "${mail_desktop}" x-scheme-handler/mailto message/rfc822
+        fi
     fi
     command -v xdg-user-dirs-update > /dev/null && run xdg-user-dirs-update
 

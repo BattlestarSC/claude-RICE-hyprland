@@ -75,3 +75,17 @@ RICE_COMPLETION_SCROLL='%K{#2C2B38}%F{#E4E0E9} %m of %M · %p · scroll with arr
 export FZF_DEFAULT_OPTS="--color=fg:#E4E0E9,bg:#191820,hl:#FD8DA8,fg+:#F3F1F6,bg+:#2C2B38,hl+:#FD8DA8\
  --color=info:#BEA0FE,prompt:#BEA0FE,pointer:#FB89CD,marker:#A6DA64,spinner:#FB89CD,header:#78D3E3,border:#3F3D50\
  --border=rounded --layout=reverse --height=40% --info=inline-right"
+
+# ---- Man pages in color ----
+# groff draws headings and options in bold, arguments underlined. With GROFF_NO_SGR it emits them
+# as overstrike (the classic backspace form) instead of its own escape codes, and less renders
+# overstrike with these termcap strings: bold → blue, underline → green italic, standout (status
+# line, search) → dark on purple. Works with any pager setup, no extra package.
+export GROFF_NO_SGR=1
+export LESS_TERMCAP_md=$'\e[1;38;2;136;175;253m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[3;38;2;166;218;100m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[1;38;2;15;14;20;48;2;190;160;254m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_mb=$'\e[1;38;2;253;141;168m'

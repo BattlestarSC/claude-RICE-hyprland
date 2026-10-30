@@ -95,6 +95,27 @@ zsh-syntax-highlighting (main + brackets, Monokai roles from the palette),
 zsh-history-substring-search (Up/Down match what is typed), fzf (Ctrl+R, Ctrl+T, Alt+C,
 `source <(fzf --zsh)` [V: fzf man page]), zoxide (`z`), eza for `ls` (`--icons=auto` [V: eza man]); `hx` → `helix` when only Arch's `helix` binary exists (editors.md).
 
+### Man pages in color (`templates/zsh/theme.zsh`)
+
+man-db formats with groff and pages with `less`. Since groff 1.18 `grotty` emits ISO 6429 SGR
+(bold/italic as escape codes), which `less -R` passes through as plain bold, so `LESS_TERMCAP_*`
+never fires. `GROFF_NO_SGR=1` makes `grotty` fall back to overstrike (`c\bc` bold, `_\bc`
+underline), which `less` maps to its termcap strings [V: grotty(1); the variable name in the
+`grotty` binary's strings, groff 1.23]. The strings are palette truecolor SGR (`sgr` filter):
+
+| Variable | Used for | Style |
+| --- | --- | --- |
+| `LESS_TERMCAP_md` / `me` | bold: headings, option names | bold `blue` |
+| `LESS_TERMCAP_us` / `ue` | underline: arguments, file names | italic `green` |
+| `LESS_TERMCAP_so` / `se` | standout: less's status line, search hits | bold `crust` on `purple` |
+| `LESS_TERMCAP_mb` | blink | bold `red` |
+
+Tested: groff → `less -R` rendered in a pty emulator; headings `#88affd` bold, arguments
+`#a6da64` italic; without `GROFF_NO_SGR` the same page is plain bold. Exported from zsh only:
+`man` started outside a zsh session (e.g. from rofi) is uncolored. Packages `man-db`,
+`man-pages`, `less` are in `packages/shell.txt` (vanilla Arch `base` has none of them [BK]).
+Checked by `tests/zsh/probe.zsh` (`man page colors`).
+
 ### Prompt (starship)
 
 Decision: **starship**, not powerlevel10k. p10k's README (2026-10-30): "THE PROJECT HAS VERY

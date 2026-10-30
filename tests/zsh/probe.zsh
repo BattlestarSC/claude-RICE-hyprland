@@ -8,6 +8,7 @@ check 'menu: Ctrl+S search'  '[[ "$(bindkey -M menuselect "^S")" == *history-inc
 check 'menu: / descends'     '[[ "$(bindkey -M menuselect "/")" == *accept-and-infer-next-history* ]]'
 check 'theme loaded'         '[[ "$ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE" == fg=#* ]]'
 check 'history file'         '[[ -d "${HISTFILE:h}" ]]'
+check 'man page colors'      '[[ $GROFF_NO_SGR == 1 && $LESS_TERMCAP_md == *"38;2;"* && $LESS_TERMCAP_us == *"38;2;"* ]]'
 check 'helper removed'       '(( ! $+functions[_rice_source] ))'
 if [[ -r /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
     check 'syntax highlighting' '(( $+functions[_zsh_highlight] )) && [[ "$ZSH_HIGHLIGHT_STYLES[command]" == fg=#* ]]'

@@ -82,7 +82,7 @@ override files the installer never overwrites: `~/.config/hypr/local.lua`,
 | Office | **TeX Live** (full), **TeXstudio** (dark, palette syntax colors), **LibreOffice** (generated Quasar theme, white pages) | LaTeX also in Neovim/Helix/vis via texlab; [office.md](docs/knowledge-base/office.md) |
 | CLI tools | **btop** (palette theme, vim keys), **htop** (terminal colors), **fastfetch** (palette config) | [cli-tools.md](docs/knowledge-base/cli-tools.md) |
 | Cursor | **Capitaine** light (official repos) | [theming.md](docs/knowledge-base/theming.md#cursor-themes) |
-| Shell | zsh + **starship** two-line rainbow prompt | full git status, exit code with signal name, meaning and pipeline status; fish-style Tab menu, autosuggestions, syntax highlighting, Up/Down history search, fzf, zoxide |
+| Shell | zsh + **starship** two-line rainbow prompt | full git status, exit code with signal name, meaning and pipeline status; fish-style Tab menu, autosuggestions, syntax highlighting, Up/Down history search, fzf, zoxide; colored man pages |
 | Lock / idle | hyprlock (themed, PAM, crash-safe session lock), hypridle | lock at 10 min, monitors off at 11 min, no auto-suspend |
 | Wallpaper | **live ASCII Earth + Moon** (Quickshell, two GPU shader passes, 4 fps, both monitors in sync; animates only on empty workspaces) · or the same scene as a still · or your own image (installer question) | [D15](docs/decisions.md#d15-wallpaper-live-ascii-earth-and-moon-gpu-shaders-in-quickshell-owner-2026-10-30) |
 | Login | greetd + ReGreet, inside Hyprland | same monitor config as the desktop; no X server |
@@ -91,12 +91,14 @@ override files the installer never overwrites: `~/.config/hypr/local.lua`,
 | Keybindings | i3 defaults (`$mod` = Super, `j k l ;`) | [docs/keybindings.md](docs/keybindings.md) |
 | Static art | generated from the palette (`tools/spacegen.py`), incl. an Orbiter-style ASCII scene | lock and login screens |
 | Notifications | Quickshell's own server: Orbit Glass popups, history panel, do-not-disturb | [D20](docs/decisions.md#d20-notifications-quickshells-own-server-owner-2026-10-30) |
+| Volume OSD | Quickshell, Orbit Glass card for volume/mute changes (no brightness OSD) | [D34](docs/decisions.md#d34-volume-osd-in-quickshell-no-brightness-osd-owner-2026-10-30) |
 | Screensaver | ASCII sky overlay at 5 min idle, whole scene drifts (anti burn-in), any input ends it | [D21](docs/decisions.md#d21-screensaver-ascii-overlay-burn-in-protection-on-ips-owner-2026-10-30) |
 | File managers | **Thunar** (default), **Dolphin** (secondary), both in the palette | [D22](docs/decisions.md#d22-file-managers-thunar-primary-dolphin-secondary-owner-2026-10-30) |
 | Browsers | **LibreWolf** (default), **Firefox** (telemetry off, NoScript + uBlock Origin), optional ungoogled-chromium | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
+| Mail | **Thunderbird** (telemetry off, remote images blocked, Dark theme recolored from the palette) | [D33](docs/decisions.md#d33-mail-thunderbird-privacy-prefs-palette-theme-owner-2026-10-30) |
 | Blender GPU | ROCm / HIP (`hip-runtime-amd`, `hiprt`) | opt-in |
 | Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing, file picker |
-| Polkit | hyprpolkitagent | |
+| Polkit | hyprpolkitagent (dialog themed through the generated `hyprtoolkit.conf`) | [D35](docs/decisions.md#d35-hyprtoolkit-theme-generated-from-the-palette-owner-2026-10-30) |
 | Audio | PipeWire + WirePlumber | |
 | Bluetooth | BlueZ, controlled from the bar | power, scan, connect, device battery |
 
@@ -138,7 +140,7 @@ lib/                      log, preflight, packages, deploy (copy + backup), file
 packages/                 package lists per group; ?name = optional (see packages/README.md)
 bin/rice-menu             scripted menus (session, clipboard, windows, keys, screenshot)
 bin/rice-sky-atlas        renders the ASCII sky's glyph atlas at a monitor's exact cell size
-bin/rice-browser-setup    applies browser prefs and palette to every Firefox/LibreWolf profile
+bin/rice-browser-setup    applies prefs and palette to every Firefox/LibreWolf/Thunderbird profile
 bin/rice-code-setup       installs the Code - OSS theme, merges the privacy settings
 bin/rice-lsp-setup        per user: language servers not in Arch's repos (ElixirLS, Metals, ocamllsp, fortls), vis-lspc
 bin/rice-libreoffice-setup installs the generated LibreOffice theme extension
@@ -147,7 +149,7 @@ colors/
 ├── quasar.toml           the palette: single source of truth for every app theme
 └── proposals/            design history (round 1 palettes, round 2 Quasar)
 config/                   dotfiles as deployed under ~/.config (hypr, quickshell, rofi, kitty, foot, zsh, editors,
-                          btop, htop, gtk, xfce4, browsers, code-oss) and /etc/greetd (greetd/)
+                          btop, htop, gtk, xfce4, browsers, thunderbird, code-oss) and /etc/greetd (greetd/)
 assets/earth/             Earth land mask for the ASCII sky (from Natural Earth, public domain)
 assets/sky/               the still ASCII sky (lock screen, login screen), from tools/spacegen.py
 templates/ → themes/quasar/   per-app color templates and their generated output

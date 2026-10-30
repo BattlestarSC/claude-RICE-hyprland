@@ -299,18 +299,75 @@ least 120 columns wide; never for git commit messages (EDITOR=nvim). `<leader>e`
 diagnostics float moved to `<leader>d`. Details:
 [knowledge-base/editors.md](knowledge-base/editors.md#file-explorer-and-buffer-tabs).
 
+### D33. Mail: Thunderbird, privacy prefs, palette theme (owner, 2026-10-30)
+
+Owner chose Thunderbird and asked for it themed if possible. Official repos (`thunderbird`).
+Set up by `rice-browser-setup` like the Firefox family: a marked `user.js` block (telemetry off,
+no remote start page, remote images blocked, built-in Dark theme, userChrome on) and a generated
+`userChrome.css` that recolors Thunderbird's design tokens from the palette. Default handler for
+`mailto:` and `.eml`. The theme rides on internals and may need a refresh after a major
+Thunderbird release (`tests/browsers/check_thunderbird.py` detects it). Details:
+[knowledge-base/browsers.md](knowledge-base/browsers.md#thunderbird).
+
+### D34. Volume OSD in Quickshell; no brightness OSD (owner, 2026-10-30)
+
+On-screen volume: an Orbit Glass card bottom center of the primary monitor for any volume or mute
+change of the default output; click-through, above fullscreen windows. Owner: no on-screen
+brightness. Part of the existing shell (no extra daemon such as SwayOSD). Details:
+[knowledge-base/bar.md](knowledge-base/bar.md#volume-osd-d34).
+
+### D35. hyprtoolkit theme generated from the palette (owner, 2026-10-30)
+
+`~/.config/hypr/hyprtoolkit.conf` themes the hyprtoolkit apps (hyprpolkitagent's dialog,
+hyprlauncher, hyprshutdown, hyprland-guiutils). Details:
+[knowledge-base/hypr-ecosystem.md](knowledge-base/hypr-ecosystem.md#hyprtoolkit-theme-source-for-hypr-gui-apps).
+
+### D36. Colored man pages (owner, 2026-10-30)
+
+`GROFF_NO_SGR=1` + `LESS_TERMCAP_*` in palette truecolor, from the generated zsh theme; `man-db`,
+`man-pages`, `less` installed. Details: [knowledge-base/zsh.md](knowledge-base/zsh.md#man-pages-in-color-templateszshthemezsh).
+
+### D37. No hardware-specific configuration (owner, 2026-10-30)
+
+"You do not need my hardware. Do not make hardware specific configs." New configs must work on
+any machine: detect at runtime, or use generic defaults. Closes O12. The configs written earlier
+for the D8 machine are listed in O16, pending the owner's go-ahead to generalize them.
+
 ## Open
 
 ### ~~O5. Notifications~~ → D20 · ~~O9. v1 scope~~ → README status table, D28 · ~~O6. Deploy method~~ → D29 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22
 
-### O12. Hardware details still needed
+### O16. Generalize the configs written for the D8 machine (follows D37)
 
-Answered: GPU RX 6000 / Navi 21 (gfx1030), 16 GB; KVM Level1Techs dual-monitor DisplayPort 1.4
-(two links per PC, no EDID emulation). Still open: exact ProArt model (true 10-bit or 8-bit+FRC,
-native gamut, refresh); it decides `cm` (see D16) and whether 10-bit stays on. Panel type
-answered 2026-10-30: **IPS** (D21).
+Hardware-specific today: `config/hypr/conf/monitors.lua` (two panels by `desc:`, 3840x2160@60,
+scale 1.5, 10-bit, `cm` sRGB, workspaces 1–5 / 6–10 per panel), `bin/rice-monitors` (assumes
+exactly two outputs; `--swap`), the bar's `workspacesPerMonitor: 5`, the Blender HIP question
+(already gated on AMD detection). **Recommendation:** `monitor = ", preferred, auto, auto"`
+fallback for every output, no fixed bit depth or color management, workspaces not pinned to
+outputs, `rice-monitors` kept as an optional "capture my layout" tool for any number of
+outputs; hot-unplug handling (D8 KVM) stays because it is harmless elsewhere.
 
-Closed: O6 → D29, O1 → D10, O2 → D7, O3 → D14, O4 → D12, O5 → D20, O14 → D21, O15 → D22, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
+### O17. Default apps: image viewer, PDF viewer, music player
+
+Recommendation (2026-10-30, not yet confirmed): **imv** (images), **Zathura** +
+`zathura-pdf-mupdf` (PDF; SyncTeX with TeXstudio/Neovim), **mpd + rmpc** (music; TUI, themed
+from the palette) with `mpd-mpris` for the bar's media pill.
+
+### O18. Screen-share window picker
+
+XDPH's default `hyprland-share-picker` (hyprland-guiutils, themed by D35), or a rofi Flight Deck
+picker via `screencopy:custom_picker_binary` (must print hyprland-share-picker's stdout format
+[V: hyprland-wiki `xdg-desktop-portal-hyprland.md`]). Recommendation: the rofi picker.
+
+### O19. Keyring
+
+Recommendation: `gnome-keyring` as the Secret Service (used through libsecret by Code - OSS,
+Chromium, `git-credential-libsecret`, NetworkManager secrets; Firefox, LibreWolf and Thunderbird
+keep their own password stores [BK]), unlocked at login by `pam_gnome_keyring.so` in
+`/etc/pam.d/greetd` (a prompted system change; the file's Arch contents [TODO-verify]).
+Alternative for KeePassXC users: its Secret Service integration instead of gnome-keyring.
+
+Closed: O12 → D37, O6 → D29, O1 → D10, O2 → D7, O3 → D14, O4 → D12, O5 → D20, O14 → D21, O15 → D22, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
 
 ## Closed questions (history)
 

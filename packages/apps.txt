@@ -20,3 +20,6 @@ firefox
 
 # Code - OSS
 code
+
+# Mail
+?thunderbird

@@ -20,14 +20,15 @@ Phase 1 started. Decided: palette Quasar (`colors/quasar.toml`), i3 default keym
 Orbit (apps) and Flight Deck (menus) themes, greetd + ReGreet login, Quickshell bar (Orbit Glass),
 live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-user
 `~/.config/rice/settings.json`), 10-bit output, mild gaps + rounding, hyprlock + hypridle,
-Quickshell notifications, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
-ungoogled-chromium) with privacy policies, kitty + foot, Code - OSS (telemetry and AI off),
+Quickshell notifications + volume OSD, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
+ungoogled-chromium) with privacy policies, Thunderbird (prefs + palette userChrome), colored man pages,
+generated `hyprtoolkit.conf`, kitty + foot, Code - OSS (telemetry and AI off),
 Neovim (primary) + vis + Helix with LSPs for Elixir/Haskell/SWI-Prolog/Scala/OCaml/Fortran,
 htop/btop/fastfetch, office (full TeX Live, TeXstudio, LibreOffice with a generated theme), Capitaine cursor, installer that copies with
 backups and makes the rice the default environment (D29).
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
 `config/quickshell/` (bar, services, sky), `config/hypr/hyprland.lua` + `conf/{binds,env,monitors,input,look,layers,rules,session,autostart}.lua`,
-`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,kitty,foot,code-oss,nvim,helix,vis,btop,htop,greetd}/`,
+`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,thunderbird,kitty,foot,code-oss,nvim,helix,vis,btop,htop,greetd}/`,
 `install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors,libreoffice-setup}`,
 `.github/workflows/ci.yml`, tests.
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
@@ -35,7 +36,7 @@ Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and th
 home, package names only by CI in `archlinux:latest`. **Not yet present:** `uninstall.sh`, a theme
 switcher. Quickshell code is render-tested
 with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
-`shell.qml` and `services/` as unverified. Decided and open questions are in
+`shell.qml`, `OsdWindow.qml` and `services/` as unverified. Decided and open questions are in
 [docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
 owner or implement behind an obvious, documented default.
 
@@ -43,6 +44,8 @@ Primary target machine (D8): AMD RX 6000 / Navi 21 (gfx1030), two 27" 4K ASUS Pr
 **removes the outputs when switched away**, Blender with HIP/ROCm; it currently logs in through SDDM, which the rice replaces with greetd +
 ReGreet (D7). Every
 monitor-related change must consider hot-unplug; see [hardware.md](docs/knowledge-base/hardware.md).
+**Owner (D37): no hardware-specific configs.** New configs must work on any machine (detect at
+runtime or use generic defaults); the D8-specific monitor setup is listed for generalization in O16.
 Keybindings follow i3's defaults ([docs/keybindings.md](docs/keybindings.md)); do not repurpose an
 i3 default key, and give every new bind a `description` (it feeds the in-session cheat sheet).
 
@@ -130,6 +133,8 @@ lua5.4 tests/nvim/check_explorer.lua <nvim-tree> <bufferline>   # explorer.lua o
 python3 tests/editors/check_helix.py <helix 25.07.1 checkout>         # config keys, theme scopes, languages.toml
 tests/zsh/run.sh                                           # loads the zsh config in real zsh; needs zsh (+ plugins)
 python3 tests/browsers/check_policies.py <policy-templates checkout> <chromium policies.yaml>   # see its docstring
+python3 tests/browsers/check_thunderbird.py <comm-central checkout>   # userChrome tokens, prefs, Dark theme id
+python3 tests/hypr/check_hyprtoolkit.py <hyprtoolkit v0.6.0 checkout>   # hyprtoolkit.conf keys
 # Quickshell (needs PySide6 + PySide6-Addons, an X server or Xvfb, IBM Plex + Symbols Nerd Font):
 python3 tests/quickshell/render.py /tmp/bar.png --background frame.png   # real bar QML + mocks; fails on any QML warning
 python3 tests/sky/render.py /tmp/sky --size 3840x2160 --dpr 1.5 --frames 24  # --size is PHYSICAL px
@@ -215,6 +220,11 @@ in an `archlinux:latest` container or on hardware.
   own policies).
 - Firefox theme CSS variables are internals and get renamed; check `LightweightThemeConsumer.sys.mjs`.
 - Notification text must stay `Text.PlainText`; apps send markup regardless of advertised caps.
+- The volume OSD reacts to Pipewire change signals, which also fire for initial values: it is
+  disarmed for 2 s at start and after the default sink changes. Keep that, or it flashes at login.
+- Thunderbird's shadow roots recompute `--layout-*` from tokens (`layout.css` is `:host, :root`):
+  theme the tokens (`--color-gray-*`, `--color-*-dark`), not only `--layout-*`, and keep `!important`.
+- Colored man pages need `GROFF_NO_SGR=1`; without it grotty sends SGR and `LESS_TERMCAP_*` never applies.
 - `Quickshell.screens` order is not "left first"; use `Screens.primary`.
 - foot ≥ 1.26 uses `[colors-dark]`; 1.28 refuses to start with the old `[colors]`. Most foot
   examples online (and the gitlab mirror) are older. foot comments are `#` only.

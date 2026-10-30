@@ -2,6 +2,7 @@
 pragma Singleton
 import QtQuick
 QtObject {
+    property var sink: null
     property real volume: 0.63
     property bool muted: false
     property var sinks: [

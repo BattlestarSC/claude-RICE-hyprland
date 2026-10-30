@@ -135,6 +135,16 @@ Relative paths resolve against hyprpaper's working directory, so always use abso
 Apps documented as following this theme: hyprlauncher, hyprpolkitagent. Others built on
 hyprtoolkit (hyprshutdown, hyprpwcenter, hyprland-guiutils dialogs) very likely do too [BK].
 
+This rice (2026-10-30): `themes/<palette>/hypr/hyprtoolkit.conf`, generated, deployed to
+`~/.config/hypr/hyprtoolkit.conf`. Keys and types [V: hyprtoolkit v0.6.0
+`src/palette/ConfigManager.cpp`]: colors are `Hyprlang::INT`, which accepts `rgba(RRGGBBAA)`
+[V: hyprlang `src/config.cpp` (rgba() parsing) @ 9508458]; also `link_text` (not in the
+wiki table). File found via `Hyprutils::Path::findConfig("hyprtoolkit")`: `$XDG_CONFIG_HOME/hypr/`
+then `~/.config/hypr/`; a missing file means defaults. Colors are written inline, not `source`d.
+Mapping: background `base`, base `mantle`, alternate_base `surface0`, text/bright_text,
+link_text blue, accent purple, accent_secondary red, rounding 10/6, IBM Plex Sans + JetBrains
+Mono, Papirus-Dark icons. Checked by `tests/hypr/check_hyprtoolkit.py`.
+
 ## hyprlauncher
 
 - Always a daemon; `hyprlauncher -d` starts it without showing a window. Bind the plain command to a key.

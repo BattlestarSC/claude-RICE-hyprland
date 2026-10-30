@@ -14,10 +14,11 @@ colors/<palette>.toml           (source of truth; roles, not app keys)
         ▼
 themes/<palette>/
   ├── hypr/colors.lua           → Hyprland: return { base = "rgba(...)", ... }
-  ├── hypr/colors.conf          → hyprlang $vars for hyprlock / hypridle / hyprtoolkit
+  ├── hypr/colors.conf          → hyprlang $vars for hyprlock / hypridle
+  ├── hypr/hyprtoolkit.conf     → hyprtoolkit apps (polkit dialog, launcher); hypr-ecosystem.md
   ├── kitty/theme.conf, foot/theme.ini ([colors-dark])
   ├── code-oss/extension/      → Code - OSS theme extension (editor.md)
-  ├── zsh/theme.zsh             → syntax-highlight, autosuggest, substring-search, completion menu, FZF_DEFAULT_OPTS
+  ├── zsh/theme.zsh             → syntax-highlight, autosuggest, substring-search, completion menu, FZF_DEFAULT_OPTS, man page colors
   ├── waybar/colors.css         → @define-color ...
   ├── starship/starship.toml    → the whole prompt config with an inline [palettes.rice]
   ├── art/*.svg                 → tools/spacegen.py: wallpaper, panel starfield, planets, ASCII scene (seeded)
@@ -26,6 +27,7 @@ themes/<palette>/
   ├── quickshell/sky/*.frag     → GLSL 440 for the ASCII sky; palette baked in as `vec3` constants
   ├── gtk-3.0/gtk.css, gtk-4.0/gtk.css, kde/scheme.colors   → see "GTK and file managers"
   ├── firefox/userChrome.css, userContent.css                → browsers.md
+  ├── thunderbird/userChrome.css → Thunderbird token overrides (browsers.md#thunderbird)
   ├── chromium/policies.json   → managed policies incl. BrowserThemeColor
   ├── btop/themes/rice.theme, fastfetch/config.jsonc        → cli-tools.md
   ├── nvim/, helix/, vis/       → editors.md
