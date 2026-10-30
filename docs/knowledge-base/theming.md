@@ -136,8 +136,7 @@ Also set by the installer (they are user files, so merged, not overwritten):
 
 ## Cursor themes
 
-Owner asked for suggestions (2026-10-30); default until they choose: **Capitaine, light variant**
-(D30). Where the theme name is set: `hypr/conf/env.lua` (`XCURSOR_THEME`; falls back to Adwaita if
+Owner asked for suggestions (2026-10-30) and chose **Capitaine, light variant** (D30). Where the theme name is set: `hypr/conf/env.lua` (`XCURSOR_THEME`; falls back to Adwaita if
 the theme is missing), gsettings `cursor-theme` (GTK apps), `/etc/greetd/{hyprland.lua,regreet.toml}`
 (login screen). The installer writes all of them from one value:
 `RICE_CURSOR=<theme directory name> ./install.sh`.

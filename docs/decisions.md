@@ -273,9 +273,9 @@ in the palette, Nerd Font keys). Blender is installed with HIP (AMD GPU, asked) 
   `archlinux:latest` (every package name, dry run on real Arch). Details:
   [knowledge-base/arch-install.md](knowledge-base/arch-install.md#the-installer).
 
-### D30. Cursor: Capitaine (light) by default (2026-10-30; owner to confirm)
+### D30. Cursor: Capitaine, light variant (owner confirmed, 2026-10-30)
 
-Owner asked for suggestions. Default is the one in the official repos (D2):
+Owner asked for suggestions and chose the recommended one, which is in the official repos (D2):
 `capitaine-cursors`, light variant. Alternatives and how to switch:
 [knowledge-base/theming.md](knowledge-base/theming.md#cursor-themes).
 
@@ -288,6 +288,16 @@ palette); texlab adds LaTeX to Neovim, Helix and vis. LibreOffice: `libreoffice-
 a generated extension (a "Quasar" color scheme for UI and document chrome, dark appearance,
 theming switched on, pages kept white). One installer question, default yes (~7 GB). Details:
 [knowledge-base/office.md](knowledge-base/office.md).
+
+### D32. Neovim: file explorer sidebar and buffer tabs (owner, 2026-10-30)
+
+Owner showed a rice with an IDE-style Neovim (file tree on the left, numbered buffer tabs with a
+"File Explorer" header over the tree) and asked for that as the default. **nvim-tree** (v1.19.0)
++ **nvim-web-devicons** + **bufferline.nvim** (v4.9.1), pinned in `lua/rice/plugins.lua` like the
+others. The tree opens with `nvim` and `nvim <dir>`, and beside a file when the terminal is at
+least 120 columns wide; never for git commit messages (EDITOR=nvim). `<leader>e` toggles it; the
+diagnostics float moved to `<leader>d`. Details:
+[knowledge-base/editors.md](knowledge-base/editors.md#file-explorer-and-buffer-tabs).
 
 ## Open
 

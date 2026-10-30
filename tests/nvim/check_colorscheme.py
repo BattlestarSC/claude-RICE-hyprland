@@ -3,12 +3,13 @@
 
     git clone --depth 1 --branch v0.12.3 --filter=blob:none --sparse https://github.com/neovim/neovim /tmp/nvim
     git -C /tmp/nvim sparse-checkout set runtime/doc
-    python3 tests/nvim/check_colorscheme.py /tmp/nvim
+    python3 tests/nvim/check_colorscheme.py /tmp/nvim [/tmp/nvim-tree]
 
 Runs themes/*/nvim/colors/rice.lua under lua5.4 with a stub `vim` that records every group,
 then requires: every tree-sitter capture in :h treesitter-highlight-groups, every
 @lsp.type.* in :h lsp-semantic-highlight, the core UI and diagnostic groups; every link target
-defined; every color a #RRGGBB string.
+defined; every color a #RRGGBB string. With an nvim-tree checkout (the pinned commit), every
+NvimTree* group the scheme sets must be one nvim-tree defines (lua/nvim-tree/appearance/init.lua).
 """
 
 from __future__ import annotations
@@ -36,17 +37,22 @@ print('{' .. table.concat(out, ',') .. '}')
 CORE = ["Normal", "NormalFloat", "FloatBorder", "CursorLine", "LineNr", "CursorLineNr", "Visual",
         "Search", "IncSearch", "Pmenu", "PmenuSel", "StatusLine", "WinSeparator", "SignColumn",
         "MatchParen", "Comment", "String", "Function", "Keyword", "Type", "Constant",
-        "DiagnosticError", "DiagnosticWarn", "DiagnosticInfo", "DiagnosticHint", "LspInlayHint"]
+        "DiagnosticError", "DiagnosticWarn", "DiagnosticInfo", "DiagnosticHint", "LspInlayHint",
+        "NvimTreeNormal", "NvimTreeFolderName", "NvimTreeGitDirtyIcon"]
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
+    if len(argv) not in (2, 3):
         print(__doc__, file=sys.stderr)
         return 2
     doc = Path(argv[1]) / "runtime/doc"
     captures = re.findall(r"^(@[a-z.]+)\s", (doc / "treesitter.txt").read_text(), re.M)
     lsp_types = re.findall(r"^(@lsp\.type\.\w+)\s", (doc / "lsp.txt").read_text(), re.M)
     errors: list[str] = []
+    tree_groups: set[str] = set()
+    if len(argv) == 3:
+        tree_groups = set(re.findall(r'group = "(NvimTree\w+)"',
+                                     (Path(argv[2]) / "lua/nvim-tree/appearance/init.lua").read_text()))
     schemes = sorted(REPO.glob("themes/*/nvim/colors/rice.lua"))
     for scheme in schemes:
         res = subprocess.run(["lua5.4", "-", str(scheme)], input=STUB, text=True, capture_output=True)
@@ -57,6 +63,9 @@ def main(argv: list[str]) -> int:
         for g in captures + lsp_types + CORE:
             if g not in groups:
                 errors.append(f"{scheme.relative_to(REPO)}: missing {g}")
+        for name in groups:
+            if tree_groups and name.startswith("NvimTree") and name not in tree_groups:
+                errors.append(f"{scheme.relative_to(REPO)}: {name} is not an nvim-tree group")
         for name, spec in groups.items():
             if "link" in spec and spec["link"] not in groups:
                 errors.append(f"{scheme.relative_to(REPO)}: {name} links to undefined {spec['link']}")

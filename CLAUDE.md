@@ -23,7 +23,7 @@ live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-us
 Quickshell notifications, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
 ungoogled-chromium) with privacy policies, kitty + foot, Code - OSS (telemetry and AI off),
 Neovim (primary) + vis + Helix with LSPs for Elixir/Haskell/SWI-Prolog/Scala/OCaml/Fortran,
-htop/btop/fastfetch, office (full TeX Live, TeXstudio, LibreOffice with a generated theme), Capitaine cursor (default, owner to confirm), installer that copies with
+htop/btop/fastfetch, office (full TeX Live, TeXstudio, LibreOffice with a generated theme), Capitaine cursor, installer that copies with
 backups and makes the rice the default environment (D29).
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
 `config/quickshell/` (bar, services, sky), `config/hypr/hyprland.lua` + `conf/{binds,env,monitors,input,look,layers,rules,session,autostart}.lua`,
@@ -125,7 +125,8 @@ python3 tests/cli/check_cli.py <htop 3.5.3> <btop v1.4.8> <fastfetch 2.70.0>   #
 python3 tests/terminals/check_kitty.py <kitty checkout>/kitty/options/definition.py   # kitty keys
 python3 tests/vscode/check_theme.py <vscode checkout>            # theme colors + settings (see docstring)
 python3 tests/prompt/check_starship.py <starship v1.25.1 checkout>   # starship options, palette names
-python3 tests/nvim/check_colorscheme.py <neovim v0.12.3 checkout>     # every tree-sitter capture + @lsp.type.* defined
+python3 tests/nvim/check_colorscheme.py <neovim v0.12.3 checkout> [<nvim-tree>]   # every tree-sitter capture + @lsp.type.* defined; NvimTree names
+lua5.4 tests/nvim/check_explorer.lua <nvim-tree> <bufferline>   # explorer.lua options vs the plugins' defaults, API calls
 python3 tests/editors/check_helix.py <helix 25.07.1 checkout>         # config keys, theme scopes, languages.toml
 tests/zsh/run.sh                                           # loads the zsh config in real zsh; needs zsh (+ plugins)
 python3 tests/browsers/check_policies.py <policy-templates checkout> <chromium policies.yaml>   # see its docstring

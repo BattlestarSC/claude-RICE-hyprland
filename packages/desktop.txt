@@ -5,8 +5,8 @@ xdg-desktop-portal-gtk
 hyprlock
 hypridle
 hyprpolkitagent
-?hyprland-guiutils
-?hyprshutdown
+hyprland-guiutils
+hyprshutdown
 qt5-wayland
 qt6-wayland
 xdg-utils
@@ -25,7 +25,7 @@ wl-clipboard
 cliphist
 grim
 slurp
-?satty
+satty
 
 # Audio: PipeWire with every compatibility layer named explicitly (no provider prompts)
 pipewire
@@ -57,4 +57,4 @@ capitaine-cursors
 
 # GTK and Qt look
 adw-gtk-theme
-?nwg-look
+nwg-look

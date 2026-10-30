@@ -2,31 +2,31 @@
 
 # TeX Live, full: texlive-meta pulls every collection except the language ones [S: Arch news
 # "TeX Live package reorganization"]; the language collections are separate packages; texlive-doc
-# is the offline documentation (texdoc).
+# is the offline documentation (texdoc). All names confirmed in Arch by CI (2026-10-30).
 texlive-meta
 texlive-doc
-?texlive-langarabic
-?texlive-langchinese
-?texlive-langcjk
-?texlive-langcyrillic
-?texlive-langczechslovak
-?texlive-langenglish
-?texlive-langeuropean
-?texlive-langfrench
-?texlive-langgerman
-?texlive-langgreek
-?texlive-langitalian
-?texlive-langjapanese
-?texlive-langkorean
-?texlive-langother
-?texlive-langpolish
-?texlive-langportuguese
-?texlive-langspanish
+texlive-langarabic
+texlive-langchinese
+texlive-langcjk
+texlive-langcyrillic
+texlive-langczechslovak
+texlive-langenglish
+texlive-langeuropean
+texlive-langfrench
+texlive-langgerman
+texlive-langgreek
+texlive-langitalian
+texlive-langjapanese
+texlive-langkorean
+texlive-langother
+texlive-langpolish
+texlive-langportuguese
+texlive-langspanish
 biber
 
 # LaTeX editor (TeXstudio) and language server for Neovim / Helix / vis (texlab)
 texstudio
-?texlab
+texlab
 
 # LibreOffice: the "fresh" (newest) branch, named explicitly so pacman does not ask
 libreoffice-fresh
@@ -34,7 +34,7 @@ libreoffice-fresh
 # Spelling, hyphenation and thesaurus (LibreOffice, TeXstudio): US English
 hunspell
 hunspell-en_us
-?hyphen
-?hyphen-en
-?libmythes
-?mythes-en
+hyphen
+hyphen-en
+libmythes
+mythes-en

@@ -1,5 +1,5 @@
 # Blender with HIP (GPU) rendering on AMD; asked, default yes on an AMD GPU. Not themed (D28).
-# HIP packages: Arch's blender lists them as optional dependencies [S].
+# HIP packages: Arch's blender lists them as optional dependencies [S]; names confirmed by CI.
 blender
-?hip-runtime-amd
-?hiprt
+hip-runtime-amd
+hiprt

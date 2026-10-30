@@ -1,7 +1,7 @@
 # Neovim (primary), vis (secondary), Helix
 neovim
 vis
-?vis-lexers
+vis-lexers
 helix
 # nvim-treesitter builds parsers: tree-sitter-cli >= 0.26.1 and a C compiler
 tree-sitter-cli

@@ -78,10 +78,10 @@ override files the installer never overwrites: `~/.config/hypr/local.lua`,
 | Compositor | Hyprland ≥ 0.57 | Lua config, split into modules; mild gaps (6/3 px), 2 px gradient border, 6 px rounding |
 | Terminal | **kitty** (primary), **foot** (secondary) | JetBrains Mono with ligatures + Nerd Font icons; both themed from the palette |
 | Editor | **Code - OSS** (`code`, open-source VS Code) | telemetry, experiments and AI features off; palette theme | 
-| Terminal editors | **Neovim** (primary), **vis** (secondary), **Helix** | tree-sitter/lexer highlighting and LSP for Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran; palette themes; servers outside Arch's repos via opt-in `rice-lsp-setup` |
+| Terminal editors | **Neovim** (primary, with file explorer sidebar and buffer tabs), **vis** (secondary), **Helix** | tree-sitter/lexer highlighting and LSP for Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran; palette themes; servers outside Arch's repos via opt-in `rice-lsp-setup` |
 | Office | **TeX Live** (full), **TeXstudio** (dark, palette syntax colors), **LibreOffice** (generated Quasar theme, white pages) | LaTeX also in Neovim/Helix/vis via texlab; [office.md](docs/knowledge-base/office.md) |
 | CLI tools | **btop** (palette theme, vim keys), **htop** (terminal colors), **fastfetch** (palette config) | [cli-tools.md](docs/knowledge-base/cli-tools.md) |
-| Cursor | **Capitaine** light (official repos); alternatives listed | [theming.md](docs/knowledge-base/theming.md#cursor-themes) |
+| Cursor | **Capitaine** light (official repos) | [theming.md](docs/knowledge-base/theming.md#cursor-themes) |
 | Shell | zsh + **starship** two-line rainbow prompt | full git status, exit code with signal name, meaning and pipeline status; fish-style Tab menu, autosuggestions, syntax highlighting, Up/Down history search, fzf, zoxide |
 | Lock / idle | hyprlock (themed, PAM, crash-safe session lock), hypridle | lock at 10 min, monitors off at 11 min, no auto-suspend |
 | Wallpaper | **live ASCII Earth + Moon** (Quickshell, two GPU shader passes, 4 fps, both monitors in sync; animates only on empty workspaces) · or the same scene as a still · or your own image (installer question) | [D15](docs/decisions.md#d15-wallpaper-live-ascii-earth-and-moon-gpu-shaders-in-quickshell-owner-2026-10-30) |

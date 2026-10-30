@@ -15,12 +15,16 @@ if vim.fn.has('nvim-0.12') == 0 then
     return
 end
 
+-- nvim-tree replaces netrw; its README asks for these before any plugin loads.
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 require('rice.options')
+pcall(vim.cmd.colorscheme, 'rice')   -- before the UI plugins, which derive colors from it
 require('rice.keymaps')
 require('rice.plugins')
 require('rice.treesitter')
 require('rice.lsp')
+require('rice.explorer')
 require('rice.statusline')
-
-pcall(vim.cmd.colorscheme, 'rice')
 pcall(require, 'local')

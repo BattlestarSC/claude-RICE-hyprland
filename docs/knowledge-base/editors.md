@@ -52,8 +52,8 @@ two plugins:
   `menuone,noselect,popup,fuzzy`; inlay hints on; document highlights on CursorHold. Default 0.12
   LSP maps (`grn` rename, `gra` code action, `grr` references, `gri` implementation, `grt` type
   definition, `gO` symbols, `K` hover, `<C-S>` signature help in insert, `[d`/`]d`) [V:
-  `runtime/doc/lsp.txt`]; the rice adds `gd`, `<leader>f` format, `<leader>e` float, `<leader>q`
-  loclist, `<leader>h` inlay hints toggle (leader = Space).
+  `runtime/doc/lsp.txt`]; the rice adds `gd`, `<leader>f` format, `<leader>d` diagnostics float, `<leader>q`
+  loclist, `<leader>h` inlay hints toggle (leader = Space); explorer and buffer keys below.
 - **Prolog vs Perl:** Neovim's `.pl` detection honours `vim.g.filetype_pl` [V:
   `runtime/lua/vim/filetype/detect.lua`]; the rice sets `'prolog'`.
 - Colors: `themes/<palette>/nvim/colors/rice.lua` (generated). Defines every capture in 0.12's
@@ -63,6 +63,39 @@ two plugins:
   runs.
 - Older Neovim: `init.lua` loads only the colors and warns.
 - Statusline: plain Lua, no plugin (mode, file, diagnostics, attached servers, filetype, position).
+
+### File explorer and buffer tabs
+
+Owner's request (2026-10-30, D32): the IDE layout of a reference rice: file tree on the left,
+numbered buffer tabs on top with a "File Explorer" header over the tree.
+
+| Piece | Plugin (pinned) | Notes |
+| --- | --- | --- |
+| Tree | nvim-tree.lua v1.19.0 @ `9a2e000` (2026-10-21); needs Nvim ≥ 0.10 [V: `lua/nvim-tree.lua`] | netrw disabled first (`vim.g.loaded_netrw`, README) |
+| Icons | nvim-web-devicons @ `ec309a0` (2026-10-13) | Nerd Font glyphs; kitty maps them to Symbols Nerd Font Mono |
+| Tabs | bufferline.nvim v4.9.1 @ `655133c` (2025-01-14) | last release is older, but it already switches between old and new Nvim APIs (`vim.islist`, `vim.iter` [V: `utils/init.lua`]) |
+
+- **When the tree opens:** `nvim dir` → nvim-tree's own `hijack_directories` (default on);
+  `nvim` → tree opens with focus; `nvim file` → tree beside the file with the file focused and
+  revealed, only if the terminal is ≥ 120 columns and the path is not inside `.git/` (so commit
+  messages from git do not get a sidebar). `:q` in the last editing window closes the tree too.
+- **Tree:** width 32, indent guides, empty folder chains on one line, git status after the name
+  and tinted names (`highlight_git = 'name'`), LSP diagnostics and unsaved-buffer marks, the tree
+  follows the current file, dotfiles and git-ignored files shown. Options checked against
+  nvim-tree's defaults table (`lua/nvim-tree/config.lua` `M.d`) and the API calls against
+  `api/impl.lua` by `tests/nvim/check_explorer.lua`.
+- **Tabs:** `1. name` ordinal numbers, file icons, LSP diagnostics counts, thin separators,
+  "File Explorer" over the tree (`offsets`). Colors come from the colorscheme (bufferline derives
+  them); the tree's colors are explicit `NvimTree*` groups in `colors/rice.lua` (sidebar
+  `mantle`, one step darker than the editor; folders blue, root purple, git states in the usual
+  roles), names checked against nvim-tree's `appearance/init.lua`.
+- **Keys:** `<leader>e` toggle the explorer (reveals the current file), `Shift+H` / `Shift+L`
+  previous/next buffer, `<leader>1`…`<leader>9` buffer by number, `<leader>x` close the buffer
+  but keep the window. Inside the tree: nvim-tree's defaults (`g?` lists them: `a` create, `d`
+  delete, `r` rename, `x`/`c`/`p` cut/copy/paste, `<CR>` open, `<C-v>`/`<C-x>` split, `H` toggle
+  dotfiles, `I` toggle git-ignored).
+- Not run in the build environment (only Neovim 0.9.5 is available there; the config needs 0.12);
+  option names and API calls are checked against the sources instead.
 
 First start: plugins clone, then parsers compile in the background (a few seconds per parser);
 highlighting appears for files opened afterwards. `:checkhealth vim.lsp`, `:checkhealth
@@ -94,8 +127,8 @@ exists.
 
 ## vis (`config/vis/`)
 
-Arch `extra` has vis 0.9 or a snapshot [S, TODO-verify the exact version and whether lexers are a
-separate `vis-lexers` package].
+Arch has `vis` and a separate `vis-lexers` package [V: CI 2026-10-30, both names exist]; the exact vis
+version (0.9 or a snapshot) [TODO-verify].
 
 - Theme: `themes/<palette>/vis/themes/rice.lua` sets `lexers.STYLE_<TAG>` (tag upper-cased, dots
   to underscores) [V: vis `lua/vis.lua` `set_syntax`]; colors `#rrggbb`; attributes `bold`,
@@ -156,7 +189,8 @@ session startup exists].
 ## Tests
 
 ```sh
-python3 tests/nvim/check_colorscheme.py <neovim v0.12.3 checkout>   # captures, semantic types, links, colors
+python3 tests/nvim/check_colorscheme.py <neovim v0.12.3 checkout> [<nvim-tree checkout>]   # captures, semantic types, links, colors, NvimTree group names
+lua5.4 tests/nvim/check_explorer.lua <nvim-tree checkout> <bufferline checkout>   # explorer options and API calls
 python3 tests/editors/check_helix.py <helix 25.07.1 checkout>       # config keys, theme scopes, languages
 shellcheck -x bin/rice-lsp-setup
 ```

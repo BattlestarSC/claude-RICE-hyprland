@@ -18,4 +18,4 @@ bat
 htop
 btop
 fastfetch
-?lm_sensors
+lm_sensors

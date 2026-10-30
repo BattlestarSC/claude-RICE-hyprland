@@ -12,7 +12,7 @@ sbt
 # OCaml (ocaml-lsp-server via opam: rice-lsp-setup)
 ocaml
 opam
-?bubblewrap
+bubblewrap
 # Fortran (fortls via pipx: rice-lsp-setup)
 gcc-fortran
 python-pipx

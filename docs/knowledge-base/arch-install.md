@@ -64,11 +64,12 @@ systemd-detect-virt   # "none" on bare metal; "kvm", "oracle", "vmware", ...
 ## Package set
 
 The lists live in [`packages/`](../../packages/README.md), one name per line; the table below is
-the overview. Names are [BK] unless marked: Arch mirrors are unreachable from the build
-environment (proxy policy, 2026-10-30), so verification is done by CI
-(`tests/installer/check_packages.sh` in `archlinux:latest`). Names the build environment could not
-confirm carry a `?` in the lists and are skipped with a warning if missing, so one wrong guess
-cannot break the pacman transaction.
+the overview. Arch mirrors are unreachable from the build environment (proxy policy,
+2026-10-30), so names are verified by CI (`tests/installer/check_packages.sh` in
+`archlinux:latest`): **every name in `packages/*.txt` exists [V: CI run 2, 2026-10-30]**, and
+`install.sh --dry-run --yes` completes there as a normal user. New, unconfirmed names get a `?`
+(skipped with a warning if missing) until CI has seen them. Labels in this table describe the
+other claims (repository, versions).
 
 | Group | Packages |
 | --- | --- |
@@ -88,7 +89,7 @@ cannot break the pacman transaction.
 | Editor | `code` (Code - OSS) [S: extra], `jq` (settings merge); `bsdtar` from `libarchive` (pacman dependency) [BK] |
 | Browsers | `librewolf` [S: extra], `firefox`; optional AUR: `ungoogled-chromium`(-bin) |
 | Office (asked) | `texlive-meta`, `texlive-doc`, `texlive-lang*`, `biber`, `texstudio`, `texlab`, `libreoffice-fresh`, `hunspell-en_us`, hyphen/mythes (office.md) |
-| Terminal editors | `neovim` [S: extra 0.12.3], `helix` [S: extra 25.07.1; binary `helix`, V: Helix book], `vis` (+ `vis-lexers`?) [S, TODO-verify], `tree-sitter-cli` (≥ 0.26.1) [S], `gcc`, `git`, `wl-clipboard` |
+| Terminal editors | `neovim` [S: extra 0.12.3], `helix` [S: extra 25.07.1; binary `helix`, V: Helix book], `vis`, `vis-lexers`, `tree-sitter-cli` (≥ 0.26.1) [S], `gcc`, `git`, `wl-clipboard` |
 | Language toolchains (prompted, per language) | `elixir`, `ghc` + `haskell-language-server` [S], `swi-prolog` [S: 10.0.2], `jdk-openjdk` (Metals) + `sbt`, `ocaml` + `opam`, `gcc-fortran`, `python-pipx` (fortls) [BK unless marked]; servers outside the repos: `bin/rice-lsp-setup` |
 
 ## The installer

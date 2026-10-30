@@ -12,8 +12,8 @@ Installed by `packages/office.txt` (installer question, default yes; about 7 GB)
   collection except the language ones, which are separate `texlive-lang*` packages;
   **`texlive-doc`** is the offline documentation [S: Arch news "TeX Live package reorganization";
   archlinux.org texlive-meta 2025.2-2 page, via search]. "Full" here = `texlive-meta` +
-  `texlive-doc` + all 17 language collections + `biber`. The language package names come from
-  the AUR `texlive-full` conflicts list [S], so they carry `?` in the list until CI confirms them.
+  `texlive-doc` + all 17 language collections + `biber`. The language package names (from the AUR `texlive-full` conflicts list [S]) are confirmed in
+  Arch [V: CI 2026-10-30].
 - Arch also has package **groups** for this; the installer cannot use groups (it checks names
   with `pacman -Si`, which does not resolve groups), hence the explicit list.
 - Not used: the AUR `texlive-full` (a single TeX Live install in /opt; build failures reported [S]).
@@ -43,7 +43,7 @@ Installed by `packages/office.txt` (installer question, default yes; about 7 GB)
 
 ## LaTeX in Neovim, Helix, vis
 
-- **texlab** (`?texlab` in office.txt [BK repo]) serves LaTeX and BibTeX.
+- **texlab** (in the official repos [V: CI 2026-10-30]) serves LaTeX and BibTeX.
 - Neovim: parsers `latex` (generated from its grammar at install: nvim-treesitter marks it
   `generate = true` [V: `parsers.lua` @ a2f6944], which is why tree-sitter-cli is installed) and
   `bibtex`; server `texlab` (lspconfig `cmd = { 'texlab' }` [V]), enabled only if installed.
@@ -54,8 +54,7 @@ Installed by `packages/office.txt` (installer question, default yes; about 7 GB)
 ## LibreOffice
 
 - Package **`libreoffice-fresh`**, named explicitly (fresh and still both provide `libreoffice`;
-  rule 5: no provider prompts). Dictionaries: `hunspell-en_us`, hyphenation and thesaurus (`?`
-  until CI confirms the names).
+  rule 5: no provider prompts). Dictionaries: `hunspell-en_us`, hyphenation and thesaurus (names confirmed by CI).
 - Toolkit: on a desktop that is not Plasma/LXQt, LibreOffice autodetects the **gtk3** VCL plugin
   [V: `vcl/source/app/salplug.cxx` `autodetect_plugin_list` @ libreoffice-26.8.2.2], so it starts
   from the same adw-gtk3-dark GTK theme as Thunar.
