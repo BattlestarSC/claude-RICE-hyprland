@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- {{ name }} for LibreOffice: dark application appearance, theming on (LibreOfficeTheme = 1;
+     26.8's default is 0 = disabled), white document pages. Names and values: officecfg
+     Common.xcs (Appearance group) @ libreoffice-26.8.2.2. Icons stay "auto" (dark variant). -->
+<oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" oor:name="Common" oor:package="org.openoffice.Office">
+  <node oor:name="Appearance">
+    <prop oor:name="LibreOfficeTheme" oor:op="fuse"><value>1</value></prop>
+    <prop oor:name="ApplicationAppearance" oor:op="fuse"><value>2</value></prop>
+    <prop oor:name="UseOnlyWhiteDocBackground" oor:op="fuse"><value>true</value></prop>
+  </node>
+</oor:component-data>

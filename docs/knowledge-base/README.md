@@ -29,6 +29,7 @@ Every non-trivial claim carries one of these labels. Keep them accurate when edi
 | [zsh.md](zsh.md) | Zsh setup without a framework, plugin sourcing on Arch, prompt, ANSI-color dependencies. |
 | [theming.md](theming.md) | How one palette reaches every app: Hyprland, kitty, zsh, GTK, Qt, file managers (Thunar, Dolphin), cursors, fonts. |
 | [editor.md](editor.md) | Code - OSS: which build, telemetry/AI settings, the generated theme extension. |
+| [office.md](office.md) | TeX Live, TeXstudio, LibreOffice: packages, theme extension, user-layer overrides. |
 | [cli-tools.md](cli-tools.md) | htop, btop, fastfetch: config paths, color handling, checks. |
 | [editors.md](editors.md) | Neovim (primary), vis, Helix: tree-sitter/lexers, LSP per target language, `rice-lsp-setup`. |
 | [browsers.md](browsers.md) | LibreWolf, Firefox, ungoogled-chromium: policies, prefs, theming, where each browser reads them. |

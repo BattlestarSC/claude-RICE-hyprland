@@ -8,6 +8,7 @@ local servers = {
     'ocamllsp',   -- OCaml: ocaml-lsp-server (opam)
     'fortls',     -- Fortran: fortls (pipx)
     'elixirls',   -- Elixir: ElixirLS (release in ~/.local); falls back to Expert below
+    'texlab',     -- LaTeX and BibTeX: texlab (pacman, office group)
 }
 
 local function available(name)

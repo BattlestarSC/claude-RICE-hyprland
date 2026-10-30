@@ -74,6 +74,7 @@ show_status() {
     status_line scala "$(have metals && echo yes || echo no)" 'metals (needs a JDK from pacman)'
     status_line ocaml "$(have ocamllsp && echo yes || echo no)" 'ocamllsp (pacman: opam ocaml)'
     status_line fortran "$(have fortls && echo yes || echo no)" 'fortls (pacman: python-pipx gcc-fortran)'
+    status_line latex "$(have texlab && echo yes || echo no)" 'texlab (pacman: texlab, installed with the office group)'
     status_line vis-lspc "$([[ -f "${vis_plugins}/vis-lspc/init.lua" ]] && echo yes || echo no)" \
         "${vis_plugins}/vis-lspc"
     case ":${PATH}:" in

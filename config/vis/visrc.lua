@@ -53,6 +53,9 @@ if ok and type(lspc) == 'table' and lspc.ls_map then
         name = 'metals', cmd = 'metals',
         roots = { 'build.sbt', 'build.sc', 'build.mill', '.scala-build' },
     }
+    -- LaTeX and BibTeX: texlab (pacman, office group). Root: the directory with .latexmkrc or .git.
+    lspc.ls_map.latex = { name = 'texlab', cmd = 'texlab', roots = { '.latexmkrc', 'latexmkrc', '.texlabroot' } }
+    lspc.ls_map.bibtex = lspc.ls_map.latex
     lspc.ls_map.fortran = {
         name = 'fortls', cmd = 'fortls --lowercase_intrinsics', roots = { '.fortls', 'fpm.toml' },
     }

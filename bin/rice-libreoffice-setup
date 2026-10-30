@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# rice-libreoffice-setup: install the rice theme into LibreOffice (26.8+). Safe to re-run.
+#
+#   rice-libreoffice-setup [SOURCE_DIR]      default: ~/.local/share/rice/libreoffice/extension
+#
+# The theme is a LibreOffice extension generated from the palette: a color scheme (UI and
+# document colors) and the appearance settings that turn theming on (dark, white pages). It is
+# zipped into an .oxt (bsdtar) and installed for this user with `unopkg add`.
+#
+# An extension only sets defaults; values you changed in Tools > Options > Appearance live in
+# your profile (registrymodifications.xcu) and win. So the three settings the theme needs
+# (current scheme, theming on, dark appearance) are removed from your profile once, after a
+# backup (registrymodifications.xcu.rice-bak); everything else there is left alone.
+# LibreOffice must be closed: it rewrites that file on exit.
+set -Eeuo pipefail
+
+src="${1:-${XDG_DATA_HOME:-${HOME}/.local/share}/rice/libreoffice/extension}"
+profile="${XDG_CONFIG_HOME:-${HOME}/.config}/libreoffice/4/user"
+
+die() { printf 'rice-libreoffice-setup: %s\n' "$*" >&2; exit 1; }
+say() { printf '  %s\n' "$*"; }
+
+find_unopkg() {
+    local c
+    for c in unopkg /usr/lib/libreoffice/program/unopkg; do
+        if command -v "${c}" > /dev/null; then printf '%s\n' "${c}"; return 0; fi
+    done
+    return 1
+}
+
+install_extension() {
+    local unopkg="$1" tmp
+    tmp="$(mktemp -d)"
+    # shellcheck disable=SC2064  # expand now: the trap must remove this run's directory
+    trap "rm -rf -- '${tmp}'" RETURN
+    (cd -- "${src}" && bsdtar --format zip -cf "${tmp}/rice-theme.oxt" description.xml META-INF registry)
+    "${unopkg}" add --force --suppress-license "${tmp}/rice-theme.oxt" > /dev/null
+    say "theme extension installed (Tools > Extensions lists it as the rice theme)"
+}
+
+# Drop the user-layer values that would hide the extension's: one <item> per line in LibreOffice's
+# own format, matched by path and property name.
+clear_overrides() {
+    local file="${profile}/registrymodifications.xcu" tmp
+    [[ -f "${file}" ]] || { say "no LibreOffice profile yet; the theme applies at first start"; return 0; }
+    if ! grep -qE 'ColorScheme"><prop oor:name="CurrentColorScheme"|Appearance"><prop oor:name="(LibreOfficeTheme|ApplicationAppearance)"' "${file}"; then
+        return 0
+    fi
+    [[ -f "${file}.rice-bak" ]] || cp -p -- "${file}" "${file}.rice-bak"
+    tmp="$(mktemp)"
+    grep -vE '<item oor:path="/org\.openoffice\.Office\.UI/ColorScheme"><prop oor:name="CurrentColorScheme"|<item oor:path="/org\.openoffice\.Office\.Common/Appearance"><prop oor:name="(LibreOfficeTheme|ApplicationAppearance)"' \
+        "${file}" > "${tmp}" || true
+    cat -- "${tmp}" > "${file}"
+    rm -f -- "${tmp}"
+    say "profile: removed your own scheme/appearance choice so the theme applies (backup: registrymodifications.xcu.rice-bak)"
+}
+
+main() {
+    (( EUID != 0 )) || die "run as your user, not root"
+    [[ -f "${src}/description.xml" && -f "${src}/registry/ColorScheme.xcu" ]] \
+        || die "missing files in ${src} (run the installer, or pass the source dir)"
+    local unopkg
+    unopkg="$(find_unopkg)" || die "LibreOffice is not installed (package: libreoffice-fresh)"
+    command -v bsdtar > /dev/null || die "bsdtar not found (package: libarchive)"
+    if pgrep -x soffice.bin > /dev/null 2>&1; then
+        die "LibreOffice is running; close it and run this again"
+    fi
+
+    printf 'Setting up LibreOffice from %s\n' "${src}"
+    install_extension "${unopkg}"
+    clear_overrides
+    printf 'Done. Start LibreOffice; Tools > Options > LibreOffice > Appearance shows the scheme.\n'
+}
+
+main "$@"

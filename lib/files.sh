@@ -47,9 +47,9 @@ deploy_user_files() {
     deploy_file "${theme}/starship/starship.toml" "${cfg}/starship.toml"
 
     # CLI tools
-    deploy_file "${REPO}/config/btop/btop.conf" "${cfg}/btop/btop.conf"
+    deploy_once "${REPO}/config/btop/btop.conf" "${cfg}/btop/btop.conf"
     deploy_file "${theme}/btop/themes/rice.theme" "${cfg}/btop/themes/rice.theme"
-    deploy_file "${REPO}/config/htop/htoprc" "${cfg}/htop/htoprc"
+    deploy_once "${REPO}/config/htop/htoprc" "${cfg}/htop/htoprc"
     deploy_file "${theme}/fastfetch/config.jsonc" "${cfg}/fastfetch/config.jsonc"
 
     # Editors
@@ -62,6 +62,10 @@ deploy_user_files() {
     deploy_file "${REPO}/config/code-oss/settings.json" "${data}/rice/code-oss/settings.json"
     deploy_file "${REPO}/config/code-oss/settings-defaults.json" "${data}/rice/code-oss/settings-defaults.json"
     deploy_tree "${theme}/code-oss/extension" "${data}/rice/code-oss/extension"
+
+    # Office: LibreOffice theme extension (rice-libreoffice-setup installs it), TeXstudio
+    deploy_tree "${theme}/libreoffice/extension" "${data}/rice/libreoffice/extension"
+    deploy_once "${theme}/texstudio/texstudio.ini" "${cfg}/texstudio/texstudio.ini"
 
     # GTK, Qt/KDE, file managers
     deploy_file "${REPO}/config/gtk-3.0/settings.ini" "${cfg}/gtk-3.0/settings.ini"

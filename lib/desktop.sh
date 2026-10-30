@@ -43,6 +43,11 @@ desktop_defaults() {
         run "${HOME}/.local/bin/rice-code-setup" || warn "rice-code-setup failed (see above); re-run it later"
     fi
 
+    # LibreOffice theme (extension + appearance), when LibreOffice is installed.
+    if (( WANT_OFFICE )) && { command -v libreoffice > /dev/null || (( DRY_RUN )); }; then
+        run "${HOME}/.local/bin/rice-libreoffice-setup" || warn "rice-libreoffice-setup failed (see above); re-run it later"
+    fi
+
     # Language servers that are not in Arch's repositories (opt-in list, D27).
     if (( WANT_LANGUAGES )); then
         run "${HOME}/.local/bin/rice-lsp-setup" elixir haskell prolog scala fortran vis-lspc \

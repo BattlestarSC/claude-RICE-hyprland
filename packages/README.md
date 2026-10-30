@@ -20,6 +20,7 @@ name, drop the `?`.
 | apps.txt | always: file managers, browsers, Code - OSS |
 | editors.txt | always: Neovim, Helix, vis and what they need to build parsers |
 | languages.txt | asked (default yes): Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran toolchains |
+| office.txt | asked (default yes): TeX Live (full), TeXstudio, texlab, LibreOffice, dictionaries |
 | network.txt | only when no network manager is active |
 | amd-gpu.txt | when an AMD GPU is detected: Mesa, Vulkan |
 | blender.txt | asked (default yes with an AMD GPU): Blender with HIP rendering |

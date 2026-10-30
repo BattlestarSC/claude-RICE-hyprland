@@ -23,12 +23,12 @@ live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-us
 Quickshell notifications, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
 ungoogled-chromium) with privacy policies, kitty + foot, Code - OSS (telemetry and AI off),
 Neovim (primary) + vis + Helix with LSPs for Elixir/Haskell/SWI-Prolog/Scala/OCaml/Fortran,
-htop/btop/fastfetch, Capitaine cursor (default, owner to confirm), installer that copies with
+htop/btop/fastfetch, office (full TeX Live, TeXstudio, LibreOffice with a generated theme), Capitaine cursor (default, owner to confirm), installer that copies with
 backups and makes the rice the default environment (D29).
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
 `config/quickshell/` (bar, services, sky), `config/hypr/hyprland.lua` + `conf/{binds,env,monitors,input,look,layers,rules,session,autostart}.lua`,
 `config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,kitty,foot,code-oss,nvim,helix,vis,btop,htop,greetd}/`,
-`install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors}`,
+`install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors,libreoffice-setup}`,
 `.github/workflows/ci.yml`, tests.
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
 **Nothing has run on real hardware yet**: the installer is tested with dry runs and a throwaway
@@ -63,6 +63,7 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | Code - OSS (settings, theme extension) | [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) |
 | Neovim / Helix / vis, language servers | [docs/knowledge-base/editors.md](docs/knowledge-base/editors.md) |
 | htop / btop / fastfetch | [docs/knowledge-base/cli-tools.md](docs/knowledge-base/cli-tools.md) |
+| TeX Live, TeXstudio, LibreOffice | [docs/knowledge-base/office.md](docs/knowledge-base/office.md) |
 | Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
 ## Hard rules
@@ -115,10 +116,11 @@ python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed 
 lua5.4 tests/lua/run.lua config/hypr/hyprland.lua         # whole config: dispatchers, keys, option names, rule keys, events
 python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
 python3 tests/lua/gen_rules.py <hyprland-wiki checkout> > tests/lua/rules.lua       # refresh rule keys + event names
-shellcheck -x install.sh lib/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh
+shellcheck -x install.sh lib/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors bin/rice-libreoffice-setup tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh
 tests/installer/run.sh                                     # installer file layer in a throwaway home (+ dry run on Arch as non-root)
 tests/installer/check_packages.sh                          # inside Arch after pacman -Sy: every packages/*.txt name exists
 ./install.sh --dry-run                                     # on Arch: every action printed, nothing changed
+python3 tests/office/check_office.py <libreoffice core 26.8> <texstudio>   # LibreOffice theme vs registry schema, TeXstudio keys/format ids
 python3 tests/cli/check_cli.py <htop 3.5.3> <btop v1.4.8> <fastfetch 2.70.0>   # checkouts; htoprc keys, btop theme/conf, fastfetch schema
 python3 tests/terminals/check_kitty.py <kitty checkout>/kitty/options/definition.py   # kitty keys
 python3 tests/vscode/check_theme.py <vscode checkout>            # theme colors + settings (see docstring)
@@ -243,5 +245,12 @@ in an `archlinux:latest` container or on hardware.
   literal as the default everywhere.
 - `shell.qml` pins Quickshell's data dir (`//@ pragma DataDir $BASE/rice/quickshell`); the sky
   atlases are found there. Pragmas must come before the first `import` line.
+- Configs an app rewrites on exit (btop.conf, htoprc, texstudio.ini) are deployed with
+  `deploy_once` (only if absent); everything else with `deploy_file`. Pick the right one.
+- LibreOffice: theming is off by default in 26.8 (`LibreOfficeTheme = 0`); the theme extension turns
+  it on. Values in the user's `registrymodifications.xcu` override any extension: that is why
+  `rice-libreoffice-setup` removes exactly three items. Registry colors are decimal ints
+  (template filter `int`). XML templates (.xcu/.xml) get no generated header (nothing may precede
+  `<?xml`); TeXstudio's INI header uses `;` (`HEADER_BY_NAME` in render_theme.py).
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.

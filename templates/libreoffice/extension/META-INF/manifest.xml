@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- {{ name }} theme for LibreOffice: the two configuration files the extension adds. -->
+<manifest:manifest xmlns:manifest="http://openoffice.org/2001/manifest">
+  <manifest:file-entry manifest:full-path="registry/ColorScheme.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+  <manifest:file-entry manifest:full-path="registry/Appearance.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+</manifest:manifest>

@@ -2,7 +2,7 @@
 # Exercise the installer's file layer (lib/deploy.sh, lib/files.sh) in a throwaway $HOME:
 # first install, re-run without changes, backup of a changed file, user hooks kept, captured
 # monitors kept, cursor substitution, then a full ./install.sh --dry-run with stubbed system
-# commands. No packages, no sudo, no network. Needs: bash, jq, rsvg-convert, awk, cmp.
+# commands. No packages, no sudo, no network. Needs: bash, coreutils, jq, awk (all but jq in Arch's base).
 #
 #   tests/installer/run.sh
 set -Eeuo pipefail
@@ -46,16 +46,20 @@ if grep -qs "kitty/kitty.conf" "${tmp}"/home/.local/state/rice/backups/*/manifes
 if [[ -f "${cfg}/rofi/local.rasi" && -f "${cfg}/foot/local.ini" ]]; then pass "local.rasi and local.ini created"; else fail "local.rasi and local.ini created"; fi
 if [[ -x "${tmp}/home/.local/bin/rice-monitors" ]]; then pass "bin is executable"; else fail "bin is executable"; fi
 if [[ $(jq -r .skyMode "${cfg}/rice/settings.json") == animated ]]; then pass "settings.json written"; else fail "settings.json written"; fi
-if cmp -s "${repo}/config/hypr/hyprland.lua" "${cfg}/hypr/hyprland.lua"; then pass "hyprland.lua deployed"; else fail "hyprland.lua deployed"; fi
+if [[ "$(sha256sum < "${repo}/config/hypr/hyprland.lua")" == "$(sha256sum < "${cfg}/hypr/hyprland.lua")" ]]; then pass "hyprland.lua deployed"; else fail "hyprland.lua deployed"; fi
 
 read -r w u b <<< "$(deploy_once)"
 if (( w == 0 && b == 0 && u > 100 )); then pass "re-run changes nothing"; else fail "re-run changes nothing"; fi
 
 printf 'include extra.conf\n' > "${cfg}/rofi/local.rasi"
+printf 'vim_keys = False\n' >> "${cfg}/btop/btop.conf"            # apps rewrite these: must survive
+printf '[texmaker]\nmine=1\n' > "${cfg}/texstudio/texstudio.ini"
 sed -i 's/REPLACE-WITH-LEFT-PANEL-DESCRIPTION/ACME X1 S1/; s/REPLACE-WITH-RIGHT-PANEL-DESCRIPTION/ACME X1 S2/' \
     "${cfg}/hypr/conf/monitors.lua"
 read -r w u b <<< "$(deploy_once)"
 if grep -qs "extra.conf" "${cfg}/rofi/local.rasi"; then pass "user hook local.rasi kept"; else fail "user hook local.rasi kept"; fi
+if grep -q "vim_keys = False" "${cfg}/btop/btop.conf" && grep -q "mine=1" "${cfg}/texstudio/texstudio.ini"; then pass "app-rewritten configs kept (btop, TeXstudio)"; else fail "app-rewritten configs kept (btop, TeXstudio)"; fi
+if [[ -f "${tmp}/home/.local/share/rice/libreoffice/extension/registry/ColorScheme.xcu" ]]; then pass "LibreOffice theme staged"; else fail "LibreOffice theme staged"; fi
 if grep -q "desc:ACME X1 S1" "${cfg}/hypr/conf/monitors.lua" && (( w == 0 )); then pass "captured panels kept"; else fail "captured panels kept"; fi
 
 read -r w _ b <<< "$(deploy_once Bibata-Modern-Ice)"

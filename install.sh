@@ -40,6 +40,7 @@ source "${REPO}/lib/desktop.sh"
 source "${REPO}/lib/system.sh"
 
 WANT_LANGUAGES=1
+WANT_OFFICE=1
 WANT_BLENDER=0
 WANT_AUR_BROWSER=0
 WANT_GREETER=1
@@ -66,6 +67,7 @@ ask_plan() {
     step "Choices (Enter takes the default)"
     ask_yn "Language toolchains and servers for Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran?" y \
         || WANT_LANGUAGES=0
+    ask_yn "Office: full TeX Live, TeXstudio, LibreOffice (about 7 GB)?" y || WANT_OFFICE=0
     if (( HAS_AMD )); then
         ask_yn "Blender with HIP (GPU) rendering?" y && WANT_BLENDER=1
     fi
@@ -85,6 +87,7 @@ ask_plan() {
 
     PKG_LISTS=(desktop.txt shell.txt apps.txt editors.txt)
     (( WANT_LANGUAGES )) && PKG_LISTS+=(languages.txt)
+    (( WANT_OFFICE )) && PKG_LISTS+=(office.txt)
     [[ -z "${NET_MANAGER}" ]] && PKG_LISTS+=(network.txt)
     (( HAS_AMD )) && PKG_LISTS+=(amd-gpu.txt)
     (( WANT_BLENDER )) && PKG_LISTS+=(blender.txt)
@@ -122,6 +125,7 @@ main() {
     parse_args "$@"
     preflight
     ask_plan
+    check_space
     resolve_packages
     show_plan
     start_log

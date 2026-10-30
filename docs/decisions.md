@@ -279,6 +279,16 @@ Owner asked for suggestions. Default is the one in the official repos (D2):
 `capitaine-cursors`, light variant. Alternatives and how to switch:
 [knowledge-base/theming.md](knowledge-base/theming.md#cursor-themes).
 
+### D31. Office: full TeX Live, TeXstudio, LibreOffice with a generated theme (owner, 2026-10-30)
+
+Owner asked for a full office setup: full TeX Live, a LaTeX editor, LibreOffice, themed if
+possible. TeX Live: `texlive-meta` + `texlive-doc` + every language collection + biber (official
+repos). Editor: **TeXstudio** (most complete; built-in Adwaita Dark style, syntax colors from the
+palette); texlab adds LaTeX to Neovim, Helix and vis. LibreOffice: `libreoffice-fresh`, themed by
+a generated extension (a "Quasar" color scheme for UI and document chrome, dark appearance,
+theming switched on, pages kept white). One installer question, default yes (~7 GB). Details:
+[knowledge-base/office.md](knowledge-base/office.md).
+
 ## Open
 
 ### ~~O5. Notifications~~ → D20 · ~~O9. v1 scope~~ → README status table, D28 · ~~O6. Deploy method~~ → D29 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22

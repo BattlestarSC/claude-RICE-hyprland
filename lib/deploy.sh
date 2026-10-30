@@ -26,6 +26,12 @@ record_backup() {
     BACKED_UP=$((BACKED_UP + 1))
 }
 
+# same_content A B: byte-identical? sha256sum is coreutils (in base); cmp is diffutils, which a
+# vanilla Arch install does not have (found by CI in archlinux:latest).
+same_content() {
+    [[ "$(sha256sum < "$1")" == "$(sha256sum < "$2")" ]]
+}
+
 # deploy_file SRC DEST [MODE]: copy one file into the user's home.
 deploy_file() {
     local src="$1" dest="$2" mode="${3:-}" backup
@@ -36,7 +42,7 @@ deploy_file() {
     if [[ -d "${dest}" && ! -L "${dest}" ]]; then
         die "${dest} is a directory, expected a file; move it away and re-run"
     fi
-    if [[ -f "${dest}" && ! -L "${dest}" ]] && cmp -s -- "${src}" "${dest}"; then
+    if [[ -f "${dest}" && ! -L "${dest}" ]] && same_content "${src}" "${dest}"; then
         UNCHANGED=$((UNCHANGED + 1))
         return 0
     fi
@@ -63,6 +69,16 @@ deploy_tree() {
     done < <(find "${src}" -type f -print0 | sort -z)
 }
 
+# deploy_once SRC DEST: for configs the app itself rewrites (btop, htop, TeXstudio save all their
+# settings on exit): copy only if DEST does not exist, so a re-run never undoes the user's changes.
+deploy_once() {
+    if [[ -e "$2" ]]; then
+        UNCHANGED=$((UNCHANGED + 1))
+        return 0
+    fi
+    deploy_file "$1" "$2" 0644
+}
+
 # ensure_file DEST: the user's override hook; create it empty, never touch an existing one.
 ensure_file() {
     [[ -e "$1" ]] && return 0
@@ -73,7 +89,7 @@ ensure_file() {
 deploy_system_file() {
     local src="$1" dest="$2" mode="${3:-0644}" backup
     [[ -f "${src}" ]] || die "missing source file ${src}"
-    if [[ -f "${dest}" ]] && cmp -s -- "${src}" "${dest}"; then
+    if [[ -f "${dest}" ]] && same_content "${src}" "${dest}"; then
         UNCHANGED=$((UNCHANGED + 1))
         return 0
     fi

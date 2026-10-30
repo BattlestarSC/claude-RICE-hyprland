@@ -87,6 +87,7 @@ cannot break the pacman transaction.
 | File managers | `thunar`, `thunar-volman`, `thunar-archive-plugin`, `xarchiver`, `tumbler`, `ffmpegthumbnailer`, `gvfs`, `gvfs-mtp`, `udisks2`; `dolphin`, `kio-extras`, `ffmpegthumbs`, `breeze` (Qt widget style Dolphin falls back to), `archlinux-xdg-menu`; theme `adw-gtk-theme` [S: extra 6.5-1] [others BK / TODO-verify] |
 | Editor | `code` (Code - OSS) [S: extra], `jq` (settings merge); `bsdtar` from `libarchive` (pacman dependency) [BK] |
 | Browsers | `librewolf` [S: extra], `firefox`; optional AUR: `ungoogled-chromium`(-bin) |
+| Office (asked) | `texlive-meta`, `texlive-doc`, `texlive-lang*`, `biber`, `texstudio`, `texlab`, `libreoffice-fresh`, `hunspell-en_us`, hyphen/mythes (office.md) |
 | Terminal editors | `neovim` [S: extra 0.12.3], `helix` [S: extra 25.07.1; binary `helix`, V: Helix book], `vis` (+ `vis-lexers`?) [S, TODO-verify], `tree-sitter-cli` (≥ 0.26.1) [S], `gcc`, `git`, `wl-clipboard` |
 | Language toolchains (prompted, per language) | `elixir`, `ghc` + `haskell-language-server` [S], `swi-prolog` [S: 10.0.2], `jdk-openjdk` (Metals) + `sbt`, `ocaml` + `opam`, `gcc-fortran`, `python-pipx` (fortls) [BK unless marked]; servers outside the repos: `bin/rice-lsp-setup` |
 
@@ -107,7 +108,7 @@ Order (`install.sh`, functions in `lib/`):
 | packages | `sudo pacman -Syu --needed <all>` (one transaction); then makepkg for the AUR extra | `lib/packages.sh` |
 | files | copy into `$HOME` with backups (below) | `lib/deploy.sh`, `lib/files.sh` |
 | assets | `qsb` → `~/.config/quickshell/sky/shaders/*.frag.qsb`; `rice-sky-atlas` at 8×16 × {1, 1.25, 1.5, 2} → `~/.local/share/rice/quickshell/`; still sky → `~/.local/share/rice/lock.png` | `lib/files.sh` |
-| desktop | gsettings (through `dbus-run-session`: a TTY has no session bus), kwriteconfig6, `xdg-mime` defaults (Thunar, LibreWolf, Neovim), `rice-browser-setup`, `rice-code-setup`, `rice-lsp-setup` | `lib/desktop.sh` |
+| desktop | gsettings (through `dbus-run-session`: a TTY has no session bus), kwriteconfig6, `xdg-mime` defaults (Thunar, LibreWolf, Neovim), `rice-browser-setup`, `rice-code-setup`, `rice-libreoffice-setup`, `rice-lsp-setup` | `lib/desktop.sh` |
 | system | `/etc/greetd/*` + enable greetd (disable the previous display manager), `chsh` to zsh, enable bluetooth (+ NetworkManager if none active), Firefox policies | `lib/system.sh` |
 
 Not started now: greetd (it would take over the TTY running the installer); reboot instead.
@@ -121,7 +122,8 @@ trap with `set -E`).
   `manifest.tsv` (`target<TAB>backup`) before it is replaced. Identical targets are skipped, so a
   re-run with no changes writes nothing (tested).
 - `local.*` override hooks (`rofi/local.rasi`, `foot/local.ini`) are created empty if missing and
-  never written again. `~/.config/rice/settings.json` is written once (wallpaper answers).
+  never written again. Configs the app rewrites on exit (`btop.conf`, `htoprc`, `texstudio.ini`)
+  are written only when absent (`deploy_once`), so a re-run never undoes changes made in the app. `~/.config/rice/settings.json` is written once (wallpaper answers).
 - `hypr/conf/monitors.lua` keeps the panel descriptions `rice-monitors` captured; `env.lua` and
   the greeter files get the chosen cursor theme before comparison, so neither causes a backup on
   every run.
@@ -134,7 +136,8 @@ trap with `set -E`).
 | `config/quickshell/**`, `themes/<p>/quickshell/common/Theme.qml`, `assets/earth/land-1024x512.png` | `~/.config/quickshell/**`, `…/sky/land.png` |
 | `config/rofi/config.rasi`, `themes/<p>/rofi/*.rasi` | `~/.config/rofi/` |
 | `config/{kitty,foot,zsh}/**` + their `themes/<p>/` files; `home/.zsh*`; `themes/<p>/starship/starship.toml` | `~/.config/…`, `~/`, `~/.config/starship.toml` |
-| `config/{btop,htop}`, `themes/<p>/{btop,fastfetch}` | `~/.config/{btop,htop,fastfetch}/` |
+| `config/{btop,htop}`, `themes/<p>/{btop,fastfetch}` | `~/.config/{btop,htop,fastfetch}/` (btop.conf, htoprc: only if absent) |
+| `themes/<p>/texstudio/texstudio.ini`, `themes/<p>/libreoffice/extension` | `~/.config/texstudio/` (only if absent), `~/.local/share/rice/libreoffice/extension` (read by `rice-libreoffice-setup`) |
 | `config/{nvim,helix,vis}/**` + `themes/<p>/{nvim,helix,vis}` | `~/.config/{nvim,helix,vis}/` |
 | `config/code-oss/*`, `themes/<p>/code-oss/extension` | `~/.local/share/rice/code-oss/` (read by `rice-code-setup`) |
 | `config/browsers/{user.js,librewolf.overrides.cfg}`, `themes/<p>/firefox/*.css` | `~/.local/share/rice/browsers/` (read by `rice-browser-setup`) |
@@ -156,6 +159,7 @@ writes both descriptions into `monitors.lua` (left = the panel with the smaller 
 | Question | Choices | Stored in |
 | --- | --- | --- |
 | Language toolchains + servers | yes (default) · no | `packages/languages.txt`, `rice-lsp-setup` |
+| Office (TeX Live full, TeXstudio, LibreOffice) | yes (default) · no | `packages/office.txt`, `rice-libreoffice-setup` |
 | Blender with HIP | yes (default, AMD GPU only) · no | `packages/blender.txt` |
 | Optional AUR browser | ungoogled-chromium-bin | off by default (D2); makepkg |
 | Wallpaper | animated ASCII Earth/Moon (default) · still ASCII (no animation, zero cost) · your own image (path; e.g. a NASA Earth photo) | `~/.config/rice/settings.json` (`skyMode`, `skyImage`), written only if the file does not exist |

@@ -19,7 +19,7 @@ jobs:
       - name: shellcheck
         run: >
           shellcheck -x install.sh lib/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup
-          bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors tests/rofi-render.sh tests/zsh/run.sh
+          bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors bin/rice-libreoffice-setup tests/rofi-render.sh tests/zsh/run.sh
           tests/installer/run.sh tests/installer/check_packages.sh
       - name: Generated themes are current
         run: python3 tools/render_theme.py colors/quasar.toml --check

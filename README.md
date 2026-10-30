@@ -36,7 +36,8 @@ What it does, in order ([details](docs/knowledge-base/arch-install.md#the-instal
 
 1. **Checks** Arch, a non-root user with working `sudo`, network, no pacman lock, free space;
    detects the GPU, the network manager and the current display manager.
-2. **Asks** a few questions (Enter takes the default): language toolchains (yes), Blender with
+2. **Asks** a few questions (Enter takes the default): language toolchains (yes), office
+   (full TeX Live, TeXstudio, LibreOffice; yes), Blender with
    HIP on AMD (yes), the AUR backup browser (no), wallpaper mode and layout, login screen (yes),
    zsh as login shell (yes). Then shows the plan and asks once.
 3. **Installs** every package from the official repositories in one `pacman -Syu --needed`
@@ -78,6 +79,7 @@ override files the installer never overwrites: `~/.config/hypr/local.lua`,
 | Terminal | **kitty** (primary), **foot** (secondary) | JetBrains Mono with ligatures + Nerd Font icons; both themed from the palette |
 | Editor | **Code - OSS** (`code`, open-source VS Code) | telemetry, experiments and AI features off; palette theme | 
 | Terminal editors | **Neovim** (primary), **vis** (secondary), **Helix** | tree-sitter/lexer highlighting and LSP for Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran; palette themes; servers outside Arch's repos via opt-in `rice-lsp-setup` |
+| Office | **TeX Live** (full), **TeXstudio** (dark, palette syntax colors), **LibreOffice** (generated Quasar theme, white pages) | LaTeX also in Neovim/Helix/vis via texlab; [office.md](docs/knowledge-base/office.md) |
 | CLI tools | **btop** (palette theme, vim keys), **htop** (terminal colors), **fastfetch** (palette config) | [cli-tools.md](docs/knowledge-base/cli-tools.md) |
 | Cursor | **Capitaine** light (official repos); alternatives listed | [theming.md](docs/knowledge-base/theming.md#cursor-themes) |
 | Shell | zsh + **starship** two-line rainbow prompt | full git status, exit code with signal name, meaning and pipeline status; fish-style Tab menu, autosuggestions, syntax highlighting, Up/Down history search, fzf, zoxide |
@@ -139,6 +141,7 @@ bin/rice-sky-atlas        renders the ASCII sky's glyph atlas at a monitor's exa
 bin/rice-browser-setup    applies browser prefs and palette to every Firefox/LibreWolf profile
 bin/rice-code-setup       installs the Code - OSS theme, merges the privacy settings
 bin/rice-lsp-setup        per user: language servers not in Arch's repos (ElixirLS, Metals, ocamllsp, fortls), vis-lspc
+bin/rice-libreoffice-setup installs the generated LibreOffice theme extension
 bin/rice-monitors         records the two panels' EDID descriptions (first login), swap, copy to the login screen
 colors/
 ├── quasar.toml           the palette: single source of truth for every app theme
@@ -167,7 +170,8 @@ tests/                    rofi-render.sh (real rofi screenshots), lua/ (Hyprland
                           terminals/ (kitty keys), vscode/ (theme colors and settings vs VS Code),
                           prompt/ (starship options vs its source), zsh/ (loads the config in real zsh),
                           nvim/ (colorscheme vs Neovim's highlight groups), editors/ (Helix config, theme, languages),
-                          cli/ (htop, btop, fastfetch vs their sources), installer/ (file layer, dry run, package names)
+                          cli/ (htop, btop, fastfetch vs their sources), office/ (LibreOffice theme vs
+                          its registry schema, TeXstudio keys), installer/ (file layer, dry run, package names)
 .github/workflows/ci.yml  shellcheck, theme drift, palette, Hyprland stub, installer; package names in archlinux:latest
 ```
 
@@ -188,6 +192,7 @@ The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout
 | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) | browser privacy settings and theming, and where each browser reads them |
 | [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) | Code - OSS: telemetry/AI settings and the generated theme |
 | [docs/knowledge-base/editors.md](docs/knowledge-base/editors.md) | Neovim, Helix, vis: highlighting and language servers per language |
+| [docs/knowledge-base/office.md](docs/knowledge-base/office.md) | TeX Live, TeXstudio, LibreOffice: packages and theming |
 | [docs/knowledge-base/cli-tools.md](docs/knowledge-base/cli-tools.md) | htop, btop, fastfetch: config and colors |
 | [docs/knowledge-base/arch-install.md](docs/knowledge-base/arch-install.md) | the installer: steps, deploy map, backups, packages |
 

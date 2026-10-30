@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- {{ name }} theme for LibreOffice, installed by rice-libreoffice-setup (unopkg add). -->
+<description xmlns="http://openoffice.org/extensions/description/2006"
+    xmlns:d="http://openoffice.org/extensions/description/2006"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+  <identifier value="org.rice.theme"/>
+  <version value="1.0.0"/>
+  <display-name>
+    <name lang="en">{{ name }} (rice theme)</name>
+  </display-name>
+  <dependencies>
+    <d:OpenOffice.org-minimal-version value="3.4" d:name="OpenOffice.org 3.4"/>
+  </dependencies>
+</description>

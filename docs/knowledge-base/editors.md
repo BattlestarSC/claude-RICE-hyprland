@@ -16,6 +16,7 @@ Labels as in [README.md](README.md#verification-labels). Sources read 2026-10-30
 | Scala | tree-sitter `scala` | tree-sitter | lexer `scala` | Metals `metals` | Coursier, `rice-lsp-setup scala` |
 | OCaml (.ml, .mli) | tree-sitter `ocaml`, `ocaml_interface` | tree-sitter | lexer `caml` | `ocamllsp` | opam `ocaml-lsp-server`, `rice-lsp-setup ocaml` |
 | Fortran | tree-sitter `fortran` | tree-sitter | lexer `fortran` | `fortls` | PyPI via pipx, `rice-lsp-setup fortran` |
+| LaTeX, BibTeX (office, D31) | tree-sitter `latex` (generated), `bibtex` | tree-sitter | lexers `latex`, `bibtex` | `texlab` | pacman (`packages/office.txt`); see office.md |
 
 Not in Arch's official repos (so not installed by default, rule 5): ElixirLS, Metals,
 ocaml-lsp-server, fortls (AUR or upstream only [S: aur.archlinux.org via search, 2026-10-30]).

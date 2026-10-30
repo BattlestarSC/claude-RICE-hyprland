@@ -3,6 +3,7 @@
 -- highlights it instead, automatically.
 local languages = {
     'elixir', 'heex', 'eex', 'haskell', 'scala', 'ocaml', 'ocaml_interface', 'fortran',
+    'latex', 'bibtex',   -- latex is generated from its grammar on install (tree-sitter-cli)
     -- everyday files
     'bash', 'lua', 'vim', 'vimdoc', 'query', 'markdown', 'markdown_inline', 'json', 'toml',
     'yaml', 'diff', 'gitcommit', 'regex',

@@ -30,6 +30,7 @@ themes/<palette>/
   ├── btop/themes/rice.theme, fastfetch/config.jsonc        → cli-tools.md
   ├── nvim/, helix/, vis/       → editors.md
   ├── greetd/regreet.css        → login screen (hardware.md)
+  ├── libreoffice/extension/, texstudio/texstudio.ini       → office.md
   └── ...
         │
         │  install.sh           (install time; no generation, only copying: D29)
@@ -43,7 +44,7 @@ time. Whether gdk-pixbuf in rofi loads SVG directly: [TODO-verify]; rasterizing 
 
 Template filters (`tools/render_theme.py`): `hex` `#rrggbb`, `hexa:A` `#rrggbbaa`, `rgba:A`
 `rgba(r,g,b,a)`, `bare` `rrggbb`, `vec3` `vec3(r, g, b)` (floats 0–1, for GLSL), `qcolor:A`
-`#AARRGGBB` (Qt's alpha-first order; `#rrggbbaa` would be misread by QML), `sgr` `r;g;b` (ANSI
+`#AARRGGBB` (Qt's alpha-first order; `#rrggbbaa` would be misread by QML), `int` 0xRRGGBB as a decimal integer (LibreOffice registry), `sgr` `r;g;b` (ANSI
 truecolor parameters), `rgbcsv` `r,g,b`
 (KDE schemes), `cssrgba:A` `rgba(r, g, b, a)` (GTK3 has no 8-digit hex).
 
