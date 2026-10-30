@@ -96,8 +96,12 @@ override files the installer never overwrites: `~/.config/hypr/local.lua`,
 | File managers | **Thunar** (default), **Dolphin** (secondary), both in the palette | [D22](docs/decisions.md#d22-file-managers-thunar-primary-dolphin-secondary-owner-2026-10-30) |
 | Browsers | **LibreWolf** (default), **Firefox** (telemetry off, NoScript + uBlock Origin), optional ungoogled-chromium | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
 | Mail | **Thunderbird** (telemetry off, remote images blocked, Dark theme recolored from the palette) | [D33](docs/decisions.md#d33-mail-thunderbird-privacy-prefs-palette-theme-owner-2026-10-30) |
+| Viewers | **imv** (images), **Zathura** + MuPDF (PDF/EPUB), both in the palette; default handlers | [apps.md](docs/knowledge-base/apps.md) |
+| Music, podcasts | **Strawberry** (library), **Amberol** (opens audio files), **Kasts** (podcasts); all on the bar's media pill (MPRIS) | [D38](docs/decisions.md#d38-default-apps-imv-zathura-strawberry--amberol-kasts-owner-2026-10-30) |
+| Qt apps | qt6ct with a generated palette, Breeze style, Papirus icons | [D41](docs/decisions.md#d41-qt-6-apps-themed-through-qt6ct-implementation-default-2026-10-30) |
+| Keyring | gnome-keyring (+ seahorse), unlocked by the login password (PAM in greetd) | [D40](docs/decisions.md#d40-keyring-gnome-keyring-unlocked-at-login-through-greetds-pam-owner-accepted-2026-10-30) |
 | Blender GPU | ROCm / HIP (`hip-runtime-amd`, `hiprt`) | opt-in |
-| Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing, file picker |
+| Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing (rofi window picker, [D39](docs/decisions.md#d39-screen-share-picker-rofi-flight-deck-owner-accepted-the-recommendation-2026-10-30)), file picker |
 | Polkit | hyprpolkitagent (dialog themed through the generated `hyprtoolkit.conf`) | [D35](docs/decisions.md#d35-hyprtoolkit-theme-generated-from-the-palette-owner-2026-10-30) |
 | Audio | PipeWire + WirePlumber | |
 | Bluetooth | BlueZ, controlled from the bar | power, scan, connect, device battery |
@@ -145,11 +149,12 @@ bin/rice-code-setup       installs the Code - OSS theme, merges the privacy sett
 bin/rice-lsp-setup        per user: language servers not in Arch's repos (ElixirLS, Metals, ocamllsp, fortls), vis-lspc
 bin/rice-libreoffice-setup installs the generated LibreOffice theme extension
 bin/rice-monitors         records the two panels' EDID descriptions (first login), swap, copy to the login screen
+bin/rice-share-picker     screen-share picker for xdg-desktop-portal-hyprland (rofi)
 colors/
 ├── quasar.toml           the palette: single source of truth for every app theme
 └── proposals/            design history (round 1 palettes, round 2 Quasar)
 config/                   dotfiles as deployed under ~/.config (hypr, quickshell, rofi, kitty, foot, zsh, editors,
-                          btop, htop, gtk, xfce4, browsers, thunderbird, code-oss) and /etc/greetd (greetd/)
+                          btop, htop, gtk, qt6ct, xfce4, browsers, thunderbird, code-oss) and /etc/greetd (greetd/)
 assets/earth/             Earth land mask for the ASCII sky (from Natural Earth, public domain)
 assets/sky/               the still ASCII sky (lock screen, login screen), from tools/spacegen.py
 templates/ → themes/quasar/   per-app color templates and their generated output
@@ -196,6 +201,7 @@ The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout
 | [docs/knowledge-base/editors.md](docs/knowledge-base/editors.md) | Neovim, Helix, vis: highlighting and language servers per language |
 | [docs/knowledge-base/office.md](docs/knowledge-base/office.md) | TeX Live, TeXstudio, LibreOffice: packages and theming |
 | [docs/knowledge-base/cli-tools.md](docs/knowledge-base/cli-tools.md) | htop, btop, fastfetch: config and colors |
+| [docs/knowledge-base/apps.md](docs/knowledge-base/apps.md) | image/PDF viewers, music, podcasts, default apps, keyring |
 | [docs/knowledge-base/arch-install.md](docs/knowledge-base/arch-install.md) | the installer: steps, deploy map, backups, packages |
 
 ## Development

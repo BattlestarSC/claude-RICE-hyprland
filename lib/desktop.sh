@@ -22,6 +22,7 @@ desktop_defaults() {
     # Dolphin and other KDE apps: the generated Quasar scheme, Papirus icons, Arch's XDG menu.
     if command -v kwriteconfig6 > /dev/null || (( DRY_RUN )); then
         run kwriteconfig6 --file dolphinrc --group UiSettings --key ColorScheme Quasar
+        run kwriteconfig6 --file kastsrc --group UiSettings --key ColorScheme Quasar
         run kwriteconfig6 --file kdeglobals --group Icons --key Theme Papirus-Dark
     fi
     if command -v kbuildsycoca6 > /dev/null; then
@@ -39,6 +40,11 @@ desktop_defaults() {
         if [[ -n "${mail_desktop}" ]]; then
             run xdg-mime default "${mail_desktop}" x-scheme-handler/mailto message/rfc822
         fi
+        set_default_app 'imv.desktop' image/
+        # Audio files open in Amberol (plays through PipeWire like everything else); Strawberry is
+        # the library player and may hold the sound card exclusively when set to a direct ALSA device.
+        set_default_app 'io.bassi.Amberol.desktop' audio/
+        set_default_app 'org.pwmt.zathura-pdf-*.desktop' application/pdf application/epub application/oxps
     fi
     command -v xdg-user-dirs-update > /dev/null && run xdg-user-dirs-update
 
@@ -64,4 +70,28 @@ desktop_defaults() {
             note "OCaml: run 'opam init', then 'rice-lsp-setup ocaml' (opam init asks before editing your shell files)"
         fi
     fi
+}
+
+# set_default_app GLOB PREFIX...: make the first installed desktop file matching GLOB the default
+# for every MIME type it declares (its MimeType= line) that starts with one of PREFIX. Desktop file
+# names and MIME lists differ between versions and plugins, so they are read, not assumed.
+set_default_app() {
+    local glob="$1" file mime prefix all=() mimes=()
+    shift
+    file="$(find /usr/share/applications -maxdepth 1 -name "${glob}" -printf '%f\n' 2> /dev/null | sort | head -n 1)"
+    if [[ -z "${file}" ]]; then
+        (( DRY_RUN )) && note "would make ${glob} the default for $* (once installed)"
+        return 0
+    fi
+    IFS=';' read -ra all < <(sed -n 's/^MimeType=//p' "/usr/share/applications/${file}" | head -n 1)
+    for mime in "${all[@]}"; do
+        for prefix in "$@"; do
+            if [[ "${mime}" == "${prefix}"* ]]; then
+                mimes+=("${mime}")
+                break
+            fi
+        done
+    done
+    (( ${#mimes[@]} )) && run xdg-mime default "${file}" "${mimes[@]}"
+    return 0
 }

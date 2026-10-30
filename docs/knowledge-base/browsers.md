@@ -122,7 +122,7 @@ current Chromium, uBlock Origin Lite (MV3) is installed by hand [BK].
 
 ## Thunderbird
 
-Mail client (owner, 2026-10-30; D33). Package `thunderbird` (extra) [TODO-verify until CI].
+Mail client (owner, 2026-10-30; D33). Package `thunderbird` [V: exists in Arch, CI run 4, 2026-10-30].
 Gecko-based like Firefox, so the same three mechanisms apply; the same script sets it up.
 
 - Profiles: `~/.thunderbird` if it exists, else `$XDG_CONFIG_HOME/thunderbird` [V:

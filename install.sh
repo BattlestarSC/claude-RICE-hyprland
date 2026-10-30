@@ -102,6 +102,7 @@ show_plan() {
     info "wallpaper: ${SKY_MODE}, ${SKY_LAYOUT}; cursor: ${CURSOR_THEME}"
     info "system (sudo):"
     (( WANT_GREETER )) && info "  - login screen: /etc/greetd/*, enable greetd${DISPLAY_MANAGER:+ (disable ${DISPLAY_MANAGER})}"
+    (( WANT_GREETER )) && info "  - keyring unlocked at login: pam_gnome_keyring in /etc/pam.d/greetd"
     (( WANT_SHELL )) && info "  - login shell: zsh"
     info "  - enable bluetooth$([[ -z "${NET_MANAGER}" ]] && printf ' and NetworkManager')"
     info "  - Firefox privacy policies: /etc/firefox/policies/policies.json"

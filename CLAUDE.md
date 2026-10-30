@@ -22,14 +22,15 @@ live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-us
 `~/.config/rice/settings.json`), 10-bit output, mild gaps + rounding, hyprlock + hypridle,
 Quickshell notifications + volume OSD, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
 ungoogled-chromium) with privacy policies, Thunderbird (prefs + palette userChrome), colored man pages,
-generated `hyprtoolkit.conf`, kitty + foot, Code - OSS (telemetry and AI off),
+generated `hyprtoolkit.conf`, imv + Zathura + Strawberry + Amberol + Kasts (D38), rofi screen-share
+picker (D39), gnome-keyring unlocked via greetd PAM (D40), Qt 6 palette through qt6ct (D41), kitty + foot, Code - OSS (telemetry and AI off),
 Neovim (primary) + vis + Helix with LSPs for Elixir/Haskell/SWI-Prolog/Scala/OCaml/Fortran,
 htop/btop/fastfetch, office (full TeX Live, TeXstudio, LibreOffice with a generated theme), Capitaine cursor, installer that copies with
 backups and makes the rice the default environment (D29).
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
 `config/quickshell/` (bar, services, sky), `config/hypr/hyprland.lua` + `conf/{binds,env,monitors,input,look,layers,rules,session,autostart}.lua`,
-`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,thunderbird,kitty,foot,code-oss,nvim,helix,vis,btop,htop,greetd}/`,
-`install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors,libreoffice-setup}`,
+`config/hypr/{hyprlock,hypridle,xdph}.conf`, `config/{gtk-3.0,gtk-4.0,qt6ct,xfce4,browsers,thunderbird,kitty,foot,code-oss,nvim,helix,vis,btop,htop,greetd}/`,
+`install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors,libreoffice-setup,share-picker}`,
 `.github/workflows/ci.yml`, tests.
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
 **Nothing has run on real hardware yet**: the installer is tested with dry runs and a throwaway
@@ -66,6 +67,7 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | Code - OSS (settings, theme extension) | [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) |
 | Neovim / Helix / vis, language servers | [docs/knowledge-base/editors.md](docs/knowledge-base/editors.md) |
 | htop / btop / fastfetch | [docs/knowledge-base/cli-tools.md](docs/knowledge-base/cli-tools.md) |
+| imv, Zathura, music/podcast apps, default apps, keyring | [docs/knowledge-base/apps.md](docs/knowledge-base/apps.md) |
 | TeX Live, TeXstudio, LibreOffice | [docs/knowledge-base/office.md](docs/knowledge-base/office.md) |
 | Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
@@ -103,11 +105,12 @@ home/                       files deployed directly under ~ (.zshenv, .zprofile,
 colors/                     palettes; proposals/ now, the chosen palette as colors/<name>.toml later
 templates/                  per-app theme templates ({{ role | filter }}), rendered by tools/render_theme.py
 themes/<palette>/           generated app themes (committed; never hand-edit)
-bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup, rice-code-setup, rice-lsp-setup, rice-monitors)
+bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup, rice-code-setup, rice-lsp-setup, rice-monitors, rice-share-picker)
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
 tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind/rule/event tests),
                             quickshell/ (bar render with mocks), sky/ (ASCII sky frames + timing),
-                            installer/ (file layer + dry run; package names in Arch), cli/, editors/, nvim/
+                            installer/ (file layer + dry run; package names in Arch; PAM edit), cli/, editors/, nvim/,
+                            hypr/ (hyprtoolkit keys, share picker), apps/ (imv, Zathura)
 docs/                       knowledge-base/, colors/, decisions.md
 ```
 
@@ -119,9 +122,12 @@ python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed 
 lua5.4 tests/lua/run.lua config/hypr/hyprland.lua         # whole config: dispatchers, keys, option names, rule keys, events
 python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
 python3 tests/lua/gen_rules.py <hyprland-wiki checkout> > tests/lua/rules.lua       # refresh rule keys + event names
-shellcheck -x install.sh lib/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors bin/rice-libreoffice-setup tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh
+shellcheck -x install.sh lib/*.sh bin/rice-* tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh tests/hypr/share-picker.sh
 tests/installer/run.sh                                     # installer file layer in a throwaway home (+ dry run on Arch as non-root)
 tests/installer/check_packages.sh                          # inside Arch after pacman -Sy: every packages/*.txt name exists
+tests/installer/pam_keyring.sh [/etc/pam.d/greetd]         # keyring PAM edit: placement, nothing else changed, idempotent
+tests/hypr/share-picker.sh                                 # rice-share-picker vs XDPH's stdout format (stub rofi/hyprctl/slurp)
+python3 tests/apps/check_viewers.py <zathura> <imv>        # zathurarc / imv config option names and color formats
 ./install.sh --dry-run                                     # on Arch: every action printed, nothing changed
 python3 tests/office/check_office.py <libreoffice core 26.8> <texstudio>   # LibreOffice theme vs registry schema, TeXstudio keys/format ids
 python3 tests/cli/check_cli.py <htop 3.5.3> <btop v1.4.8> <fastfetch 2.70.0>   # checkouts; htoprc keys, btop theme/conf, fastfetch schema
@@ -225,6 +231,16 @@ in an `archlinux:latest` container or on hardware.
 - Thunderbird's shadow roots recompute `--layout-*` from tokens (`layout.css` is `:host, :root`):
   theme the tokens (`--color-gray-*`, `--color-*-dark`), not only `--layout-*`, and keep `!important`.
 - Colored man pages need `GROFF_NO_SGR=1`; without it grotty sends SGR and `LESS_TERMCAP_*` never applies.
+- XDPH runs `custom_picker_binary` from the systemd user environment (no `~/.local/bin` on PATH)
+  and hyprlang expands neither `~` nor environment variables in values: `xdph.conf` keeps
+  `= ~/...` in the repo and the installer writes the absolute path (`with_home`).
+- The share picker's stdout is a protocol: `[SELECTION]<r?>/screen:|window:|region:...`. Check
+  `src/shared/ScreencopyShared.cpp` before changing it; `tests/hypr/share-picker.sh` pins it.
+- `/etc/pam.d/greetd` is edited, not replaced: `with_keyring_pam` adds two lines to whatever Arch
+  ships and must stay idempotent (a re-run that changes it makes a backup every time).
+- `QT_QPA_PLATFORMTHEME=qt6ct` themes every Qt 6 app; `qt6ct.conf` is `deploy_once` (its GUI
+  rewrites it), `colors/rice.conf` is generated. Zathura's `include local` and imv's config are
+  generated (`HEADER_BY_NAME` gives the extensionless files a `#` header).
 - `Quickshell.screens` order is not "left first"; use `Screens.primary`.
 - foot ≥ 1.26 uses `[colors-dark]`; 1.28 refuses to start with the old `[colors]`. Most foot
   examples online (and the gitlab mirror) are older. foot comments are `#` only.

@@ -30,6 +30,13 @@ system_setup() {
             as_root systemctl disable "${DISPLAY_MANAGER}.service"
         fi
         as_root systemctl enable greetd.service
+        # Keyring: unlock gnome-keyring with the login password (greetd authenticates user
+        # sessions through the PAM service "greetd").
+        if [[ -f /etc/pam.d/greetd ]]; then
+            deploy_system_file "$(with_keyring_pam /etc/pam.d/greetd)" /etc/pam.d/greetd
+        else
+            note "would add pam_gnome_keyring to /etc/pam.d/greetd (installed by the greetd package)"
+        fi
     fi
 
     if (( WANT_SHELL )) && [[ "$(getent passwd "$(id -un)" | cut -d: -f7)" != /usr/bin/zsh ]]; then
@@ -48,4 +55,20 @@ system_setup() {
     if (( WANT_AUR_BROWSER )); then
         deploy_system_file "${theme}/chromium/policies.json" /etc/chromium/policies/managed/rice.json
     fi
+}
+
+# with_keyring_pam FILE: path of a copy of the PAM file FILE that also unlocks gnome-keyring with
+# the login password: "auth optional pam_gnome_keyring.so" after the last auth line and
+# "session optional pam_gnome_keyring.so auto_start" after the last session line (the module's
+# documented placement). A file that already mentions the module is copied unchanged, so
+# re-runs compare equal and make no backup.
+with_keyring_pam() {
+    local out
+    out="${WORK_DIR}/pam-greetd.$RANDOM"
+    if grep -q 'pam_gnome_keyring\.so' -- "$1"; then
+        cp -- "$1" "${out}"
+    else
+        awk -f "${REPO}/lib/pam-keyring.awk" "$1" "$1" > "${out}"
+    fi
+    printf '%s' "${out}"
 }

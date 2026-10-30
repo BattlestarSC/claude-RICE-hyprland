@@ -169,6 +169,40 @@ that need elevation fail silently or hang. [V: hyprland-wiki `hyprpolkitagent.md
 
 [V: hyprland-wiki `xdg-desktop-portal-hyprland.md`, `screen-sharing.md`, 2026-10-29]
 
+### Screen-share picker
+
+This rice (D39, owner 2026-10-30): `~/.config/hypr/xdph.conf` sets
+`screencopy { custom_picker_binary = <home>/.local/bin/rice-share-picker }`, a rofi menu in the
+Flight Deck theme. XDPH reads the file once at start (`systemctl --user restart
+xdg-desktop-portal-hyprland` after editing).
+
+- **Path:** XDPH runs the picker with `execvp` from its own (systemd user) environment, whose PATH
+  normally lacks `~/.local/bin`, so the path must be absolute. hyprlang does not expand `~` or
+  environment variables in values (it substitutes only `$vars` defined in the file
+  [V: hyprlang `src/config.cpp` @ 9508458]); the installer writes the home directory in
+  (`with_home` in `lib/files.sh`). [V: XDPH `src/shared/ScreencopyShared.cpp`, hyprutils
+  `src/os/Process.cpp`.]
+- **Protocol** [V: XDPH `src/shared/ScreencopyShared.cpp`, identical in v1.3.11, v1.4.0 and v1.5.0
+  for these parts; the stock picker's `formatSelection` in `hyprland-share-picker/PickerData.cpp`]:
+  input `XDPH_WINDOW_SHARING_LIST` (`HANDLE[HC>]CLASS[HT>]TITLE[HE>]ADDRESS[HA>]` per window;
+  XDPH turns quotes, dollar signs, backticks and `>]` in names into spaces), `--allow-token` when `allow_token_by_default` is on;
+  output one line `[SELECTION]<flags>/screen:OUTPUT`, `/window:HANDLE` or
+  `/region:OUTPUT@X,Y,W,H` (logical pixels relative to the output), flag `r` = let the app keep a
+  restore token. No `[SELECTION]` on stdout = cancelled.
+- **Menu:** screens from `hyprctl -j monitors` (connector names are the wl_output names XDPH
+  matches), windows from the list (newlines in titles flattened), "region" runs
+  `slurp -f '%o %X %Y %W %H'` (output-local, clipped to the output; slurp ≥ 1.4.0 [V: slurp
+  `main.c`, commit 956c9c9], the same format XDPH 1.5's own picker uses). Enter shares; Alt+Enter
+  shares and sets `r` (rofi `-kb-custom-1 Alt+Return`, exit code 10; Alt+Return has no default
+  binding [V: rofi `source/keyb.c`]). rofi returns the row index (`-format i`), so titles never
+  have to be parsed back.
+- Not offered: workspace sharing (XDPH 1.5 only, `XDPH_WORKSPACE_SHARING_LIST_V3`).
+- XDPH 1.5.0's stock picker is a hyprtoolkit app [V: `hyprland-share-picker/CMakeLists.txt`
+  needs hyprtoolkit ≥ 0.6.0; 1.4.0's was Qt Widgets], so it follows `hyprtoolkit.conf` too if
+  the line is removed.
+- Tested: `tests/hypr/share-picker.sh` (stub rofi/hyprctl/slurp; every output shape, cancel paths,
+  hostile titles). **Not run against a real XDPH.**
+
 ## hyprshutdown
 
 Recommended way to exit Hyprland: asks apps to close gracefully instead of killing them.

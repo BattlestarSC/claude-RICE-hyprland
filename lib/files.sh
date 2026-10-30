@@ -7,14 +7,15 @@ deploy_user_files() {
     local cfg="${XDG_CONFIG_HOME:-${HOME}/.config}" data="${XDG_DATA_HOME:-${HOME}/.local/share}"
     local theme="${REPO}/themes/${PALETTE}"
 
-    # Hyprland, lock, idle. env.lua gets the chosen cursor; monitors.lua keeps panels already
-    # captured by rice-monitors.
+    # Hyprland, lock, idle, portal. env.lua gets the chosen cursor; monitors.lua keeps panels
+    # already captured by rice-monitors; xdph.conf gets the absolute path of the share picker.
     local file rel
     while IFS= read -r -d '' file; do
         rel="${file#"${REPO}/config/hypr/"}"
         case "${rel}" in
             conf/env.lua) deploy_file "$(with_cursor "${file}")" "${cfg}/hypr/${rel}" 0644 ;;
             conf/monitors.lua) deploy_file "$(with_panels "${file}" "${cfg}/hypr/${rel}")" "${cfg}/hypr/${rel}" 0644 ;;
+            xdph.conf) deploy_file "$(with_home "${file}")" "${cfg}/hypr/${rel}" 0644 ;;
             *) deploy_file "${file}" "${cfg}/hypr/${rel}" ;;
         esac
     done < <(find "${REPO}/config/hypr" -type f -print0 | sort -z)
@@ -74,7 +75,14 @@ deploy_user_files() {
     deploy_file "${REPO}/config/gtk-4.0/settings.ini" "${cfg}/gtk-4.0/settings.ini"
     deploy_file "${theme}/gtk-4.0/gtk.css" "${cfg}/gtk-4.0/gtk.css"
     deploy_file "${theme}/kde/scheme.colors" "${data}/color-schemes/Quasar.colors"
+    deploy_once "${REPO}/config/qt6ct/qt6ct.conf" "${cfg}/qt6ct/qt6ct.conf"
+    deploy_file "${theme}/qt6ct/colors/rice.conf" "${cfg}/qt6ct/colors/rice.conf"
     deploy_tree "${REPO}/config/xfce4" "${cfg}/xfce4"
+
+    # Viewers: images (imv), PDF (Zathura; ~/.config/zathura/local is yours)
+    deploy_file "${theme}/imv/config" "${cfg}/imv/config"
+    deploy_file "${theme}/zathura/zathurarc" "${cfg}/zathura/zathurarc"
+    ensure_file "${cfg}/zathura/local"
 
     # Browsers (rice-browser-setup applies these to every profile)
     deploy_file "${REPO}/config/browsers/user.js" "${data}/rice/browsers/user.js"
@@ -115,6 +123,15 @@ with_cursor() {
     local out
     out="${WORK_DIR}/$(basename -- "$1").$RANDOM"
     sed "s/capitaine-cursors-light/${CURSOR_THEME}/g" -- "$1" > "${out}"
+    printf '%s' "${out}"
+}
+
+# with_home FILE: path of a copy of FILE with "= ~/" written as "= $HOME/" (for configs that
+# need absolute paths and cannot expand "~" or environment variables themselves).
+with_home() {
+    local out
+    out="${WORK_DIR}/$(basename -- "$1").$RANDOM"
+    HOME_DIR="${HOME}" awk '{ i = index($0, "= ~/"); if (i) $0 = substr($0, 1, i + 1) ENVIRON["HOME_DIR"] substr($0, i + 3) } { print }' "$1" > "${out}"
     printf '%s' "${out}"
 }
 

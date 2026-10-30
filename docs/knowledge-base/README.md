@@ -31,6 +31,7 @@ Every non-trivial claim carries one of these labels. Keep them accurate when edi
 | [editor.md](editor.md) | Code - OSS: which build, telemetry/AI settings, the generated theme extension. |
 | [office.md](office.md) | TeX Live, TeXstudio, LibreOffice: packages, theme extension, user-layer overrides. |
 | [cli-tools.md](cli-tools.md) | htop, btop, fastfetch: config paths, color handling, checks. |
+| [apps.md](apps.md) | imv, Zathura, Strawberry, Amberol, Kasts, default apps, gnome-keyring + PAM. |
 | [editors.md](editors.md) | Neovim (primary), vis, Helix: tree-sitter/lexers, LSP per target language, `rice-lsp-setup`. |
 | [browsers.md](browsers.md) | LibreWolf, Firefox, ungoogled-chromium: policies, prefs, theming, where each browser reads them. |
 | [sources.md](sources.md) | Source list with retrieval dates and how to re-verify. |

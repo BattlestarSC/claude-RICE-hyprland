@@ -1,0 +1,52 @@
+# {{ name }} for Zathura (PDF viewer). Deployed to ~/.config/zathura/zathurarc; add your own
+# settings in ~/.config/zathura/local (included at the end, created empty by the installer).
+# Option names: zathura zathura/config.c (girara UI options are registered there too).
+# Pages stay as the document draws them (white); Ctrl+R recolors them into the palette.
+# Docs: docs/knowledge-base/apps.md#zathura
+
+set font                     "JetBrains Mono 11"
+set selection-clipboard      clipboard
+set window-title-basename    true
+set statusbar-home-tilde     true
+set adjust-open              "best-fit"
+set synctex                  true
+
+set default-bg               "{{ base }}"
+set default-fg               "{{ text }}"
+set statusbar-bg             "{{ mantle }}"
+set statusbar-fg             "{{ subtext }}"
+set inputbar-bg              "{{ crust }}"
+set inputbar-fg              "{{ text }}"
+set notification-bg          "{{ surface0 }}"
+set notification-fg          "{{ text }}"
+set notification-warning-bg  "{{ yellow }}"
+set notification-warning-fg  "{{ crust }}"
+set notification-error-bg    "{{ red }}"
+set notification-error-fg    "{{ crust }}"
+set completion-bg            "{{ mantle }}"
+set completion-fg            "{{ text }}"
+set completion-group-bg      "{{ crust }}"
+set completion-group-fg      "{{ purple }}"
+set completion-highlight-bg  "{{ purple }}"
+set completion-highlight-fg  "{{ crust }}"
+set index-bg                 "{{ base }}"
+set index-fg                 "{{ text }}"
+set index-active-bg          "{{ surface1 }}"
+set index-active-fg          "{{ bright }}"
+set scrollbar-bg             "{{ mantle }}"
+set scrollbar-fg             "{{ surface2 }}"
+set render-loading-bg        "{{ base }}"
+set render-loading-fg        "{{ overlay }}"
+set highlight-color          "{{ yellow | cssrgba:0.35 }}"
+set highlight-fg             "{{ crust }}"
+set highlight-active-color   "{{ purple | cssrgba:0.5 }}"
+set signature-success-color  "{{ green | cssrgba:0.35 }}"
+set signature-warning-color  "{{ yellow | cssrgba:0.35 }}"
+set signature-error-color    "{{ red | cssrgba:0.35 }}"
+
+# Ctrl+R: the page background becomes the palette's base, text its text color.
+set recolor-lightcolor       "{{ base }}"
+set recolor-darkcolor        "{{ text }}"
+set recolor-keephue          true
+
+include local

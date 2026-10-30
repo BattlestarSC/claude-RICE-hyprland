@@ -28,6 +28,8 @@ themes/<palette>/
   ├── gtk-3.0/gtk.css, gtk-4.0/gtk.css, kde/scheme.colors   → see "GTK and file managers"
   ├── firefox/userChrome.css, userContent.css                → browsers.md
   ├── thunderbird/userChrome.css → Thunderbird token overrides (browsers.md#thunderbird)
+  ├── qt6ct/colors/rice.conf    → Qt 6 palette (#qt-apps-qt6ct)
+  ├── imv/config, zathura/zathurarc → image and PDF viewers (apps.md)
   ├── chromium/policies.json   → managed policies incl. BrowserThemeColor
   ├── btop/themes/rice.theme, fastfetch/config.jsonc        → cli-tools.md
   ├── nvim/, helix/, vis/       → editors.md
@@ -86,6 +88,7 @@ A future `rice-theme <name>` script would copy the other palette's files over th
   `gtk-4.0/settings.ini` [BK]. libadwaita apps ignore custom themes except via `gtk-4.0/gtk.css`
   color overrides; generate that file from the palette. `nwg-look` is the GUI the wiki recommends. [V wiki master-tutorial]
 - **Qt:** `hyprqt6engine` (wiki-recommended) or `qt6ct` with `QT_QPA_PLATFORMTHEME`. [V wiki]
+  This rice uses qt6ct (official repos): see [Qt apps (qt6ct)](#qt-apps-qt6ct).
   hyprqt6engine is **AUR-only** [S: search 2026-10-30], so it is not on the default path (D2);
   its `theme:color_scheme` takes an absolute path (no `~` expansion [V: source d0ce29c]) to a
   qt6ct scheme or a KDE `.colors` file, which would theme every Qt app with the same file.
@@ -105,6 +108,30 @@ Generated per palette (`templates/gtk-3.0/gtk.css`, `templates/gtk-4.0/gtk.css`,
 | GTK3 (Thunar, GTK3 file pickers) | `~/.config/gtk-3.0/gtk.css` + `settings.ini` (`gtk-theme-name=adw-gtk3-dark`) | `@define-color` overrides of adw-gtk3's named colors (`window_bg_color`, `view_bg_color`, `accent_bg_color`, `sidebar_*`, `headerbar_*`, `card_*`, `popover_*`, … [V: adw-gtk3 source 47922ed]) |
 | GTK4 / libadwaita | `~/.config/gtk-4.0/gtk.css` | `:root { --window-bg-color: …; }` CSS variables. libadwaita's `@define-color` names are "compatibility colors" that **don't pick up overridden colors** [V: libadwaita `doc/css-variables.md` f2e30ed] |
 | Dolphin (and KDE apps) | `~/.local/share/color-schemes/Quasar.colors`; `dolphinrc [UiSettings] ColorScheme=Quasar` | KColorSchemeManager reads `[UiSettings] ColorScheme` from the app's own config and applies it, also outside Plasma [V: kcolorscheme `kcolorschememanager.cpp` 8bb948c; Dolphin `dolphinmainwindow.cpp` 11f42e6 creates the manager and a "Window Color Scheme" menu]. Format follows Breeze Dark [V: KDE/breeze `colors/BreezeDark.colors`] |
+
+### Qt apps (qt6ct)
+
+Decision D41 (2026-10-30, needed so Strawberry is not light): `QT_QPA_PLATFORMTHEME=qt6ct`
+(`hypr/conf/env.lua`) makes every Qt 6 app take its style, palette, icons and fonts from
+`~/.config/qt6ct/qt6ct.conf`:
+
+- `[Appearance] style=Breeze` (installed for Dolphin; Qt falls back to Fusion if absent),
+  `custom_palette=true`, `color_scheme_path=~/.config/qt6ct/colors/rice.conf` (qt6ct expands `~`
+  and `$VAR/` [V: qt6ct `src/qt6ct-common/qt6ct.cpp` `resolvePath`]), `icon_theme=Papirus-Dark`;
+  `[Fonts] general="IBM Plex Sans,11"`, `fixed="JetBrains Mono,11"` (the short `QFont::fromString`
+  form parses [V: Qt 6.12 via PySide6]). Keys [V: qt6ct `src/qt6ct-qtplugin/qt6ctplatformtheme.cpp`
+  `readSettings`, GitHub mirror 0.9]. Deployed with `deploy_once`: the qt6ct GUI rewrites it.
+- `colors/rice.conf` (generated, `templates/qt6ct/colors/rice.conf`): `[ColorScheme]`
+  `active_colors`, `inactive_colors`, `disabled_colors`, each one `#AARRGGBB` per
+  `QPalette::ColorRole` in enum order (22 with `Accent`; qt6ct copies Highlight into Accent when a
+  file has 21) [V: `loadColorScheme`; enum order checked in Qt 6.12]. Mapping: window `mantle`,
+  views `base`, alternate rows and buttons `surface0`, text `text`, selection purple with `crust`
+  text, links blue, placeholder `overlay`; disabled text `overlay`.
+- KDE apps that create a `KColorSchemeManager` (Dolphin, Kasts) still apply the Quasar `.colors`
+  scheme named in their own rc file on top.
+- Rendered with PySide6 (Fusion, this palette): table selection, alternating rows, disabled
+  button and slider all readable. Not run with the real qt6ct plugin [TODO-verify on Arch].
+- Qt 5 apps would need qt5ct; none in the package lists.
 
 Role mapping (both GTK files and the KDE scheme): sidebar `crust`, window/header bar `mantle`,
 file view `base`, cards/popovers/dialogs `surface0`, accent and selection **purple with `crust`

@@ -47,6 +47,16 @@ if [[ -f "${cfg}/rofi/local.rasi" && -f "${cfg}/foot/local.ini" ]]; then pass "l
 if [[ -x "${tmp}/home/.local/bin/rice-monitors" ]]; then pass "bin is executable"; else fail "bin is executable"; fi
 if [[ $(jq -r .skyMode "${cfg}/rice/settings.json") == animated ]]; then pass "settings.json written"; else fail "settings.json written"; fi
 if [[ "$(sha256sum < "${repo}/config/hypr/hyprland.lua")" == "$(sha256sum < "${cfg}/hypr/hyprland.lua")" ]]; then pass "hyprland.lua deployed"; else fail "hyprland.lua deployed"; fi
+if grep -qxF "    custom_picker_binary = ${tmp}/home/.local/bin/rice-share-picker" "${cfg}/hypr/xdph.conf"; then
+    pass "xdph.conf has the absolute picker path"
+else
+    fail "xdph.conf has the absolute picker path"
+fi
+if [[ -f "${cfg}/zathura/local" && -f "${cfg}/qt6ct/colors/rice.conf" && -f "${cfg}/imv/config" ]]; then
+    pass "viewers and qt6ct deployed"
+else
+    fail "viewers and qt6ct deployed"
+fi
 
 read -r w u b <<< "$(deploy_once)"
 if (( w == 0 && b == 0 && u > 100 )); then pass "re-run changes nothing"; else fail "re-run changes nothing"; fi

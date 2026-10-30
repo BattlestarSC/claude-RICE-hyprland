@@ -19,8 +19,8 @@ jobs:
       - name: shellcheck
         run: >
           shellcheck -x install.sh lib/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup
-          bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors bin/rice-libreoffice-setup tests/rofi-render.sh tests/zsh/run.sh
-          tests/installer/run.sh tests/installer/check_packages.sh
+          bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors bin/rice-libreoffice-setup bin/rice-share-picker
+          tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh tests/hypr/share-picker.sh
       - name: Generated themes are current
         run: python3 tools/render_theme.py colors/quasar.toml --check
       - name: Palette contrast rules
@@ -29,6 +29,10 @@ jobs:
         run: lua5.4 tests/lua/run.lua config/hypr/hyprland.lua
       - name: Installer file layer
         run: tests/installer/run.sh
+      - name: Keyring PAM edit (sample file)
+        run: tests/installer/pam_keyring.sh
+      - name: Screen-share picker output
+        run: tests/hypr/share-picker.sh
 
   packages:
     runs-on: ubuntu-24.04
@@ -46,3 +50,7 @@ jobs:
           chown -R builder:builder /home/builder/rice
           su builder -c 'cd ~/rice && ./install.sh --dry-run --yes'
           su builder -c 'cd ~/rice && tests/installer/run.sh'
+      - name: Keyring PAM edit on Arch's real /etc/pam.d/greetd
+        run: |
+          pacman -S --noconfirm --needed greetd
+          tests/installer/pam_keyring.sh /etc/pam.d/greetd

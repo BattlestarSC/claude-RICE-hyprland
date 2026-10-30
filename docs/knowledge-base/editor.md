@@ -53,6 +53,12 @@ Not done: `extensions.autoUpdate` stays on (it contacts Open VSX for extension u
 not telemetry). Third-party extensions can bring their own telemetry settings (e.g.
 `redhat.telemetry.enabled`); add those to `settings.json` when such an extension is installed.
 
+**Keyring** (`~/.vscode-oss/argv.json`, D40): `rice-code-setup` adds
+`"password-store": "gnome-libsecret"` after the opening brace (the file is JSONC: comments and
+trailing commas are fine [V: `src/vs/base/common/jsonc.ts`]; VS Code passes the key to Electron
+[V: `src/mainImpl.ts`]); a `password-store` already there is kept, the original is kept once as
+`argv.json.rice-bak`. Details: [apps.md](apps.md#keyring-d40).
+
 ## Theme (`templates/code-oss/extension/`)
 
 A local extension "Rice" generated from the palette: `package.json` + `themes/rice-color-theme.json`

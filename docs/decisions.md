@@ -333,6 +333,36 @@ hyprlauncher, hyprshutdown, hyprland-guiutils). Details:
 any machine: detect at runtime, or use generic defaults. Closes O12. The configs written earlier
 for the D8 machine are listed in O16, pending the owner's go-ahead to generalize them.
 
+### D38. Default apps: imv, Zathura, Strawberry + Amberol, Kasts (owner, 2026-10-30)
+
+Owner accepted imv (images) and Zathura (PDF, MuPDF backend). Music: owner wants **Strawberry**
+but notes that it can take the output device exclusively, so a second GUI player handles local
+files: **Amberol** (no library, PipeWire output) is the default for audio files. Podcasts:
+**Kasts** (KDE; themed by the Quasar KDE scheme). imv and Zathura configs are generated from the
+palette; defaults are set from each app's declared MIME types. Closes O17. Details:
+[knowledge-base/apps.md](knowledge-base/apps.md).
+
+### D39. Screen-share picker: rofi, Flight Deck (owner accepted the recommendation, 2026-10-30)
+
+`bin/rice-share-picker`, set as XDPH's `screencopy:custom_picker_binary` in
+`~/.config/hypr/xdph.conf`: screens, windows, region (slurp); Alt+Enter also allows the app's
+restore token. Closes O18. Details:
+[knowledge-base/hypr-ecosystem.md](knowledge-base/hypr-ecosystem.md#screen-share-picker).
+
+### D40. Keyring: gnome-keyring, unlocked at login through greetd's PAM (owner accepted, 2026-10-30)
+
+`gnome-keyring` + `seahorse`; the installer adds `pam_gnome_keyring.so` to `/etc/pam.d/greetd`
+(backed up, listed in the plan); Code - OSS is pointed at it (`argv.json` `password-store`).
+Closes O19. Details: [knowledge-base/apps.md](knowledge-base/apps.md#keyring-d40).
+
+### D41. Qt 6 apps themed through qt6ct (implementation default, 2026-10-30)
+
+Needed for D38 (Strawberry is a plain Qt Widgets app and would otherwise be light).
+`QT_QPA_PLATFORMTHEME=qt6ct` with a palette-generated color scheme, Breeze style, Papirus icons,
+the rice fonts. Official repos (hyprqt6engine, the wiki's other suggestion, is AUR-only). Easy to
+undo: remove the line from `env.lua`. Details:
+[knowledge-base/theming.md](knowledge-base/theming.md#qt-apps-qt6ct).
+
 ## Open
 
 ### ~~O5. Notifications~~ → D20 · ~~O9. v1 scope~~ → README status table, D28 · ~~O6. Deploy method~~ → D29 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22
@@ -347,28 +377,7 @@ fallback for every output, no fixed bit depth or color management, workspaces no
 outputs, `rice-monitors` kept as an optional "capture my layout" tool for any number of
 outputs; hot-unplug handling (D8 KVM) stays because it is harmless elsewhere.
 
-### O17. Default apps: image viewer, PDF viewer, music player
-
-Recommendation (2026-10-30, not yet confirmed): **imv** (images), **Zathura** +
-`zathura-pdf-mupdf` (PDF; SyncTeX with TeXstudio/Neovim), **mpd + rmpc** (music; TUI, themed
-from the palette) with `mpd-mpris` for the bar's media pill.
-
-### O18. Screen-share window picker
-
-XDPH's default `hyprland-share-picker` (shipped in hyprland-guiutils and drawn with hyprtoolkit, so
-themed by D35 [BK; TODO-verify]), or a rofi Flight Deck
-picker via `screencopy:custom_picker_binary` (must print hyprland-share-picker's stdout format
-[V: hyprland-wiki `xdg-desktop-portal-hyprland.md`]). Recommendation: the rofi picker.
-
-### O19. Keyring
-
-Recommendation: `gnome-keyring` as the Secret Service (used through libsecret by Code - OSS,
-Chromium, `git-credential-libsecret`, NetworkManager secrets; Firefox, LibreWolf and Thunderbird
-keep their own password stores [BK]), unlocked at login by `pam_gnome_keyring.so` in
-`/etc/pam.d/greetd` (a prompted system change; the file's Arch contents [TODO-verify]).
-Alternative for KeePassXC users: its Secret Service integration instead of gnome-keyring.
-
-Closed: O12 → D37, O6 → D29, O1 → D10, O2 → D7, O3 → D14, O4 → D12, O5 → D20, O14 → D21, O15 → D22, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
+Closed: O17 → D38, O18 → D39, O19 → D40, O12 → D37, O6 → D29, O1 → D10, O2 → D7, O3 → D14, O4 → D12, O5 → D20, O14 → D21, O15 → D22, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
 
 ## Closed questions (history)
 

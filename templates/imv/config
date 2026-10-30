@@ -1,0 +1,13 @@
+# {{ name }} for imv (image viewer). Deployed to ~/.config/imv/config. Options checked against
+# imv src/imv.c (option names; colors are 6-digit hex without "#", alpha 2-digit hex).
+# imv's own key bindings stay (h j k l pan, i/o zoom, d overlay, f fullscreen, q quit).
+# Docs: docs/knowledge-base/apps.md#imv
+
+[options]
+background = {{ crust | bare }}
+overlay_font = IBM Plex Sans:12
+overlay_text_color = {{ text | bare }}
+overlay_text_alpha = ff
+overlay_background_color = {{ mantle | bare }}
+overlay_background_alpha = e6
+overlay_position_bottom = true

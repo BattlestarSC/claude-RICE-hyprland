@@ -74,9 +74,10 @@ other claims (repository, versions).
 | Group | Packages |
 | --- | --- |
 | Compositor + hypr stack | `hyprland` [V wiki], `xdg-desktop-portal-hyprland` [V wiki], `xdg-desktop-portal-gtk`, `hyprlock`, `hypridle`, `hyprpaper`, `hyprpolkitagent`, `hyprlauncher`, `hyprshutdown`, `hyprsunset`, `hyprpicker` |
-| Qt/GTK integration | `qt5-wayland`, `qt6-wayland` [V wiki must-have], `hyprqt6engine` or `qt6ct`, `nwg-look` |
+| Qt/GTK integration | `qt5-wayland`, `qt6-wayland` [V wiki must-have], `qt6ct` (D41), `nwg-look` |
+| Keyring | `gnome-keyring`, `seahorse` (D40; `?` until CI) |
 | Audio / media | `pipewire`, `wireplumber` [V wiki], `pipewire-pulse`, `pipewire-alsa`, `pipewire-jack`, `pavucontrol`, `playerctl`, `brightnessctl` |
-| Terminal + shell | `kitty`, `foot`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-history-substring-search`, `zsh-completions` [S: extra], `starship` [S: extra 1.25.1], `fzf`, `zoxide`, `eza`, `bat`; CLI tools `htop`, `btop`, `fastfetch` (D28); `man-db`, `man-pages`, `less` (`?` until CI) |
+| Terminal + shell | `kitty`, `foot`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-history-substring-search`, `zsh-completions` [S: extra], `starship` [S: extra 1.25.1], `fzf`, `zoxide`, `eza`, `bat`; CLI tools `htop`, `btop`, `fastfetch` (D28); `man-db`, `man-pages`, `less` [V: CI run 4] |
 | Bar / wallpaper / notifications | `quickshell` [S], `qt6-shadertools` (`qsb`, compiles the sky shaders at install) [BK]; notifications are Quickshell's own (D20) |
 | Bluetooth | `bluez`, `bluez-utils` [BK]; enabling `bluetooth.service` is a prompted system change |
 | Launcher / menus | `rofi` (≥ 2.0 for native Wayland), `jq`, `libnotify`, `librsvg` (`rsvg-convert` rasterizes generated art at install) |
@@ -87,7 +88,8 @@ other claims (repository, versions).
 | Network (only if none present) | `networkmanager`, `network-manager-applet` |
 | File managers | `thunar`, `thunar-volman`, `thunar-archive-plugin`, `xarchiver`, `tumbler`, `ffmpegthumbnailer`, `gvfs`, `gvfs-mtp`, `udisks2`; `dolphin`, `kio-extras`, `ffmpegthumbs`, `breeze` (Qt widget style Dolphin falls back to), `archlinux-xdg-menu`; theme `adw-gtk-theme` [S: extra 6.5-1] [others BK / TODO-verify] |
 | Editor | `code` (Code - OSS) [S: extra], `jq` (settings merge); `bsdtar` from `libarchive` (pacman dependency) [BK] |
-| Browsers + mail | `librewolf` [S: extra], `firefox`; optional AUR: `ungoogled-chromium`(-bin); `thunderbird` (D33; `?` until CI) |
+| Browsers + mail | `librewolf` [S: extra], `firefox`; optional AUR: `ungoogled-chromium`(-bin); `thunderbird` (D33) [V: CI run 4] |
+| Viewers, music, podcasts | `imv`, `zathura`, `zathura-pdf-mupdf`, `strawberry`, `amberol`, `kasts` (D38; `?` until CI) |
 | Office (asked) | `texlive-meta`, `texlive-doc`, `texlive-lang*`, `biber`, `texstudio`, `texlab`, `libreoffice-fresh`, `hunspell-en_us`, hyphen/mythes (office.md) |
 | Terminal editors | `neovim` [S: extra 0.12.3], `helix` [S: extra 25.07.1; binary `helix`, V: Helix book], `vis`, `vis-lexers`, `tree-sitter-cli` (≥ 0.26.1) [S], `gcc`, `git`, `wl-clipboard` |
 | Language toolchains (prompted, per language) | `elixir`, `ghc` + `haskell-language-server` [S], `swi-prolog` [S: 10.0.2], `jdk-openjdk` (Metals) + `sbt`, `ocaml` + `opam`, `gcc-fortran`, `python-pipx` (fortls) [BK unless marked]; servers outside the repos: `bin/rice-lsp-setup` |
@@ -110,7 +112,7 @@ Order (`install.sh`, functions in `lib/`):
 | files | copy into `$HOME` with backups (below) | `lib/deploy.sh`, `lib/files.sh` |
 | assets | `qsb` → `~/.config/quickshell/sky/shaders/*.frag.qsb`; `rice-sky-atlas` at 8×16 × {1, 1.25, 1.5, 2} → `~/.local/share/rice/quickshell/`; still sky → `~/.local/share/rice/lock.png` | `lib/files.sh` |
 | desktop | gsettings (through `dbus-run-session`: a TTY has no session bus), kwriteconfig6, `xdg-mime` defaults (Thunar, LibreWolf, Neovim), `rice-browser-setup`, `rice-code-setup`, `rice-libreoffice-setup`, `rice-lsp-setup` | `lib/desktop.sh` |
-| system | `/etc/greetd/*` + enable greetd (disable the previous display manager), `chsh` to zsh, enable bluetooth (+ NetworkManager if none active), Firefox policies | `lib/system.sh` |
+| system | `/etc/greetd/*` + enable greetd (disable the previous display manager), keyring unlock in `/etc/pam.d/greetd`, `chsh` to zsh, enable bluetooth (+ NetworkManager if none active), Firefox policies | `lib/system.sh` |
 
 Not started now: greetd (it would take over the TTY running the installer); reboot instead.
 Log: `~/.local/state/rice/install-<time>.log`. Any unexpected failure prints file and line (ERR
@@ -133,7 +135,7 @@ trap with `set -E`).
 
 | Source | Target |
 | --- | --- |
-| `config/hypr/**`, `themes/<p>/hypr/colors.{lua,conf}`, `themes/<p>/hypr/hyprtoolkit.conf` | `~/.config/hypr/**`, `~/.config/hypr/theme/`, `~/.config/hypr/hyprtoolkit.conf` |
+| `config/hypr/**`, `themes/<p>/hypr/colors.{lua,conf}`, `themes/<p>/hypr/hyprtoolkit.conf` | `~/.config/hypr/**` (`xdph.conf`: the share picker's path rewritten to your home), `~/.config/hypr/theme/`, `~/.config/hypr/hyprtoolkit.conf` |
 | `config/quickshell/**`, `themes/<p>/quickshell/common/Theme.qml`, `assets/earth/land-1024x512.png` | `~/.config/quickshell/**`, `…/sky/land.png` |
 | `config/rofi/config.rasi`, `themes/<p>/rofi/*.rasi` | `~/.config/rofi/` |
 | `config/{kitty,foot,zsh}/**` + their `themes/<p>/` files; `home/.zsh*`; `themes/<p>/starship/starship.toml` | `~/.config/…`, `~/`, `~/.config/starship.toml` |
@@ -143,8 +145,11 @@ trap with `set -E`).
 | `config/code-oss/*`, `themes/<p>/code-oss/extension` | `~/.local/share/rice/code-oss/` (read by `rice-code-setup`) |
 | `config/browsers/{user.js,librewolf.overrides.cfg}`, `themes/<p>/firefox/*.css`, `config/thunderbird/user.js`, `themes/<p>/thunderbird/userChrome.css` | `~/.local/share/rice/browsers/` (`thunderbird/` below it; read by `rice-browser-setup`) |
 | `config/gtk-{3,4}.0/settings.ini`, `themes/<p>/gtk-{3,4}.0/gtk.css`, `themes/<p>/kde/scheme.colors`, `config/xfce4` | `~/.config/gtk-{3,4}.0/`, `~/.local/share/color-schemes/Quasar.colors`, `~/.config/xfce4/` |
+| `config/qt6ct/qt6ct.conf`, `themes/<p>/qt6ct/colors/rice.conf` | `~/.config/qt6ct/` (qt6ct.conf: only if absent) |
+| `themes/<p>/imv/config`, `themes/<p>/zathura/zathurarc` | `~/.config/imv/config`, `~/.config/zathura/zathurarc` (+ empty `local`) |
 | `bin/*` | `~/.local/bin/` (0755) |
 | `config/greetd/*`, `themes/<p>/greetd/regreet.css`, `themes/<p>/hypr/colors.lua`, the user's `monitors.lua`, rendered sky | `/etc/greetd/` |
+| the installed `/etc/pam.d/greetd` + two `pam_gnome_keyring.so` lines (`lib/pam-keyring.awk`) | `/etc/pam.d/greetd` (apps.md#keyring-d40) |
 | `config/browsers/firefox-policies.json` (+ `themes/<p>/chromium/policies.json` with the AUR browser) | `/etc/firefox/policies/policies.json` (`/etc/chromium/policies/managed/rice.json`) |
 
 ### Monitors
@@ -203,7 +208,8 @@ fi
 ```
 
 For TTY login, GNOME Keyring auto-unlock needs `pam_gnome_keyring.so` lines in
-`/etc/pam.d/login` (example in wiki uwsm.md). Opt-in only.
+`/etc/pam.d/login` (example in wiki uwsm.md); not done. The graphical login gets them in
+`/etc/pam.d/greetd` (D40, [apps.md](apps.md#keyring-d40)).
 
 ## Validation strategy (CI and local)
 

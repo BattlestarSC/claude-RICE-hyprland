@@ -6,6 +6,9 @@
 hl.env("GDK_BACKEND", "wayland,x11,*")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
+-- Qt 6 apps take style, palette (generated from the colors), icons and fonts from qt6ct
+-- (~/.config/qt6ct/). KDE apps (Dolphin, Kasts) still apply their own Quasar scheme on top.
+hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 
 -- Dolphin's "Open with" list needs Arch's XDG menu outside Plasma (theming.md).
 hl.env("XDG_MENU_PREFIX", "arch-")

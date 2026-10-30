@@ -15,10 +15,14 @@
 # enforced keys. Re-running never undoes your own font or theme choices, only privacy keys.
 # The original is kept once as settings.json.rice-bak. If your file has comments or trailing
 # commas (VS Code accepts them, jq does not), it is left alone and you are told what to add.
+# Keyring: ~/.vscode-oss/argv.json gets "password-store": "gnome-libsecret", so saved logins go
+# to the Secret Service (gnome-keyring) even though Electron does not recognise Hyprland as a
+# desktop; a password-store you already set is kept.
 set -Eeuo pipefail
 
 src="${1:-${HOME}/.local/share/rice/code-oss}"
 user_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/Code - OSS/User"
+argv_file="${HOME}/.vscode-oss/argv.json"
 
 die() { printf 'rice-code-setup: %s\n' "$*" >&2; exit 1; }
 say() { printf '  %s\n' "$*"; }
@@ -61,6 +65,33 @@ merge_settings() {
     say "settings: merged into ${target} (original: settings.json.rice-bak)"
 }
 
+# argv.json is JSONC (comments, trailing commas: src/vs/base/common/jsonc.ts), so the key is
+# inserted as a line after the opening brace instead of rewriting the file with jq.
+set_password_store() {
+    local line='    "password-store": "gnome-libsecret",' tmp
+    if [[ ! -e "${argv_file}" ]]; then
+        mkdir -p -- "$(dirname -- "${argv_file}")"
+        printf '{\n%s\n}\n' "${line%,}" > "${argv_file}"
+        say "keyring: wrote ${argv_file}"
+        return 0
+    fi
+    if grep -q '"password-store"' -- "${argv_file}"; then
+        say "keyring: ${argv_file} already sets password-store; left unchanged"
+        return 0
+    fi
+    if ! grep -qE '^[[:space:]]*\{[[:space:]]*$' -- "${argv_file}"; then
+        say "keyring: add ${line%,} to ${argv_file} yourself (no line with only \"{\")"
+        return 0
+    fi
+    [[ -f "${argv_file}.rice-bak" ]] || cp -p -- "${argv_file}" "${argv_file}.rice-bak"
+    tmp="$(mktemp)"
+    LINE="${line}" awk '!done && /^[[:space:]]*\{[[:space:]]*$/ { print; print ENVIRON["LINE"]; done = 1; next } { print }' \
+        "${argv_file}" > "${tmp}"
+    cat -- "${tmp}" > "${argv_file}"
+    rm -f -- "${tmp}"
+    say "keyring: password-store set in ${argv_file} (original: argv.json.rice-bak)"
+}
+
 main() {
     (( EUID != 0 )) || die "run as your user, not root"
     [[ -f "${src}/extension/package.json" && -f "${src}/settings.json" && -f "${src}/settings-defaults.json" ]] \
@@ -73,6 +104,7 @@ main() {
     printf 'Setting up Code - OSS (%s) from %s\n' "${cli}" "${src}"
     install_theme "${cli}"
     merge_settings
+    set_password_store
     printf 'Done. Restart Code - OSS to apply.\n'
 }
 
