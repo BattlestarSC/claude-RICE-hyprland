@@ -17,10 +17,14 @@ Visual goal: a soft dark, space-themed palette with Monokai-style accents and me
 ## Current state
 
 Phase 1 started. Decided: palette Quasar (`colors/quasar.toml`), i3 default keymap, rofi with the
-Orbit (apps) and Flight Deck (menus) themes, greetd + ReGreet login. Present beyond docs: theme
-generator + templates, generated `themes/quasar/`, `config/rofi/`, `config/hypr/conf/binds.lua`,
-`bin/rice-menu`, tests. **Not yet present:** `install.sh`, the rest of the Hyprland config
-(entry point, monitors, look, rules, autostart), kitty, zsh, bar, lock/idle, greeter files. Decided and open questions are in
+Orbit (apps) and Flight Deck (menus) themes, greetd + ReGreet login, Quickshell bar (Orbit Glass),
+live ASCII Earth/Moon wallpaper on GPU shaders, 10-bit output. Present beyond docs: theme
+generator + templates, generated `themes/quasar/`, `config/rofi/`, `config/quickshell/` (bar,
+services, sky), `config/hypr/conf/{binds,monitors,layers}.lua`, `bin/rice-menu`, `bin/rice-sky-atlas`,
+tests. **Not yet present:** `install.sh`, the rest of the Hyprland config (entry point, look,
+window rules, autostart), kitty, zsh, lock/idle, greeter files. Quickshell code is render-tested
+with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
+`shell.qml` and `services/` as unverified. Decided and open questions are in
 [docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
 owner or implement behind an obvious, documented default.
 
@@ -41,7 +45,7 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | kitty / zsh | [docs/knowledge-base/kitty.md](docs/knowledge-base/kitty.md), [docs/knowledge-base/zsh.md](docs/knowledge-base/zsh.md) |
 | Monitors, GPU, ROCm, SDDM | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
 | rofi, launcher, scripted menus | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) |
-| Status bar, telemetry sources | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) |
+| Status bar, telemetry sources, Quickshell, ASCII sky wallpaper | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) |
 | Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
 ## Hard rules
@@ -72,14 +76,16 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 install.sh / uninstall.sh   entry points (bash)
 lib/                        bash modules sourced by install.sh (log, preflight, packages, deploy, backup)
 packages/                   package lists, one name per line, comments allowed
-config/                     files deployed under ~/.config (hypr/, kitty/, zsh/, waybar/, ...)
+config/                     files deployed under ~/.config (hypr/, kitty/, zsh/, quickshell/, rofi/, ...)
+assets/                     binary inputs (assets/earth/land-1024x512.png from tools/earthmask.py)
 home/                       files deployed directly under ~ (.zshenv, .zprofile, .zshrc)
 colors/                     palettes; proposals/ now, the chosen palette as colors/<name>.toml later
 templates/                  per-app theme templates ({{ role | filter }}), rendered by tools/render_theme.py
 themes/<palette>/           generated app themes (committed; never hand-edit)
-bin/                        user commands deployed to ~/.local/bin (rice-menu)
+bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas)
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
-tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind tests)
+tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind tests),
+                            quickshell/ (bar render with mocks), sky/ (ASCII sky frames + timing)
 docs/                       knowledge-base/, colors/, decisions.md
 ```
 
@@ -88,8 +94,12 @@ docs/                       knowledge-base/, colors/, decisions.md
 ```sh
 python3 tools/render_theme.py colors/quasar.toml           # templates/ -> themes/quasar/
 python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed themes are stale
-lua5.4 tests/lua/run.lua config/hypr/conf/binds.lua        # dispatcher names, modifiers, duplicate keys
-shellcheck -x bin/rice-menu tests/rofi-render.sh
+lua5.4 tests/lua/run.lua config/hypr/conf/*.lua            # dispatcher names, modifiers, duplicate keys
+shellcheck -x bin/rice-menu bin/rice-sky-atlas tests/rofi-render.sh
+# Quickshell (needs PySide6 + PySide6-Addons, an X server or Xvfb, IBM Plex + Symbols Nerd Font):
+python3 tests/quickshell/render.py /tmp/bar.png --background frame.png   # real bar QML + mocks; fails on any QML warning
+python3 tests/sky/render.py /tmp/sky --size 3840x2160 --dpr 1.5 --frames 24  # --size is PHYSICAL px
+python3 tools/earthmask.py ne_50m_land.geojson 1024 512 > assets/earth/land-1024x512.png   # input: see its docstring
 tests/rofi-render.sh /tmp/rofi-shots                       # needs Xvfb, rofi, rsvg-convert, hsetroot, imagemagick, Papirus
 python3 tools/palette.py check  colors/quasar.toml colors/proposals/round2/*.toml   # 42 WCAG + APCA rules; must pass
 python3 tools/palette.py report colors/proposals/round2/*.toml   # per-role WCAG / APCA table
@@ -156,5 +166,11 @@ in an `archlinux:latest` container or on hardware.
 - rofi cannot combine a gradient frame with a translucent body; see launcher.md.
 - rofi: a missing `@import` file is fatal (shown in place of the menu); `configuration {}` set in
   one theme persists into others loaded with `-theme`.
+- Quickshell QML: a property named `top`/`left`/... collides with Item's FINAL anchor lines;
+  `implicitHeight` on a `Row`/`Column` is read-only; Quickshell-only types must stay out of
+  `BarContent` and the panels or `tests/quickshell/render.py` cannot load them.
+- QML colors with alpha are `#AARRGGBB` (template filter `qcolor`), not `#RRGGBBAA`.
+- Sky shaders take angles pre-wrapped to [0, 2π) from JS doubles; never pass raw time into a float uniform.
+- Mocks in `tests/quickshell/mocks/` must keep the same interface as `config/quickshell/services/`.
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.

@@ -45,8 +45,16 @@ main X11 holdouts on this machine are likely Steam and games. [V: wiki `config-o
   can't screen-capture with 10-bit enabled**; 8-bit+FRC panels advertising 10-bit can cause eye strain.
 - An ICC profile (`icc = "/abs/path.icm"`) overrides `cm` and forces sRGB EOTF. Relevant for
   color-managed Blender work. Not part of the installer; documented as an option.
-- Default plan: `bitdepth = 10, cm = "auto"` behind a toggle in the monitor menu, since screen
-  sharing is the main thing it can break. Decide after the exact model is known.
+- **12-bit is not available**: `bitdepth` takes 8 or 10 [V: wiki `monitors/colors.md`, 2026-10-30].
+  The link is not the limit: 4K60 RGB at 12 bpc needs ~18.7 Gbit/s, within DP 1.4 HBR3's
+  25.92 Gbit/s payload [arithmetic, approx.]. Hyprland's option range is.
+- Presets [V wiki]: `auto` (srgb at 8 bpc, **wide = BT.2020 primaries** at 10 bpc), `srgb`, `dcip3`,
+  `dp3`, `adobe`, `wide`, `edid` ("known to be inaccurate"), `hdr`, `hdredid`.
+- **Configured (2026-10-30): `bitdepth = 10, cm = "srgb"`** (`config/hypr/conf/monitors.lua`).
+  `auto` would pick BT.2020 primaries at 10 bpc, which no ProArt panel covers, so sRGB content would
+  be mapped to the wrong primaries [inference from the preset table]. With `srgb`, set the panel's
+  OSD to its sRGB mode, or switch `cm` to the preset matching the panel's native gamut (`dcip3` /
+  `adobe`) once the model is known. Set `bitdepth = 8` if screen sharing breaks.
 
 ### KVM hot-unplug: what Hyprland 0.57 does
 

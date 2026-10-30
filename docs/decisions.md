@@ -95,7 +95,48 @@ forces a bar engine, so O3 is independent again.
 Project name stays `claude-RICE-hyprland`; short name `rice` for paths and commands
 (`~/.local/state/rice/`, `rice-menu`). Personal use: no license file.
 
+### D14. Bar: Quickshell, Orbit Glass design (owner's call, 2026-10-30)
+
+Frosted-glass pills per monitor (workspaces · clock · system, drives, network, Bluetooth, volume,
+media) with live dropdown panels: System (CPU per core + history, load 1/5/15 against thread count,
+memory, GPU, VRAM, every drive with usage ring and I/O), Network, **Bluetooth** (power, scan,
+connect/disconnect, device battery), Audio (volume, mute, **output selection**, now playing).
+Engine Quickshell (Arch `extra`). Code: `config/quickshell/`; rendered for real with mock
+services by `tests/quickshell/render.py`. Telemetry pills only on the primary (left) monitor;
+the right monitor shows workspaces 6–10, title and clock.
+- **Revisit if:** Quickshell breaks across Qt updates in practice (see bar.md, Risk).
+
+### D15. Wallpaper: live ASCII Earth and Moon, GPU shaders in Quickshell (owner, 2026-10-30)
+
+Owner asked for an animated, slowly rotating ASCII Earth/Moon on both 4K monitors, hyper-optimized,
+suggesting a compiled language (Zig, OCaml, Haskell, COBOL). Decision: **two GLSL fragment passes
+in a Quickshell `Background` layer**, not a CPU program in any language.
+- **Why:** the per-frame work is ~29k character cells (scene) + 8.3M pixels (glyph lookup) per
+  monitor. Measured on this repo's renderer through Mesa llvmpipe (LLVM-JIT'd SIMD on 4 cores,
+  i.e. about as fast as hand-written native CPU code gets): 200–474 ms per 4K frame. On the GPU the
+  same shaders are trivially parallel; on Navi 21 they should cost well under 1 ms per frame
+  [estimate, not measured on hardware]. A CPU renderer in Zig/OCaml/etc. would also have to upload
+  ~33 MB per monitor per frame to a compositor surface; the shader approach uploads nothing.
+- **Shape:** pass 1 evaluates the scene once per cell (cols × rows texture: color + ink density);
+  pass 2 maps density to a glyph from a font atlas rendered at the exact physical cell size.
+  Earth texture from Natural Earth land polygons (public domain). Angles come from the wall clock,
+  so both monitors (and restarts) stay in phase; 10 fps; hidden when the monitor's workspace has a
+  fullscreen window. Earth day 6 min, clouds 5 min, Moon orbit 30 min (`common/Config.qml`).
+- **Default `skyMode: "mirror"`** (the full scene on each monitor); `"span"` treats both monitors
+  as one canvas with the Earth across the seam. Owner to confirm.
+- **Static art** (`tools/spacegen.py`) stays for hyprlock and the login screen.
+
+### D16. Color depth: 10-bit, not 12 (2026-10-30)
+
+Owner asked for 12-bit if possible. Hyprland's `bitdepth` accepts 8 or 10 only [V: wiki
+`monitors/colors.md`]; the DP 1.4 link itself would carry 4K60 at 12 bpc (~18.7 of 25.92 Gbit/s),
+so this is a compositor limit. Configured: `bitdepth = 10`, `cm = "srgb"` (`config/hypr/conf/monitors.lua`).
+
 ## Open
+
+### ~~O3. Status bar~~ → D14
+
+<details><summary>History</summary>
 
 ### O3. Status bar: recommendation made, awaiting confirmation
 
@@ -104,6 +145,8 @@ network, per-NVMe disk usage; inspiration: the "Orbiter" ASCII space rice.
 Concepts in [bar/concepts.html](bar/concepts.html): Orbiter, Telemetry, Flight Deck, Orbit Glass,
 Twin HUD. **Recommendation: Quickshell, Telemetry design, split per screen (Twin HUD).** waybar
 cannot do live dropdown panels or a native output picker. Details: [knowledge-base/bar.md](knowledge-base/bar.md).
+
+</details>
 
 ### ~~O4. Launcher~~ → D12
 
@@ -123,8 +166,8 @@ if the bar goes Quickshell. Details: [knowledge-base/launcher.md](knowledge-base
 
 ### O5. Notifications
 
-**Recommendation: mako**; swaync if a notification center is wanted. Revisit with O3: a
-Quickshell bar can host notifications itself.
+**Recommendation: mako**; swaync if a notification center is wanted. Now that the bar is
+Quickshell (D14), a Quickshell notification server is the third option (one theme, one codebase).
 
 ### O6. Deploy method: symlink into the repo vs copy
 
@@ -142,6 +185,7 @@ neovim/btop/fastfetch themes, Blender UI theme from the palette.
 ### O12. Hardware details still needed
 
 Answered: GPU RX 6000 / Navi 21 (gfx1030), 16 GB; KVM Level1Techs dual-monitor DisplayPort 1.4
-(two links per PC, no EDID emulation). Still open: exact ProArt model (10-bit, gamut, refresh).
+(two links per PC, no EDID emulation). Still open: exact ProArt model (true 10-bit or 8-bit+FRC,
+native gamut, refresh); it decides `cm` (see D16) and whether 10-bit stays on.
 
-Closed: O1 → D10, O2 → D7, O4 → D12, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
+Closed: O1 → D10, O2 → D7, O3 → D14, O4 → D12, O7 → D8, O8 → D13, O10 → D13, O11 → D11.

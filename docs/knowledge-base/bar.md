@@ -22,7 +22,7 @@ Arch `extra`: `quickshell` 0.3.1 [S: archlinux.org via search].
 | **Output selection** | `Pipewire.preferredDefaultAudioSink` is **writable**; `defaultAudioSink` is the current one | node `description`, `nickname`, `isSink` for the list |
 | Media | `Quickshell.Services.Mpris` | |
 | Network | `Quickshell.Networking` | **NetworkManager only** (DBus). Without NM, read `/sys/class/net` |
-| Bluetooth | `src/bluetooth` module | |
+| Bluetooth | `Quickshell.Bluetooth`: `Bluetooth.defaultAdapter` (`enabled`, `discovering` writable), `devices`; device `connect()`, `disconnect()`, `pair()`, `connected`, `paired`, `batteryAvailable`, `battery` (0–1), `icon` | BlueZ over DBus: needs `bluez` + `bluetooth.service` |
 | Hyprland | `Quickshell.Hyprland`: workspaces, monitors, toplevels, focused monitor/workspace, `usingLua` | already aware of 0.55+ Lua IPC |
 | Blur | `BackgroundEffect.blurRegion` via `ext-background-effect-v1` | Hyprland support for that protocol: [TODO-verify]; layer rules on the namespace are the fallback |
 | Also available | notifications server, system tray (StatusNotifier), polkit agent, UPower, idle notify/inhibit, **session lock** (lock screen), **greetd** client (greeter), screencopy | one codebase could own bar, OSD, notifications, lock and greeter |
@@ -43,28 +43,63 @@ Verified against `Alexays/Waybar` man pages @ 2026-10-28 (0.15.0). [V: source]
 - No dropdown panels with live data; tooltips only.
 - Multiple bars per output via `"output"`; hot-plug behavior with 0.15: [TODO-verify].
 
-## Recommendation (2026-10-30)
+## Decision (2026-10-30): Quickshell, Orbit Glass
 
-**Quickshell**, design **Telemetry** split per screen (**Twin HUD**). Reasons: live dropdown panels
-and a native output picker are requirements; per-screen instances suit the KVM; the same code can
-later provide notifications, OSD and an ASCII lock screen. Pending owner confirmation (O3).
+Recommended Telemetry/Twin HUD; the owner picked **Orbit Glass** (D14). Engine reasons unchanged:
+live dropdown panels and a native output picker are requirements; per-screen instances suit the
+KVM; the same code can later provide notifications, OSD and an ASCII lock screen.
+
+## Implementation (`config/quickshell/`)
+
+```text
+shell.qml            ShellRoot: Variants over Quickshell.screens → Wallpaper + Bar per monitor
+common/              Config (sky mode/fps/periods, workspaces per monitor), Icons, Fmt
+                     + Theme.qml deployed from themes/<palette>/quickshell/common/
+services/            singletons: System, Audio, Media, Network, Bluetooth, SkyClock
+bar/                 Bar (PanelWindow + PopupWindow), BarContent, panels, small widgets
+sky/                 Wallpaper (Background layer), AsciiSky (two ShaderEffect passes)
+```
+
+- Imports use `import qs.common` / `qs.services` / `qs.bar` (Quickshell ≥ 0.2 maps `qs.*` to
+  directories under the shell root) [V: source].
+- Monitor ↔ bar: `Hyprland.monitorFor(screen)`; the primary monitor (workspaces 1–5) carries the
+  telemetry pills; the secondary shows workspaces 6–10, title and clock. Clicking a workspace runs
+  `Hyprland.dispatch('hl.dsp.focus({ workspace = N })')`; under 0.57 the dispatch string is a Lua
+  expression [V: `usingLua` in source; exact behavior on hardware: TODO-verify].
+- Layer namespaces: `rice-bar` (bar and its popups; blurred via `hl.layer_rule` in
+  `config/hypr/conf/layers.lua`), `rice-sky` (wallpaper, no animation).
+- Services are deliberately polling plain files (table below); Pipewire, MPRIS and BlueZ are event
+  driven through Quickshell's own modules. Network uses `/proc/net/route` + `/sys/class/net` +
+  `ip -j -4 addr`, so it works without NetworkManager.
+
+### Testing without a compositor
+
+`tests/quickshell/render.py OUT.png [--background frame.png]` loads the real bar QML through PySide6
+(Qt Quick) with mock services (`tests/quickshell/mocks/`, same interfaces) and a stub `Quickshell`
+module, and **fails on any QML warning**. Quickshell-only types (PanelWindow, PopupWindow, Pipewire,
+Bluetooth, Hyprland) are therefore kept out of `BarContent` and the panels; only `Bar.qml`,
+`Wallpaper.qml`, `shell.qml` and `services/` touch them and are untested off-hardware.
+
+Pitfalls found that way: a custom property named `top` collides with Item's anchor line
+("Cannot override FINAL property"); `implicitHeight` is read-only on `Row`/`Column`; a `Row` inside a
+`RowLayout` collapses to its tallest child unless given `Layout.preferredHeight`.
 
 ## Data sources (no extra daemons)
 
 | Metric | Source | Poll |
 | --- | --- | --- |
 | CPU % total and per core | `/proc/stat` deltas | 1 s |
-| Load averages | `/proc/loadavg` | 5 s |
-| Memory | `/proc/meminfo` (`MemTotal - MemAvailable`) | 2 s |
-| Disk usage per drive | `df -B1 --output=source,target,size,used` filtered to `/dev/nvme*`, mapped to drives via `lsblk -J -o NAME,PKNAME,MOUNTPOINTS` | 30 s |
-| Disk I/O per drive | `/proc/diskstats` sectors read/written deltas (×512 B) for `nvmeXn1` | 2 s |
+| Load averages | `/proc/loadavg` | 1 s |
+| Memory | `/proc/meminfo` (`MemTotal - MemAvailable`) | 1 s |
+| Disk usage per drive | `lsblk -J -b -o NAME,PKNAME,TYPE,MOUNTPOINTS,FSUSED,FSSIZE`, partitions summed into their disk (`util-linux`, in `base`) | 30 s |
+| Disk I/O per drive | `/proc/diskstats` sectors read/written deltas (×512 B) for `nvmeXn1`, `sdX` | 1 s |
 | Network rates | `/sys/class/net/<if>/statistics/{rx,tx}_bytes` deltas | 1 s |
-| Network details | `Quickshell.Networking` (NM) or `ip -j addr` | on change |
-| GPU busy / VRAM / temp (amdgpu) | `/sys/class/drm/card*/device/gpu_busy_percent`, `mem_info_vram_used`, `mem_info_vram_total`, `hwmon/*/temp1_input` [BK] | 2 s |
-| Audio, media | PipeWire / MPRIS services (event driven) | – |
+| Network details | default route from `/proc/net/route`; address from `ip -j -4 addr` | 10 s |
+| GPU busy / VRAM / temp (amdgpu) | `/sys/class/drm/card*/device/gpu_busy_percent`, `mem_info_vram_used`, `mem_info_vram_total`, `hwmon/*/temp1_input` [BK] | 1 s |
+| Audio, media, Bluetooth | PipeWire / MPRIS / BlueZ through Quickshell (event driven) | – |
 
-All are plain file reads (QML `FileView`, or `Process` for `df`/`lsblk`): cheap enough to poll at
-these rates on both monitors' bars from one shared data singleton.
+All are plain file reads (QML `FileView`, or `Process` for `lsblk`/`ip`): cheap enough to poll at
+these rates, once, from singletons shared by both monitors' bars.
 
 ## The ASCII look
 
@@ -72,10 +107,28 @@ these rates on both monitors' bars from one shared data singleton.
   scene (planet with continents, clouds, atmosphere; moon; stars; nebula dust) as SVG text in the
   palette. Rasterize with `rsvg-convert` for hyprpaper, hyprlock and the ReGreet background, so
   wallpaper, lock and login share one grid like Orbiter's. Fonts must be installed when rasterizing.
-- **Live (later, optional):** a Quickshell window on the `Background` layer with a Qt Quick
-  `ShaderEffect` (scene pass + ASCII pass), camera following the cursor. Costs GPU continuously on
-  two 4K panels; should pause when a window is fullscreen. Shaders need compiling to `.qsb`
-  (`qt6-shadertools`) [BK].
+- **Live (built, D15):** `config/quickshell/sky/`: a `Background`-layer window per monitor with
+  two `ShaderEffect` passes (no camera tracking; the scene moves only with time).
+  1. `scene.frag` runs on a cols × rows item (one fragment per character cell: 320 × 90 at
+     4K with 8 × 16 logical cells at scale 1.5): ray-sphere for Earth and Moon, land mask texture
+     (`assets/earth/land-1024x512.png`, from Natural Earth via `tools/earthmask.py`), ice caps,
+     desert band, fbm clouds on their own rotation, day/night with city lights, atmosphere rim,
+     tidally locked Moon, fixed-glyph twinkling stars, nebula dust. Output: rgb = color, a = ink.
+  2. A `ShaderEffectSource` (nearest filtering, exact texture size) feeds `glyph.frag`, which picks
+     one of 10 glyphs (` .:-=+*#%@`) from an atlas made by `bin/rice-sky-atlas` at the **physical**
+     cell size (12 × 24 px at scale 1.5), so glyphs are pixel-exact, never scaled.
+  - Time: `services/SkyClock.qml` computes angles from `Date.now() % 86400 s` in JS doubles and
+    wraps them to [0, 2π) before they reach float uniforms; periods divide a day, so the animation
+    is seamless across the wrap and identical on both monitors. 10 fps (`Config.skyFps`).
+  - Pauses: each monitor hides its sky while its active workspace has a fullscreen window; the
+    clock stops only when every view is paused.
+  - Measured (llvmpipe, CPU): 200–474 ms per 4K frame; not representative of the GPU. Real cost on
+    Navi 21 to measure with `tests/sky/render.py` on hardware [TODO-verify]. The steady cost that
+    remains on any GPU is the compositor re-compositing two 4K outputs 10 times a second.
+  - Unverified on a real Quickshell: frame callbacks while hidden, `ShaderEffectSource` with
+    `hideSource` + `visible: false` inside a `PanelWindow` [TODO-verify on hardware].
+  - Dev test: `tests/sky/render.py OUTDIR [--size WxH] [--dpr 1.5] [--frames N] [--span]`
+    (PySide6 + Addons for `pyside6-qsb`, any OpenGL incl. llvmpipe).
 - **Lock screen with the same grid:** Quickshell's session-lock module could replace hyprlock
   (ASCII clock included). Phase 3 option; hyprlock with the static ASCII image is the v1 path.
 

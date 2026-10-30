@@ -21,6 +21,8 @@ themes/<palette>/
   ├── starship/palette.toml
   ├── art/*.svg                 → tools/spacegen.py: wallpaper, panel starfield, planets, ASCII scene (seeded)
   ├── gtk/colors.css            → GTK3/4 @define-color overrides (libadwaita-compatible names)
+  ├── quickshell/common/Theme.qml  → QML singleton: palette (`qcolor`), glass tints, fonts, sizes
+  ├── quickshell/sky/*.frag     → GLSL 440 for the ASCII sky; palette baked in as `vec3` constants
   └── ...                       (mako/swaync, btop, nvim, bat as they get added)
         │
         │  install.sh           (install time; no generation, only linking)
@@ -31,6 +33,16 @@ themes/<palette>/
 Generated art is SVG (sharp at 4K, a few KB to ~50 KB). Consumers that need raster images (rofi
 `url()` through gdk-pixbuf, hyprpaper) get PNGs from `rsvg-convert` (package `librsvg`) at install
 time. Whether gdk-pixbuf in rofi loads SVG directly: [TODO-verify]; rasterizing avoids the question.
+
+Template filters (`tools/render_theme.py`): `hex` `#rrggbb`, `hexa:A` `#rrggbbaa`, `rgba:A`
+`rgba(r,g,b,a)`, `bare` `rrggbb`, `vec3` `vec3(r, g, b)` (floats 0–1, for GLSL), `qcolor:A`
+`#AARRGGBB` (Qt's alpha-first order; `#rrggbbaa` would be misread by QML).
+
+Shaders are the one generated output that needs a build step on the target: Qt Quick loads `.qsb`
+files, so the installer compiles `themes/<palette>/quickshell/sky/*.frag` with `qsb` from
+`qt6-shadertools` (`/usr/lib/qt6/bin/qsb` [TODO-verify path]) using the flags in
+`tests/sky/render.py`. Committing `.qsb` binaries instead would avoid the package but put opaque
+blobs in diffs.
 
 ### Why render at dev time and commit the outputs
 

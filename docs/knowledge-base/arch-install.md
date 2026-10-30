@@ -71,12 +71,13 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Qt/GTK integration | `qt5-wayland`, `qt6-wayland` [V wiki must-have], `hyprqt6engine` or `qt6ct`, `nwg-look` |
 | Audio / media | `pipewire`, `wireplumber` [V wiki], `pipewire-pulse`, `pipewire-alsa`, `pipewire-jack`, `pavucontrol`, `playerctl`, `brightnessctl` |
 | Terminal + shell | `kitty`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-completions`, `starship`, `fzf`, `zoxide`, `eza`, `bat` |
-| Bar / notifications | `quickshell` or `waybar` (decision O3), `mako` or `swaync` |
+| Bar / wallpaper / notifications | `quickshell` [S], `qt6-shadertools` (`qsb`, compiles the sky shaders at install) [BK], `mako` or `swaync` (O5) |
+| Bluetooth | `bluez`, `bluez-utils` [BK]; enabling `bluetooth.service` is a prompted system change |
 | Launcher / menus | `rofi` (≥ 2.0 for native Wayland), `jq`, `libnotify`, `librsvg` (`rsvg-convert` rasterizes generated art at install) |
 | Login | `greetd`, `greetd-regreet` (greeter runs inside Hyprland; no X server) |
 | GPU (AMD) | `mesa`, `vulkan-radeon`; opt-in Blender GPU step: `hip-runtime-amd`, `hiprt` [S: Arch blender optdepends] |
 | Clipboard / screenshots | `wl-clipboard`, `cliphist`, `grim`, `slurp`, `satty` (verify repo) |
-| Fonts / icons / cursor | `ttf-jetbrains-mono-nerd`, `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
+| Fonts / icons / cursor | `ttf-jetbrains-mono-nerd`, `ttf-ibm-plex` (bar text) [BK], `ttf-nerd-fonts-symbols` (bar icons) [BK], `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
 | Network (only if none present) | `networkmanager`, `network-manager-applet` |
 
 ## Starting the session
