@@ -370,8 +370,11 @@ Owner: the installer must install Elixir/Erlang, Haskell, SWI-Prolog, Fortran an
 always installed (OCaml from D27 stays). **JDK 25 (LTS)**: the Scala JDK compatibility page
 (docs.scala-lang.org, 2026-10-27) lists JDK 26 and 27 only for newer Scala 3 lines, while the
 tooling table (sbt, scala-cli, mill) and its "good choices" stop at 25, so 25 is the newest JDK
-the whole Scala toolchain supports. `archlinux-java` is pointed at it when another JDK is the
-default. Language servers outside the repositories come from `rice-lsp-setup` as before.
+the whole Scala toolchain supports (Arch's `jdk-openjdk` is already 27, so the installer
+installs `jdk25-openjdk`). `archlinux-java` is pointed at it when another JDK is the default.
+Scala itself is not packaged in Arch: `rice-lsp-setup` installs `scala`, `scalac`, `scala-cli`
+and Metals with Coursier. Erlang: the full `erlang` (observer, dialyzer…), not only the
+`erlang-core` that `elixir` needs.
 Details: [knowledge-base/editors.md](knowledge-base/editors.md#toolchains-d42).
 
 ## Open

@@ -92,7 +92,7 @@ other claims (repository, versions).
 | Viewers, music, podcasts | `imv`, `zathura`, `zathura-pdf-mupdf`, `strawberry`, `amberol`, `kasts` (D38; `?` until CI) |
 | Office (asked) | `texlive-meta`, `texlive-doc`, `texlive-lang*`, `biber`, `texstudio`, `texlab`, `libreoffice-fresh`, `hunspell-en_us`, hyphen/mythes (office.md) |
 | Terminal editors | `neovim` [S: extra 0.12.3], `helix` [S: extra 25.07.1; binary `helix`, V: Helix book], `vis`, `vis-lexers`, `tree-sitter-cli` (≥ 0.26.1) [S], `gcc`, `git`, `wl-clipboard` |
-| Language toolchains (prompted, per language) | `elixir`, `ghc` + `haskell-language-server` [S], `swi-prolog` [S: 10.0.2], `jdk-openjdk` (Metals) + `sbt`, `ocaml` + `opam`, `gcc-fortran`, `python-pipx` (fortls) [BK unless marked]; servers outside the repos: `bin/rice-lsp-setup` |
+| Language toolchains (always, D42) | `erlang` + `elixir`, `ghc` + `cabal-install` + `haskell-language-server`, `swi-prolog`, `jdk25-openjdk` + `sbt`, `ocaml` + `opam`, `gcc-fortran`, `python-pipx` [V: CI]; Scala, Metals and the other servers outside the repos: `bin/rice-lsp-setup` ([editors.md](editors.md#toolchains-d42)) |
 
 ## The installer
 

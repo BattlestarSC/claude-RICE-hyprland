@@ -1,4 +1,6 @@
-# Elixir (ElixirLS itself: rice-lsp-setup)
+# Elixir and Erlang/OTP. elixir needs only erlang-core; erlang is the full OTP (observer,
+# debugger, dialyzer, wx...). ElixirLS itself: rice-lsp-setup.
+erlang
 elixir
 # Haskell
 ghc

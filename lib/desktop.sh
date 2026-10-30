@@ -74,14 +74,17 @@ desktop_defaults() {
 # for every MIME type it declares (its MimeType= line) that starts with one of PREFIX. Desktop file
 # names and MIME lists differ between versions and plugins, so they are read, not assumed.
 set_default_app() {
-    local glob="$1" file mime prefix all=() mimes=()
+    local glob="$1" file line mime prefix all=() mimes=()
     shift
     file="$(find /usr/share/applications -maxdepth 1 -name "${glob}" -printf '%f\n' 2> /dev/null | sort | head -n 1)"
     if [[ -z "${file}" ]]; then
         (( DRY_RUN )) && note "would make ${glob} the default for $* (once installed)"
         return 0
     fi
-    IFS=';' read -ra all < <(sed -n 's/^MimeType=//p' "/usr/share/applications/${file}" | head -n 1)
+    # A here-string always gives read a line (read fails at EOF, which set -e would turn into an
+    # abort when the file has no MimeType= line).
+    line="$(sed -n 's/^MimeType=//p' "/usr/share/applications/${file}" | head -n 1)"
+    IFS=';' read -ra all <<< "${line}"
     for mime in "${all[@]}"; do
         for prefix in "$@"; do
             if [[ "${mime}" == "${prefix}"* ]]; then
@@ -90,6 +93,10 @@ set_default_app() {
             fi
         done
     done
-    (( ${#mimes[@]} )) && run xdg-mime default "${file}" "${mimes[@]}"
+    if (( ${#mimes[@]} )); then
+        run xdg-mime default "${file}" "${mimes[@]}"
+    else
+        warn "${file} declares no MIME type starting with $*; not made the default"
+    fi
     return 0
 }

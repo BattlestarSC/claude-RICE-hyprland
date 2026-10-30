@@ -34,7 +34,9 @@ Present beyond docs: theme generator + templates, generated `themes/quasar/`, `c
 `.github/workflows/ci.yml`, tests.
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
 **Nothing has run on real hardware yet**: the installer is tested with dry runs and a throwaway
-home, package names only by CI in `archlinux:latest`. **Not yet present:** `uninstall.sh`, a theme
+home, and for real (`./install.sh --yes` as a sudo user, then `verify-install.sh` and an
+idempotent re-run) by the `full-install` workflow in an `archlinux:latest` container, which cannot
+start Hyprland, greetd or any GUI. **Not yet present:** `uninstall.sh`, a theme
 switcher. Quickshell code is render-tested
 with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
 `shell.qml`, `OsdWindow.qml` and `services/` as unverified. Decided and open questions are in
@@ -126,6 +128,7 @@ shellcheck -x install.sh lib/*.sh bin/rice-* tests/rofi-render.sh tests/zsh/run.
 tests/installer/run.sh                                     # installer file layer in a throwaway home (+ dry run on Arch as non-root)
 tests/installer/check_packages.sh                          # inside Arch after pacman -Sy: every packages/*.txt name exists
 tests/installer/pam_keyring.sh [/etc/pam.d/greetd]         # keyring PAM edit: placement, nothing else changed, idempotent
+docker run --rm -v "$PWD:/src:ro" archlinux:latest bash /src/tests/installer/full-install.sh   # real install + verify (CI: full-install.yml)
 tests/hypr/share-picker.sh                                 # rice-share-picker vs XDPH's stdout format (stub rofi/hyprctl/slurp)
 python3 tests/apps/check_viewers.py <zathura> <imv>        # zathurarc / imv config option names and color formats
 ./install.sh --dry-run                                     # on Arch: every action printed, nothing changed
@@ -231,6 +234,13 @@ in an `archlinux:latest` container or on hardware.
 - Thunderbird's shadow roots recompute `--layout-*` from tokens (`layout.css` is `:host, :root`):
   theme the tokens (`--color-gray-*`, `--color-*-dark`), not only `--layout-*`, and keep `!important`.
 - Colored man pages need `GROFF_NO_SGR=1`; without it grotty sends SGR and `LESS_TERMCAP_*` never applies.
+- greetd starts the session with `/bin/sh` + `/etc/profile` + `~/.profile` only: zsh's `.zshenv`
+  does not run there. Anything Hyprland must find in `~/.local/bin` relies on the PATH line in
+  `hypr/conf/env.lua`.
+- Arch's `jdk-openjdk` is the newest JDK (27 in 2026-10), newer than the Scala tooling supports:
+  keep the versioned `jdk25-openjdk` (D42). `scala`, `scala-cli`, `metals` are not packaged.
+- `--noconfirm` answers "no" to conflict prompts and picks default providers: a new package that
+  conflicts with an installed one aborts the whole transaction. The full-install CI catches it.
 - XDPH runs `custom_picker_binary` from the systemd user environment (no `~/.local/bin` on PATH)
   and hyprlang expands neither `~` nor environment variables in values: `xdph.conf` keeps
   `= ~/...` in the repo and the installer writes the absolute path (`with_home`).

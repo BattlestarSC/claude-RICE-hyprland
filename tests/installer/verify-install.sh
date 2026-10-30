@@ -73,6 +73,7 @@ expect "LibreOffice theme extension registered" "rice" /usr/lib/libreoffice/prog
 echo "== languages (compile and run)"
 check "Elixir runs" elixir -e 'IO.puts(Enum.sum(1..10))'
 expect "Erlang/OTP present" "OTP" erl -noshell -eval 'io:format("OTP ~s~n", [erlang:system_info(otp_release)]), halt().'
+check "full Erlang/OTP (observer, dialyzer)" erl -noshell -eval 'ok = application:load(observer), ok = application:load(dialyzer), halt().'
 printf 'main :: IO ()\nmain = print (sum [1..10 :: Int])\n' > "${work}/hello.hs"
 check "GHC compiles and runs" bash -c "cd '${work}' && ghc -O0 -o hello-hs hello.hs && ./hello-hs | grep -qx 55"
 check "cabal" cabal --version

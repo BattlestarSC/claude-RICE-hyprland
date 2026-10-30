@@ -156,6 +156,34 @@ version (0.9 or a snapshot) [TODO-verify].
   (`STYLE_DIAGNOSTIC_*`). **Not run inside vis in the build environment** (executing the plugin
   was not permitted there); verify on Arch with `:lspc-start-server`.
 
+## Toolchains (D42)
+
+Always installed by `install.sh` (owner, 2026-10-30). Package facts from `pacman -Si` in
+`archlinux:latest` [V: CI, 2026-10-30]:
+
+| Language | From pacman (`packages/languages.txt`) | From `rice-lsp-setup` (per user, `~/.local/bin`) |
+| --- | --- | --- |
+| Elixir + Erlang/OTP | `elixir` 1.20 (needs only `erlang-core`), `erlang` 29.1 (meta: observer, debugger, dialyzer, wx …) | ElixirLS |
+| Haskell | `ghc`, `cabal-install`, `haskell-language-server` | (none) |
+| SWI-Prolog | `swi-prolog` | `lsp_server` pack |
+| Fortran | `gcc-fortran`, `python-pipx` | fortls |
+| Scala | `jdk25-openjdk` (25.0.5), `sbt` (2.0.12, needs `java-runtime-headless`) | `scala`, `scalac`, `scala-cli`, Metals via Coursier |
+| OCaml | `ocaml`, `opam`, `bubblewrap` | ocaml-lsp-server after `opam init` (asks; not automatic) |
+
+- **Why JDK 25, not `jdk-openjdk`:** `jdk-openjdk` is JDK 27 in Arch now. Scala's JDK
+  compatibility page (docs.scala-lang.org, 2026-10-27) supports 27 only from the non-LTS Scala
+  3.10 and 26 from 3.8 / 3.9 LTS, while its tooling table (scala-cli, sbt, mill) and its
+  recommendation ("JDK 17, 21, and 25 are all good choices") end at 25. 25 is therefore the
+  newest JDK the whole toolchain supports. `install.sh` runs `archlinux-java set java-25-openjdk`
+  when another JDK is the default (env name [TODO-verify: full-install CI]).
+- **Scala is not packaged** (`scala`, `scala-cli`, `metals`, `coursier`: not in the repositories
+  [V: CI]). Coursier, Scala's official installer, puts them in `~/.local/bin`; its launchers run on
+  the system JDK.
+- `~/.local/bin` is on PATH in zsh (`.zshenv`) and, for programs Hyprland starts, through
+  `hypr/conf/env.lua` (greetd does not run zsh's startup files).
+- Proof: `tests/installer/verify-install.sh` (run by the full-install CI) compiles and runs a
+  program in Elixir, Erlang, Haskell, SWI-Prolog, Fortran, Java and Scala and starts each server.
+
 ## Language servers: install routes
 
 | Server | Command | Route | Notes |
