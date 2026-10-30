@@ -57,16 +57,27 @@ else
 fi
 
 echo "== configs in the real programs"
-# Hyprland parses the Lua config without starting a compositor (src/Compositor.cpp initServer).
-check "Hyprland accepts ~/.config/hypr/hyprland.lua" Hyprland --verify-config -c "${cfg}/hypr/hyprland.lua"
-check "Hyprland accepts the login screen's /etc/greetd/hyprland.lua" Hyprland --verify-config -c /etc/greetd/hyprland.lua
-# Neovim: first start installs the pinned plugins (vim.pack, git) and loads every module.
-nvim_out="$(timeout 300 nvim --headless '+lua vim.defer_fn(function() vim.cmd("qa!") end, 20000)' 2>&1 || true)"
-if grep -qE 'E[0-9]+:|Error|error|stack traceback' <<< "${nvim_out}"; then
-    fail "Neovim starts without errors"; printf '%s\n' "${nvim_out}" | tail -n 20 | sed 's/^/     /'
+# Hyprland parses the Lua config without starting a compositor (src/Compositor.cpp initServer);
+# it still wants a runtime directory.
+rt="$(mktemp -d)"; chmod 0700 "${rt}"
+check "Hyprland accepts ~/.config/hypr/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${cfg}/hypr/hyprland.lua"
+check "Hyprland accepts the login screen's /etc/greetd/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c /etc/greetd/hyprland.lua
+# Neovim, first start: installs the pinned plugins (vim.pack, git), starts the tree-sitter parser
+# builds and loads every module; it must then quit on its own. A snapshot of its child processes
+# after 2 minutes shows what it waits on if it does not.
+( sleep 120; printf 'processes after 120 s:\n'; pgrep -a -f 'nvim|tree-sitter|git|cc1' ) > "${work}/nvim-ps.txt" 2>&1 &
+nvim_rc=0
+nvim_out="$(timeout 420 nvim --headless '+lua vim.defer_fn(function() print("RICE-LOADED") vim.cmd("qa!") end, 20000)' < /dev/null 2>&1)" || nvim_rc=$?
+if (( nvim_rc == 0 )) && [[ "${nvim_out}" == *RICE-LOADED* ]] && ! grep -qE 'E[0-9]+:|Error|stack traceback' <<< "${nvim_out}"; then
+    pass "Neovim first start: plugins installed, config loaded, quits"
 else
-    pass "Neovim starts without errors (plugins installed)"
+    fail "Neovim first start (exit ${nvim_rc}; 124 = still running after 420 s)"
+    printf '%s\n' "${nvim_out}" | tail -n 25 | sed 's/^/     /'
+    sed 's/^/     /' "${work}/nvim-ps.txt" 2> /dev/null || true
 fi
+nvim_rc=0
+nvim_out="$(timeout 60 nvim --headless '+lua print("RICE-LOADED")' +qa < /dev/null 2>&1)" || nvim_rc=$?
+if (( nvim_rc == 0 )) && [[ "${nvim_out}" == *RICE-LOADED* ]]; then pass "Neovim second start"; else fail "Neovim second start (exit ${nvim_rc})"; printf '%s\n' "${nvim_out}" | tail -n 15 | sed 's/^/     /'; fi
 check "Neovim plugins present" test -d "${data}/nvim/site/pack/core/opt/nvim-tree.lua"
 check "Helix config loads" bash -c "helix --health 2>&1 | grep -q 'Config file'"
 
