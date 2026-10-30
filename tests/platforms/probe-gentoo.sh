@@ -43,8 +43,9 @@ for atom in "${atoms[@]}"; do
         [[ -d "${dir}" ]] || continue
         repo="$(basename "$(dirname "$(dirname "${dir}")")")"
         mapfile -t ebuilds < <(find "${dir}" -maxdepth 1 -name '*.ebuild' -printf '%f\n' | sed 's/\.ebuild$//' | sort -V)
+        (( ${#ebuilds[@]} )) || continue
         newest="${ebuilds[-1]}"
-        kw="$(sed -n 's/^KEYWORDS="\(.*\)"/\1/p' "${dir}/${newest}.ebuild" | tr ' ' '\n' | grep -E '^~?amd64$' | head -n 1)"
+        kw="$(sed -n 's/^KEYWORDS="\(.*\)"/\1/p' "${dir}/${newest}.ebuild" | tr ' ' '\n' | grep -E '^~?amd64$' | head -n 1 || true)"
         printf '%-40s %-12s %s [%s]\n' "${atom}" "${repo}" "$(printf '%s ' "${ebuilds[@]: -3}" | sed "s|${atom##*/}-||g")" "${kw:-no-amd64-kw}"
         found=1
     done
