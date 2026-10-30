@@ -1,0 +1,41 @@
+# Ubuntu 26.04 names (probe: tests/platforms/probe-ubuntu.sh, CI 2026-10-30). The Hyprland 0.57
+# stack, Quickshell and ReGreet are built from source (lib/platform/ubuntu.sh, build.txt).
+greetd
+xdg-desktop-portal-gtk
+xdg-utils
+xdg-user-dirs
+dconf-service
+dconf-cli
+gnome-keyring
+seahorse
+qt6ct
+qtwayland5
+qt6-wayland
+xwayland
+librsvg2-bin
+rofi
+jq
+libnotify-bin
+wl-clipboard
+cliphist
+grim
+slurp
+pipewire
+wireplumber
+pipewire-pulse
+pipewire-alsa
+pipewire-jack
+pavucontrol
+playerctl
+brightnessctl
+bluez
+fonts-jetbrains-mono
+fonts-ibm-plex
+fonts-noto-core
+fonts-noto-color-emoji
+papirus-icon-theme
+nwg-look
+# polkit agent runtime (hyprpolkitagent is built)
+polkitd
+# kreadconfig6/kwriteconfig6 (Dolphin and Kasts color scheme; Debian splits them out)
+?libkf6config-bin

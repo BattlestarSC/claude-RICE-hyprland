@@ -1,0 +1,32 @@
+# File managers
+thunar
+thunar-volman
+thunar-archive-plugin
+xarchiver
+tumbler
+ffmpegthumbnailer
+gvfs
+gvfs-backends
+udisks2
+dolphin
+kio-extras
+ffmpegthumbs
+breeze
+# Browsers and mail: Firefox and Thunderbird as .debs from ppa:mozillateam (pinned), LibreWolf
+# and VSCodium (Code - OSS builds) through extrepo
+librewolf
+firefox
+thunderbird
+codium
+# Viewers, music, podcasts (Zathura: Poppler backend; Ubuntu has no MuPDF plugin)
+imv
+zathura
+zathura-pdf-poppler
+strawberry
+amberol
+kasts
+gstreamer1.0-plugins-base
+gstreamer1.0-plugins-good
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-ugly
+gstreamer1.0-libav

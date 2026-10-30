@@ -1,0 +1,5 @@
+# Neovim 0.12 and tree-sitter CLI >= 0.26.1 come from upstream releases (Ubuntu: 0.11.6, 0.25.9).
+hx
+vis
+git
+build-essential

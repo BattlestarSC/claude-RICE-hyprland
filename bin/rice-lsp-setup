@@ -10,7 +10,7 @@
 #
 #   language  server                 comes from                        lands in
 #   elixir    ElixirLS v0.31.1       GitHub release zip                ~/.local/share/rice/elixir-ls
-#   haskell   haskell-language-server pacman (checked only)            /usr/bin
+#   haskell   haskell-language-server pacman on Arch; ghcup elsewhere     /usr/bin or ~/.local/share/rice/.ghcup
 #   prolog    lsp_server pack         swipl pack install               SWI-Prolog's user pack dir
 #   scala     scala, scalac, scala-cli, Metals  Coursier (cs, downloaded if absent) ~/.local/bin
 #   ocaml     ocaml-lsp-server        opam (current switch)            ~/.opam; wrapper in ~/.local/bin
@@ -18,13 +18,14 @@
 #   vis-lspc  vis LSP plugin @9d0f7a0 git (gitlab.com/muhq/vis-lspc)   ~/.config/vis/plugins
 #
 # These come from GitHub, Maven Central, opam and PyPI, not from Arch: that is why this is a
-# separate, opt-in step (docs/knowledge-base/editors.md). Compilers and runtimes come from pacman;
-# missing ones are reported with the pacman command to run.
+# separate step (docs/knowledge-base/editors.md). Compilers and runtimes come from the system's
+# package manager; missing ones are reported.
 set -Eeuo pipefail
 
 readonly elixir_ls_version='0.31.1'
 readonly vis_lspc_url='https://gitlab.com/muhq/vis-lspc.git'
 readonly vis_lspc_rev='9d0f7a0'
+readonly ghcup_url='https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup'
 readonly coursier_url='https://github.com/coursier/launchers/raw/master/cs-x86_64-pc-linux.gz'
 
 data_dir="${XDG_DATA_HOME:-${HOME}/.local/share}/rice"
@@ -48,7 +49,11 @@ run() {
 need() {
     local cmd="$1" pkg="$2"
     have "${cmd}" && return 0
-    say "missing ${cmd}: sudo pacman -S --needed ${pkg}"
+    if have pacman; then
+        say "missing ${cmd}: sudo pacman -S --needed ${pkg}"
+    else
+        say "missing ${cmd}: install it with your package manager (Arch name: ${pkg})"
+    fi
     return 1
 }
 
@@ -105,11 +110,31 @@ setup_elixir() {
 }
 
 setup_haskell() {
-    local ok=0
-    need ghc ghc || ok=1
-    need haskell-language-server-wrapper haskell-language-server || ok=1
-    (( ok == 0 )) && say "haskell-language-server: installed (Arch's build matches Arch's ghc only)"
-    return "${ok}"
+    need ghc ghc || return 1
+    if have haskell-language-server-wrapper; then
+        say "haskell-language-server: installed"
+        return 0
+    fi
+    if have pacman; then
+        need haskell-language-server-wrapper haskell-language-server
+        return 1
+    fi
+    # Not packaged here: ghcup (the Haskell project's installer) provides servers built for the
+    # system's GHC; the wrapper picks the one matching each project.
+    local ghcup="${data_dir}/ghcup/ghcup"
+    if [[ ! -x "${ghcup}" ]]; then
+        run mkdir -p -- "${data_dir}/ghcup"
+        if (( dry_run )); then
+            say "would download ${ghcup_url}"
+        else
+            curl -fL --proto '=https' --tlsv1.2 -o "${ghcup}.part" "${ghcup_url}"
+            mv -- "${ghcup}.part" "${ghcup}"
+        fi
+        run chmod +x -- "${ghcup}"
+    fi
+    run env GHCUP_INSTALL_BASE_PREFIX="${data_dir}" "${ghcup}" install hls latest
+    run ln -sfn -- "${data_dir}/.ghcup/bin/haskell-language-server-wrapper" "${bin_dir}/haskell-language-server-wrapper"
+    say "haskell-language-server via ghcup (${data_dir}/.ghcup)"
 }
 
 setup_prolog() {
@@ -144,7 +169,9 @@ setup_scala() {
     run mkdir -p -- "${bin_dir}"
     # Scala itself is not in Arch's repositories: the official route is Coursier, which installs
     # the scala runner (scala-cli based since Scala 3.5), scalac and scala-cli next to Metals.
-    run "${cs}" install --install-dir "${bin_dir}" scala scalac scala-cli metals
+    local apps=(scala scalac scala-cli metals)
+    have sbt || apps+=(sbt)   # Arch packages sbt; elsewhere Coursier installs it too
+    run "${cs}" install --install-dir "${bin_dir}" "${apps[@]}"
 }
 
 setup_ocaml() {

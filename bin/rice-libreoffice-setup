@@ -22,7 +22,8 @@ say() { printf '  %s\n' "$*"; }
 
 find_unopkg() {
     local c
-    for c in unopkg /usr/lib/libreoffice/program/unopkg; do
+    for c in unopkg /usr/lib/libreoffice/program/unopkg /usr/lib64/libreoffice/program/unopkg \
+        /usr/local/lib/libreoffice/program/unopkg /opt/libreoffice*/program/unopkg; do
         if command -v "${c}" > /dev/null; then printf '%s\n' "${c}"; return 0; fi
     done
     return 1

@@ -1,0 +1,17 @@
+kitty
+foot
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+starship
+fzf
+zoxide
+eza
+bat
+man-db
+manpages
+less
+htop
+btop
+fastfetch
+lm-sensors

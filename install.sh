@@ -32,6 +32,10 @@ source "${REPO}/lib/platform.sh"
 source "${REPO}/lib/preflight.sh"
 # shellcheck source=lib/packages.sh
 source "${REPO}/lib/packages.sh"
+# shellcheck source=lib/pins.sh
+source "${REPO}/lib/pins.sh"
+# shellcheck source=lib/extras.sh
+source "${REPO}/lib/extras.sh"
 # shellcheck source=lib/deploy.sh
 source "${REPO}/lib/deploy.sh"
 # shellcheck source=lib/files.sh
@@ -90,7 +94,7 @@ ask_plan() {
     ask_yn "Make zsh your login shell?" y || WANT_SHELL=0
 
     # Programming languages are always installed (owner, D42).
-    PKG_LISTS=(desktop.txt shell.txt apps.txt editors.txt languages.txt)
+    PKG_LISTS=(desktop.txt shell.txt apps.txt editors.txt languages.txt "${PLAT_EXTRA_LISTS[@]}")
     (( WANT_OFFICE )) && PKG_LISTS+=(office.txt)
     [[ -z "${NET_MANAGER}" ]] && PKG_LISTS+=(network.txt)
     (( HAS_AMD )) && PKG_LISTS+=(amd-gpu.txt)

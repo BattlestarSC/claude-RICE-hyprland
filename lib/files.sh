@@ -168,7 +168,14 @@ build_assets() {
     step "Building shaders and images"
     local cfg="${XDG_CONFIG_HOME:-${HOME}/.config}" data="${XDG_DATA_HOME:-${HOME}/.local/share}"
     local theme="${REPO}/themes/${PALETTE}" qsb name scale w h
-    qsb="$(command -v qsb || true)"
+    # qsb is a Qt tool outside PATH on most systems (Arch/Debian, Fedora, FreeBSD layouts).
+    qsb="$(command -v qsb qsb-qt6 qsb6 2> /dev/null | head -n 1 || true)"
+    local c
+    for c in /usr/lib/qt6/bin/qsb /usr/lib/qt6/libexec/qsb /usr/lib/x86_64-linux-gnu/qt6/bin/qsb \
+        /usr/lib64/qt6/bin/qsb /usr/local/lib/qt6/bin/qsb /usr/local/libexec/qt6/qsb; do
+        [[ -n "${qsb}" ]] && break
+        [[ -x "${c}" ]] && qsb="${c}"
+    done
     [[ -n "${qsb}" ]] || qsb=/usr/lib/qt6/bin/qsb
     if [[ -x "${qsb}" ]] || (( DRY_RUN )); then
         run mkdir -p -- "${cfg}/quickshell/sky/shaders"

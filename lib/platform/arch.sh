@@ -31,6 +31,8 @@ plat_install() {
     as_root pacman "${flags[@]}" -- "$@"
 }
 
+plat_installed() { pacman -Q -- "$1" > /dev/null 2>&1; }
+
 plat_service_enable() { as_root systemctl enable "$1.service"; }
 plat_display_manager() { systemd_display_manager; }
 plat_set_display_manager() { systemd_set_display_manager "$@"; }

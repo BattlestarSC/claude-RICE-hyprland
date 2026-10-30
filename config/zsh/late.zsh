@@ -1,9 +1,15 @@
 # Loaded last (after local.zsh). zsh-syntax-highlighting must be the last plugin that wraps zle
 # widgets; zsh-history-substring-search must come after it (both projects' instructions).
-_rice_source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+_rice_source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+    /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+    /usr/share/zsh/site-functions/zsh-syntax-highlighting.zsh \
+    /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Up/Down search history for what is already typed (fish behavior).
-if _rice_source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh; then
+if _rice_source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh \
+    /usr/share/zsh-history-substring-search/zsh-history-substring-search.zsh \
+    /usr/share/zsh/site-functions/zsh-history-substring-search.zsh \
+    /usr/local/share/zsh-history-substring-search/zsh-history-substring-search.zsh; then
     HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
     bindkey '^[[A' history-substring-search-up
     bindkey '^[[B' history-substring-search-down

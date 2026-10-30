@@ -7,6 +7,7 @@
 #   PLAT_NAME, PKG_DIR                 display name; directory with the package lists
 #   plat_preflight                     checks before anything changes (version, package db, lock)
 #   plat_available NAME...             print the names the repositories have (one per line)
+#   plat_installed NAME                true if the package is installed (used by the CI verifier)
 #   plat_plan                          extra plan lines (repositories it will add, builds)
 #   plat_setup_repos                   add repositories / overlays (after the plan is accepted)
 #   plat_install NAME...               install packages (non-interactive with --yes)
@@ -48,6 +49,9 @@ declare -g ZSH_BIN=/usr/bin/zsh GREETD_DIR=/etc/greetd GREETER_USER=greeter PAM_
     FIREFOX_POLICY_DIR=/etc/firefox/policies
 # shellcheck disable=SC2034  # used by lib/desktop.sh
 declare -ga DATA_DIRS=(/usr/local/share /usr/share)
+
+# shellcheck disable=SC2034  # lists and names a platform module may add
+declare -ga PLAT_EXTRA_LISTS=() PLAT_REPO_PACKAGES=()
 
 plat_plan() { return 0; }
 plat_setup_repos() { return 0; }

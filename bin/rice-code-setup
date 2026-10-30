@@ -21,7 +21,8 @@
 set -Eeuo pipefail
 
 src="${1:-${HOME}/.local/share/rice/code-oss}"
-user_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/Code - OSS/User"
+config_home="${XDG_CONFIG_HOME:-${HOME}/.config}"
+user_dir="${config_home}/Code - OSS/User"   # VSCodium (codium): ${config_home}/VSCodium/User
 argv_file="${HOME}/.vscode-oss/argv.json"
 
 die() { printf 'rice-code-setup: %s\n' "$*" >&2; exit 1; }
@@ -29,7 +30,7 @@ say() { printf '  %s\n' "$*"; }
 
 find_cli() {
     local c
-    for c in code code-oss; do
+    for c in code code-oss codium; do
         if command -v "${c}" > /dev/null; then printf '%s\n' "${c}"; return 0; fi
     done
     return 1
@@ -97,7 +98,8 @@ main() {
     [[ -f "${src}/extension/package.json" && -f "${src}/settings.json" && -f "${src}/settings-defaults.json" ]] \
         || die "missing files in ${src} (run the installer, or pass the source dir)"
     local cli
-    cli="$(find_cli)" || die "Code - OSS is not installed (package: code)"
+    cli="$(find_cli)" || die "Code - OSS is not installed (Arch: code; elsewhere: VSCodium, codium)"
+    [[ "${cli}" == codium ]] && user_dir="${config_home}/VSCodium/User"
     command -v bsdtar > /dev/null || die "bsdtar not found (package: libarchive)"
     command -v jq > /dev/null || die "jq not found (package: jq)"
 

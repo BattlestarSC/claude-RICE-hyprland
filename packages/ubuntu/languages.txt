@@ -1,0 +1,12 @@
+# D42. Haskell's language server (ghcup) and Scala itself + sbt (Coursier): rice-lsp-setup.
+erlang
+elixir
+ghc
+cabal-install
+swi-prolog
+openjdk-25-jdk
+ocaml
+opam
+bubblewrap
+gfortran
+pipx

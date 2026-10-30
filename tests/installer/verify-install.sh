@@ -6,6 +6,13 @@
 set -Eeuo pipefail
 
 repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
+REPO="${repo}"
+# shellcheck source=lib/log.sh
+source "${repo}/lib/log.sh"
+# shellcheck source=lib/platform.sh
+source "${repo}/lib/platform.sh"
+detect_platform
+echo "platform: ${PLAT_NAME} (${PLAT_INIT})"
 cfg="${XDG_CONFIG_HOME:-${HOME}/.config}"
 data="${XDG_DATA_HOME:-${HOME}/.local/share}"
 export PATH="${HOME}/.local/bin:${PATH}"
@@ -32,20 +39,24 @@ expect() {
 
 echo "== packages"
 missing=()
-for list in desktop shell apps editors languages office network; do
+for list in desktop shell apps editors languages office network "${PLAT_EXTRA_LISTS[@]%.txt}"; do
+    [[ -f "${PKG_DIR}/${list}.txt" ]] || continue
     while IFS= read -r name; do
         optional=0
         [[ "${name}" == \?* ]] && { optional=1; name="${name#\?}"; }
-        pacman -Q -- "${name}" > /dev/null 2>&1 && continue
+        plat_installed "${name}" && continue
         # An optional name the repositories lack was skipped on purpose.
-        (( optional )) && ! pacman -Si -- "${name}" > /dev/null 2>&1 && continue
+        if (( optional )) && ! plat_available "${name}" | grep -qFx -- "${name}"; then continue; fi
         missing+=("${name}")
-    done < <(sed -e 's/#.*//' -e 's/[[:space:]]//g' -e '/^$/d' "${repo}/packages/${list}.txt")
+    done < <(sed -e 's/#.*//' -e 's/[[:space:]]//g' -e '/^$/d' "${PKG_DIR}/${list}.txt")
 done
 if (( ${#missing[@]} )); then fail "packages installed (missing: ${missing[*]})"; else pass "every listed package is installed"; fi
 
 echo "== desktop commands"
-for cmd in Hyprland hyprlock hypridle quickshell rofi kitty foot zsh starship nvim helix vis code \
+# Same program, different names: Helix is hx outside Arch, Code - OSS is VSCodium's codium.
+helix_cmd="$(command -v helix || command -v hx || echo helix)"
+code_cmd="$(command -v code || command -v codium || echo code)"
+for cmd in Hyprland hyprlock hypridle quickshell rofi kitty foot zsh starship nvim "${helix_cmd##*/}" vis "${code_cmd##*/}" \
     librewolf firefox thunderbird thunar dolphin imv zathura strawberry amberol kasts qt6ct \
     greetd regreet gnome-keyring-daemon seahorse btop htop fastfetch slurp grim wl-copy jq; do
     if command -v "${cmd}" > /dev/null; then pass "command ${cmd}"; else fail "command ${cmd}"; fi
@@ -62,7 +73,7 @@ echo "== configs in the real programs"
 # it still wants a runtime directory.
 rt="$(mktemp -d)"; chmod 0700 "${rt}"
 check "Hyprland accepts ~/.config/hypr/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${cfg}/hypr/hyprland.lua"
-check "Hyprland accepts the login screen's /etc/greetd/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c /etc/greetd/hyprland.lua
+check "Hyprland accepts the login screen's ${GREETD_DIR}/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${GREETD_DIR}/hyprland.lua"
 # Neovim: the installer pre-built plugins and parsers (lib/desktop.sh nvim_prepare), so the first
 # start is an ordinary one and must load the config and quit.
 parsers="$(find "${data}/nvim/site/parser" -name '*.so' 2> /dev/null | wc -l)"
@@ -71,7 +82,7 @@ nvim_rc=0
 nvim_out="$(timeout 60 nvim --headless '+lua print("RICE-LOADED")' +qa < /dev/null 2>&1)" || nvim_rc=$?
 if (( nvim_rc == 0 )) && [[ "${nvim_out}" == *RICE-LOADED* ]]; then pass "Neovim starts, loads the config and quits"; else fail "Neovim starts, loads the config and quits (exit ${nvim_rc})"; printf '%s\n' "${nvim_out}" | tail -n 15 | sed 's/^/     /'; fi
 check "Neovim plugins present" test -d "${data}/nvim/site/pack/core/opt/nvim-tree.lua"
-check "Helix config loads" bash -c "helix --health 2>&1 | grep -q 'Config file'"
+check "Helix config loads" bash -c "'${helix_cmd}' --health 2>&1 | grep -q 'Config file'"
 
 echo "== office"
 for cmd in pdflatex lualatex xelatex biber texstudio texlab libreoffice; do
@@ -85,7 +96,11 @@ Hello, rice. $e^{i\pi} + 1 = 0$
 \end{document}
 EOF
 check "pdflatex builds a document" bash -c "cd '${work}' && pdflatex -interaction=nonstopmode doc.tex && test -s doc.pdf"
-expect "LibreOffice theme extension registered" "rice" /usr/lib/libreoffice/program/unopkg list
+unopkg=unopkg
+for c in /usr/lib/libreoffice/program/unopkg /usr/lib64/libreoffice/program/unopkg /usr/local/lib/libreoffice/program/unopkg; do
+    [[ -x "${c}" ]] && { unopkg="${c}"; break; }
+done
+expect "LibreOffice theme extension registered" "rice" "${unopkg}" list
 
 echo "== languages (compile and run)"
 check "Elixir runs" elixir -e 'IO.puts(Enum.sum(1..10))'
@@ -99,7 +114,9 @@ printf 'program hello\n  print *, sum([1,2,3,4,5,6,7,8,9,10])\nend program hello
 check "gfortran compiles and runs" bash -c "cd '${work}' && gfortran -o hello-f hello.f90 && ./hello-f | grep -q 55"
 expect "Java is OpenJDK 25" 'version "25' java -version
 expect "javac is 25" "javac 25" javac -version
-expect "archlinux-java default is java-25-openjdk" "java-25-openjdk" archlinux-java get
+if [[ "${PLAT_ID}" == arch ]]; then
+    expect "archlinux-java default is java-25-openjdk" "java-25-openjdk" archlinux-java get
+fi
 printf 'public class Hello { public static void main(String[] a) { System.out.println(6 * 7); } }\n' > "${work}/Hello.java"
 check "javac compiles and java runs" bash -c "cd '${work}' && javac Hello.java && java -cp . Hello | grep -qx 42"
 check "Scala runs a program" bash -c "cd '${work}' && printf '@main def hi(): Unit = println(6 * 7)\n' > hi.scala && scala run hi.scala | grep -qx 42"
@@ -128,7 +145,7 @@ for f in rice/quickshell/sky-atlas-12x24.png rice/lock.png color-schemes/Quasar.
     if [[ -s "${data}/${f}" ]]; then pass "data/${f}"; else fail "data/${f}"; fi
 done
 expect "xdph.conf points at the picker" "${HOME}/.local/bin/rice-share-picker" cat "${cfg}/hypr/xdph.conf"
-expect "Code - OSS theme installed" "rice" code --list-extensions
+expect "Code - OSS theme installed" "rice" "${code_cmd}" --list-extensions
 expect "Code - OSS uses the keyring" "gnome-libsecret" cat "${HOME}/.vscode-oss/argv.json"
 
 echo "== shell"
@@ -149,11 +166,11 @@ expect "Dolphin uses the Quasar scheme" "Quasar" kreadconfig6 --file dolphinrc -
 
 echo "== system"
 expect "greetd is the display manager" "greetd.service" readlink /etc/systemd/system/display-manager.service
-expect "login shell is zsh" "/usr/bin/zsh" getent passwd "$(id -un)"
-expect "keyring unlocked at login" "pam_gnome_keyring.so auto_start" cat /etc/pam.d/greetd
-check "greeter config deployed" test -s /etc/greetd/hyprland.lua
-check "login background rendered" test -s /etc/greetd/background.png
-check "Firefox policies" test -s /etc/firefox/policies/policies.json
+expect "login shell is zsh" "${ZSH_BIN}" getent passwd "$(id -un)"
+expect "keyring unlocked at login" "pam_gnome_keyring.so auto_start" cat "${PAM_DIR}/greetd"
+check "greeter config deployed" test -s "${GREETD_DIR}/hyprland.lua"
+check "login background rendered" test -s "${GREETD_DIR}/background.png"
+check "Firefox policies" test -s "${FIREFOX_POLICY_DIR}/policies.json"
 check "bluetooth enabled" test -e /etc/systemd/system/bluetooth.target.wants/bluetooth.service
 
 echo

@@ -15,12 +15,26 @@ user=builder
 section() { printf '\n######## %s\n' "$*"; }
 
 section "base system"
-pacman -Syu --noconfirm --needed sudo git
-# The docker image skips man pages and docs (NoExtract); keep that, it only saves space.
-useradd -m -G wheel "${user}"
-# A wheel user whose sudo does not ask for a password stands in for "types the password once".
-printf '%%wheel ALL=(ALL:ALL) NOPASSWD: ALL\n' > /etc/sudoers.d/10-wheel
-chmod 0440 /etc/sudoers.d/10-wheel
+distro="$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"')"
+admin_group=wheel
+case "${distro}" in
+    arch)
+        pacman -Syu --noconfirm --needed sudo git
+        xvfb=(pacman -S --noconfirm --needed xorg-server-xvfb)
+        ;;
+    ubuntu)
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -q
+        apt-get install -y -q sudo git ca-certificates locales
+        admin_group=sudo
+        xvfb=(apt-get install -y -q xvfb)
+        ;;
+    *) echo "full-install.sh: no base setup for ${distro}"; exit 2 ;;
+esac
+useradd -m -G "${admin_group}" -s /bin/bash "${user}"
+# A sudo user whose sudo does not ask for a password stands in for "types the password once".
+printf '%%%s ALL=(ALL:ALL) NOPASSWD: ALL\n' "${admin_group}" > /etc/sudoers.d/10-admin
+chmod 0440 /etc/sudoers.d/10-admin
 cp -r /src "/home/${user}/rice"
 chown -R "${user}:${user}" "/home/${user}/rice"
 
@@ -34,7 +48,7 @@ summary() {
     grep -h '^  ! ' /tmp/run1.log /tmp/run2.log 2> /dev/null | sort | uniq -c || echo "(none)"
     section "size"
     grep -h '^first run:' /tmp/full-install-time 2> /dev/null || true
-    du -sxh /usr /opt /var/lib/pacman /var/cache/pacman/pkg "/home/${user}" 2> /dev/null || true
+    du -sxh /usr /opt /var/cache/pacman/pkg /var/cache/apt/archives "/home/${user}" 2> /dev/null || true
     return "${rc}"
 }
 trap summary EXIT
@@ -50,7 +64,7 @@ as_user "/home/${user}/rice/tests/installer/verify-install.sh"
 section "Quickshell loads the shell (Xvfb; informational)"
 # No Wayland compositor can run here, so Hyprland/Pipewire/layer-shell features are missing, but
 # QML syntax, imports and type errors in the real shell show up in its log.
-pacman -S --noconfirm --needed xorg-server-xvfb > /dev/null
+"${xvfb[@]}" > /dev/null
 # shellcheck disable=SC2016  # expanded by the user's shell, not this one
 as_user 'export XDG_RUNTIME_DIR=$(mktemp -d) DISPLAY=:99 QT_QPA_PLATFORM=xcb
     Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 & xpid=$!
