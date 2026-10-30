@@ -124,7 +124,7 @@ python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed 
 lua5.4 tests/lua/run.lua config/hypr/hyprland.lua         # whole config: dispatchers, keys, option names, rule keys, events
 python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
 python3 tests/lua/gen_rules.py <hyprland-wiki checkout> > tests/lua/rules.lua       # refresh rule keys + event names
-shellcheck -x install.sh lib/*.sh bin/rice-* tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh tests/hypr/share-picker.sh
+shellcheck -x install.sh lib/*.sh lib/platform/*.sh bin/rice-* tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh tests/hypr/share-picker.sh
 tests/installer/run.sh                                     # installer file layer in a throwaway home (+ dry run on Arch as non-root)
 tests/installer/check_packages.sh                          # inside Arch after pacman -Sy: every packages/*.txt name exists
 tests/installer/pam_keyring.sh [/etc/pam.d/greetd]         # keyring PAM edit: placement, nothing else changed, idempotent

@@ -60,6 +60,8 @@ desktop_defaults() {
         run "${HOME}/.local/bin/rice-libreoffice-setup" || warn "rice-libreoffice-setup failed (see above); re-run it later"
     fi
 
+    nvim_prepare
+
     # Language servers that are not in Arch's repositories (D27, D42).
     run "${HOME}/.local/bin/rice-lsp-setup" elixir haskell prolog scala fortran vis-lspc \
         || warn "some language servers were not installed; run rice-lsp-setup to see which"
@@ -98,5 +100,19 @@ set_default_app() {
     else
         warn "${file} declares no MIME type starting with $*; not made the default"
     fi
+    return 0
+}
+
+# Neovim: clone the pinned plugins and build the tree-sitter parsers now, so the first start is
+# an ordinary one. The config starts the same parser install asynchronously; waiting on it here
+# (with a time limit) keeps that work out of the user's first session. Found by the full-install
+# CI: a first start that is still compiling parsers did not quit on :qa!.
+nvim_prepare() {
+    command -v nvim > /dev/null || (( DRY_RUN )) || return 0
+    info "Neovim: plugins and tree-sitter parsers (a few minutes the first time)"
+    run timeout 900 nvim --headless \
+        -c 'lua require("nvim-treesitter").install(require("rice.treesitter").languages):wait(840000)' \
+        -c 'qa!' < /dev/null > /dev/null 2>&1 \
+        || warn "Neovim parsers not fully built; Neovim finishes them on its next start"
     return 0
 }

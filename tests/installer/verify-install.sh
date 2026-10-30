@@ -14,7 +14,8 @@ trap 'rm -rf -- "${work}"' EXIT
 fails=0
 
 pass() { printf 'ok   %s\n' "$1"; }
-fail() { printf 'FAIL %s\n' "$1"; fails=$((fails + 1)); }
+failed=()
+fail() { printf 'FAIL %s\n' "$1"; fails=$((fails + 1)); failed+=("$1"); }
 # check NAME CMD...: CMD must succeed (its output is shown only on failure).
 check() {
     local name="$1" out
@@ -62,22 +63,13 @@ echo "== configs in the real programs"
 rt="$(mktemp -d)"; chmod 0700 "${rt}"
 check "Hyprland accepts ~/.config/hypr/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${cfg}/hypr/hyprland.lua"
 check "Hyprland accepts the login screen's /etc/greetd/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c /etc/greetd/hyprland.lua
-# Neovim, first start: installs the pinned plugins (vim.pack, git), starts the tree-sitter parser
-# builds and loads every module; it must then quit on its own. A snapshot of its child processes
-# after 2 minutes shows what it waits on if it does not.
-( sleep 120; printf 'processes after 120 s:\n'; pgrep -a -f 'nvim|tree-sitter|git|cc1' ) > "${work}/nvim-ps.txt" 2>&1 &
-nvim_rc=0
-nvim_out="$(timeout 420 nvim --headless '+lua vim.defer_fn(function() print("RICE-LOADED") vim.cmd("qa!") end, 20000)' < /dev/null 2>&1)" || nvim_rc=$?
-if (( nvim_rc == 0 )) && [[ "${nvim_out}" == *RICE-LOADED* ]] && ! grep -qE 'E[0-9]+:|Error|stack traceback' <<< "${nvim_out}"; then
-    pass "Neovim first start: plugins installed, config loaded, quits"
-else
-    fail "Neovim first start (exit ${nvim_rc}; 124 = still running after 420 s)"
-    printf '%s\n' "${nvim_out}" | tail -n 25 | sed 's/^/     /'
-    sed 's/^/     /' "${work}/nvim-ps.txt" 2> /dev/null || true
-fi
+# Neovim: the installer pre-built plugins and parsers (lib/desktop.sh nvim_prepare), so the first
+# start is an ordinary one and must load the config and quit.
+parsers="$(find "${data}/nvim/site/parser" -name '*.so' 2> /dev/null | wc -l)"
+if (( parsers >= 23 )); then pass "tree-sitter parsers built (${parsers})"; else fail "tree-sitter parsers built (${parsers} of 23)"; fi
 nvim_rc=0
 nvim_out="$(timeout 60 nvim --headless '+lua print("RICE-LOADED")' +qa < /dev/null 2>&1)" || nvim_rc=$?
-if (( nvim_rc == 0 )) && [[ "${nvim_out}" == *RICE-LOADED* ]]; then pass "Neovim second start"; else fail "Neovim second start (exit ${nvim_rc})"; printf '%s\n' "${nvim_out}" | tail -n 15 | sed 's/^/     /'; fi
+if (( nvim_rc == 0 )) && [[ "${nvim_out}" == *RICE-LOADED* ]]; then pass "Neovim starts, loads the config and quits"; else fail "Neovim starts, loads the config and quits (exit ${nvim_rc})"; printf '%s\n' "${nvim_out}" | tail -n 15 | sed 's/^/     /'; fi
 check "Neovim plugins present" test -d "${data}/nvim/site/pack/core/opt/nvim-tree.lua"
 check "Helix config loads" bash -c "helix --health 2>&1 | grep -q 'Config file'"
 
@@ -166,6 +158,7 @@ check "bluetooth enabled" test -e /etc/systemd/system/bluetooth.target.wants/blu
 
 echo
 if (( fails )); then
+    printf 'FAILED: %s\n' "${failed[@]}"
     printf '%d check(s) failed\n' "${fails}"
     exit 1
 fi

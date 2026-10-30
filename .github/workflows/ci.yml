@@ -18,7 +18,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y shellcheck lua5.4 zsh jq librsvg2-bin
       - name: shellcheck
         run: >
-          shellcheck -x install.sh lib/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup
+          shellcheck -x install.sh lib/*.sh lib/platform/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup
           bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors bin/rice-libreoffice-setup bin/rice-share-picker
           tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh tests/hypr/share-picker.sh
       - name: Generated themes are current

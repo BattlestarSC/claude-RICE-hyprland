@@ -33,3 +33,6 @@ vim.api.nvim_create_autocmd('FileType', {
         end
     end,
 })
+
+-- The installer builds these parsers ahead of the first start (lib/desktop.sh, nvim_prepare).
+return { languages = languages }

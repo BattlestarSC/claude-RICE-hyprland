@@ -1,52 +1,58 @@
 # shellcheck shell=bash
 # Package lists (packages/*.txt) and installation. Sourced by install.sh.
-# One pacman transaction, always with -u: never a partial upgrade (arch-install.md rule 3).
+# The package manager itself is the platform module's (lib/platform/<id>.sh).
 
 PKG_LISTS=()      # list files chosen in the plan, relative to packages/
 PKG_REQUIRED=()   # names to install
 PKG_SKIPPED=()    # optional names (?name) the repositories do not have
 
-# Print the names in a list, one per line; optional ones keep their "?" prefix.
+# Print the names in a list, one per line; optional ones keep their "?" prefix. A list the
+# platform does not have (e.g. network.txt on FreeBSD) is empty.
 list_names() {
-    sed -e 's/#.*//' -e 's/[[:space:]]//g' -e '/^$/d' -- "${REPO}/packages/$1"
+    [[ -f "${PKG_DIR}/$1" ]] || return 0
+    sed -e 's/#.*//' -e 's/[[:space:]]//g' -e '/^$/d' -- "${PKG_DIR}/$1"
 }
 
-# Check every name against the local sync database (no -Sy here: syncing without upgrading
-# would leave the system half-updated if the installer stops before pacman -Syu).
+# Check every name against the platform's repositories (plat_available, one query for all).
 resolve_packages() {
     step "Checking package names"
-    local list name missing=()
+    local list name missing=() wanted=() optional=()
+    declare -A have=()
     PKG_REQUIRED=()
     PKG_SKIPPED=()
     for list in "${PKG_LISTS[@]}"; do
         while IFS= read -r name; do
             if [[ "${name}" == \?* ]]; then
-                name="${name#\?}"
-                if pacman -Si -- "${name}" > /dev/null 2>&1; then
-                    PKG_REQUIRED+=("${name}")
-                else
-                    PKG_SKIPPED+=("${name}")
-                fi
-            elif pacman -Si -- "${name}" > /dev/null 2>&1; then
-                PKG_REQUIRED+=("${name}")
+                optional+=("${name#\?}")
             else
-                missing+=("${name} (${list})")
+                wanted+=("${name}|${list}")
             fi
         done < <(list_names "${list}")
     done
+    while IFS= read -r name; do
+        have["${name}"]=1
+    done < <(plat_available "${optional[@]}" "${wanted[@]%%|*}")
+    for name in "${wanted[@]}"; do
+        if [[ -n "${have[${name%%|*}]:-}" ]]; then
+            PKG_REQUIRED+=("${name%%|*}")
+        else
+            missing+=("${name%%|*} (${name#*|})")
+        fi
+    done
+    for name in "${optional[@]}"; do
+        if [[ -n "${have[${name}]:-}" ]]; then PKG_REQUIRED+=("${name}"); else PKG_SKIPPED+=("${name}"); fi
+    done
     if (( ${#missing[@]} )); then
         printf '    %s\n' "${missing[@]}" >&2
-        die "these packages are not in your repositories. If your system was not updated recently, run 'sudo pacman -Syu' and re-run; otherwise please report it"
+        die "these packages are not in your repositories. If your system was not updated recently, update it and re-run; otherwise please report it"
     fi
     (( ${#PKG_SKIPPED[@]} )) && warn "not in the repositories, skipped: ${PKG_SKIPPED[*]}"
     info "${#PKG_REQUIRED[@]} packages from: ${PKG_LISTS[*]}"
 }
 
 install_packages() {
-    step "Installing packages (pacman -Syu: full system upgrade plus the rice)"
-    local flags=(-Syu --needed)
-    (( ASSUME_YES )) && flags+=(--noconfirm)
-    as_root pacman "${flags[@]}" -- "${PKG_REQUIRED[@]}"
+    step "Installing packages"
+    plat_install "${PKG_REQUIRED[@]}"
 }
 
 # Build an AUR package as the user (makepkg refuses root), install it with pacman via makepkg -si.
