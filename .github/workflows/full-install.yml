@@ -1,0 +1,39 @@
+# A real ./install.sh --yes in a fresh archlinux:latest container, as a sudo user, then
+# tests/installer/verify-install.sh and an idempotency re-run. Slow (the full package set,
+# TeX Live included, is several GB), so it runs when the installer, packages, configs or
+# scripts change, and on demand.
+name: full-install
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - install.sh
+      - lib/**
+      - packages/**
+      - bin/**
+      - config/**
+      - themes/**
+      - home/**
+      - tests/installer/**
+      - .github/workflows/full-install.yml
+
+jobs:
+  install:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space on the runner
+        run: |
+          df -h / /mnt
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost
+          sudo docker image prune --all --force > /dev/null
+          df -h / /mnt
+      - name: Install and verify in archlinux:latest
+        run: |
+          sudo mkdir -p /mnt/pacman-cache
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/src:ro" \
+            -v /mnt/pacman-cache:/var/cache/pacman/pkg \
+            archlinux:latest bash /src/tests/installer/full-install.sh

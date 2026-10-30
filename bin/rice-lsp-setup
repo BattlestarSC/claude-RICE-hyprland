@@ -71,7 +71,7 @@ show_status() {
     status_line haskell "$(have haskell-language-server-wrapper && echo yes || echo no)" \
         'haskell-language-server-wrapper (pacman: haskell-language-server ghc)'
     status_line prolog "$(prolog_pack_ok && echo yes || echo no)" 'swipl + lsp_server pack (pacman: swi-prolog)'
-    status_line scala "$(have metals && echo yes || echo no)" 'metals (needs a JDK from pacman)'
+    status_line scala "$(have metals && echo yes || echo no)" 'metals (needs jdk25-openjdk from pacman)'
     status_line ocaml "$(have ocamllsp && echo yes || echo no)" 'ocamllsp (pacman: opam ocaml)'
     status_line fortran "$(have fortls && echo yes || echo no)" 'fortls (pacman: python-pipx gcc-fortran)'
     status_line latex "$(have texlab && echo yes || echo no)" 'texlab (pacman: texlab, installed with the office group)'
@@ -122,7 +122,7 @@ setup_prolog() {
 }
 
 setup_scala() {
-    need java jdk-openjdk || return 1
+    need java jdk25-openjdk || return 1
     local cs
     if have cs; then
         cs=cs

@@ -105,7 +105,7 @@ Order (`install.sh`, functions in `lib/`):
 | Step | What | Where |
 | --- | --- | --- |
 | preflight | not root, `/etc/arch-release`, pacman/sudo/git, no `db.lck`, a sync db, DNS, ≥ 12 GB free, `sudo -v`; detects GPU vendor (sysfs), active network manager, current display manager, VM | `lib/preflight.sh` |
-| questions | language toolchains (y), Blender + HIP on AMD (y), AUR ungoogled-chromium (n), wallpaper mode and layout, greetd (y), zsh login shell (y) | `install.sh` |
+| questions | Blender + HIP on AMD (y), AUR ungoogled-chromium (n), wallpaper mode and layout, greetd (y), zsh login shell (y) | `install.sh` |
 | package check | every name against the **local** sync db (`pacman -Si`); no `-Sy` before the upgrade, so stopping here leaves the system consistent | `lib/packages.sh` |
 | plan | packages, files, system changes; one confirmation | `install.sh` |
 | packages | `sudo pacman -Syu --needed <all>` (one transaction); then makepkg for the AUR extra | `lib/packages.sh` |
@@ -164,7 +164,6 @@ writes both descriptions into `monitors.lua` (left = the panel with the smaller 
 
 | Question | Choices | Stored in |
 | --- | --- | --- |
-| Language toolchains + servers | yes (default) · no | `packages/languages.txt`, `rice-lsp-setup` |
 | Office (TeX Live full, TeXstudio, LibreOffice) | yes (default) · no | `packages/office.txt`, `rice-libreoffice-setup` |
 | Blender with HIP | yes (default, AMD GPU only) · no | `packages/blender.txt` |
 | Optional AUR browser | ungoogled-chromium-bin | off by default (D2); makepkg |

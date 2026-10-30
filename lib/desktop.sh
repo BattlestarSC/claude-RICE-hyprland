@@ -60,15 +60,13 @@ desktop_defaults() {
         run "${HOME}/.local/bin/rice-libreoffice-setup" || warn "rice-libreoffice-setup failed (see above); re-run it later"
     fi
 
-    # Language servers that are not in Arch's repositories (opt-in list, D27).
-    if (( WANT_LANGUAGES )); then
-        run "${HOME}/.local/bin/rice-lsp-setup" elixir haskell prolog scala fortran vis-lspc \
-            || warn "some language servers were not installed; run rice-lsp-setup to see which"
-        if [[ -d "${OPAMROOT:-${HOME}/.opam}" ]]; then
-            run "${HOME}/.local/bin/rice-lsp-setup" ocaml || warn "OCaml server not installed"
-        else
-            note "OCaml: run 'opam init', then 'rice-lsp-setup ocaml' (opam init asks before editing your shell files)"
-        fi
+    # Language servers that are not in Arch's repositories (D27, D42).
+    run "${HOME}/.local/bin/rice-lsp-setup" elixir haskell prolog scala fortran vis-lspc \
+        || warn "some language servers were not installed; run rice-lsp-setup to see which"
+    if [[ -d "${OPAMROOT:-${HOME}/.opam}" ]]; then
+        run "${HOME}/.local/bin/rice-lsp-setup" ocaml || warn "OCaml server not installed"
+    else
+        note "OCaml: run 'opam init', then 'rice-lsp-setup ocaml' (opam init asks before editing your shell files)"
     fi
 }
 

@@ -20,7 +20,7 @@ carries a `?`; use it for new names that cannot be checked before CI runs. CI ru
 | shell.txt | always: terminals, zsh, CLI tools |
 | apps.txt | always: file managers, browsers, Code - OSS |
 | editors.txt | always: Neovim, Helix, vis and what they need to build parsers |
-| languages.txt | asked (default yes): Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran toolchains |
+| languages.txt | always (D42): Elixir/Erlang, Haskell, SWI-Prolog, Scala (OpenJDK 25), OCaml, Fortran toolchains |
 | office.txt | asked (default yes): TeX Live (full), TeXstudio, texlab, LibreOffice, dictionaries |
 | network.txt | only when no network manager is active |
 | amd-gpu.txt | when an AMD GPU is detected: Mesa, Vulkan |

@@ -43,14 +43,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Every package name exists
         run: tests/installer/check_packages.sh
-      - name: Package facts (temporary probe)
-        run: |
-          for p in jdk-openjdk jdk25-openjdk jdk26-openjdk jdk21-openjdk scala scala-cli sbt metals coursier erlang erlang-nox elixir \
-                   gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav dbus amberol kasts strawberry; do
-            pacman -Si "$p" 2>/dev/null | grep -E '^(Name|Version|Depends On|Optional Deps|Provides|Conflicts With) ' | cut -c1-400 || echo "== $p: not found"
-            echo
-          done
-          pacman -Qo /usr/bin/dbus-run-session || true
       - name: install.sh --dry-run as a normal user
         run: |
           useradd -m builder
@@ -62,3 +54,11 @@ jobs:
         run: |
           pacman -S --noconfirm --needed greetd
           tests/installer/pam_keyring.sh /etc/pam.d/greetd
+      - name: Package facts (temporary probe)
+        run: |
+          for p in jdk-openjdk jdk25-openjdk jdk27-openjdk jdk26-openjdk jdk21-openjdk scala scala-cli sbt metals coursier erlang erlang-nox elixir \
+                   gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav dbus amberol kasts strawberry; do
+            pacman -Si "$p" 2>/dev/null | grep -E '^(Name|Version|Depends On|Optional Deps|Provides|Conflicts With) ' | cut -c1-400 || echo "== $p: not found"
+            echo
+          done
+          pacman -Qo /usr/bin/dbus-run-session || true

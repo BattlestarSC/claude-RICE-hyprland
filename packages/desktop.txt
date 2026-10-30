@@ -12,6 +12,8 @@ qt6-wayland
 ?qt6ct
 xdg-utils
 xdg-user-dirs
+# gsettings writes nothing persistent without the dconf backend (GTK dark mode, fonts, cursor)
+dconf
 
 # Keyring (Secret Service), unlocked at login through /etc/pam.d/greetd; seahorse manages it
 ?gnome-keyring

@@ -46,6 +46,25 @@ run() {
 # as_root CMD...: run with sudo (the only way the installer gains root).
 as_root() { run sudo "$@"; }
 
+# Keep sudo's credential cache warm for the whole run: the package step alone can take longer
+# than sudo's timeout (5 min by default), and an unattended --yes run must not stop at a second
+# password prompt. A background loop refreshes it every minute and ends with the installer.
+SUDO_KEEPALIVE=""
+keep_sudo_alive() {
+    (( DRY_RUN )) && return 0
+    (
+        while sleep 60; do
+            kill -0 "$$" 2> /dev/null || exit 0
+            sudo -n -v 2> /dev/null || exit 0
+        done
+    ) &
+    SUDO_KEEPALIVE=$!
+}
+stop_sudo_keepalive() {
+    [[ -n "${SUDO_KEEPALIVE}" ]] && kill "${SUDO_KEEPALIVE}" 2> /dev/null
+    return 0
+}
+
 # ask_yn QUESTION DEFAULT(y|n): 0 for yes. --yes or a non-interactive stdin takes the default.
 ask_yn() {
     local question="$1" default="$2" reply hint

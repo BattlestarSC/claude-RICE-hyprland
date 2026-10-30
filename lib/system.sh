@@ -44,6 +44,16 @@ system_setup() {
         as_root chsh -s /usr/bin/zsh "$(id -un)"
     fi
 
+    # Java: the JDK the Scala toolchain supports (D42) must be the default when others exist.
+    if command -v archlinux-java > /dev/null || (( DRY_RUN )); then
+        local current
+        current="$(archlinux-java get 2> /dev/null || true)"
+        if [[ "${current}" != "${JDK_ENV}" ]]; then
+            info "default Java: ${JDK_ENV}${current:+ (was ${current})}"
+            as_root archlinux-java set "${JDK_ENV}"
+        fi
+    fi
+
     info "services"
     as_root systemctl enable bluetooth.service
     if [[ -z "${NET_MANAGER}" ]]; then

@@ -261,7 +261,7 @@ in the palette, Nerd Font keys). Blender is installed with HIP (AMD GPU, asked) 
   are skipped; `local.*` hooks are created empty and never touched; captured monitor IDs and the
   cursor choice survive re-runs.
 - **All packages in one `pacman -Syu --needed`** (official repos), including the language
-  toolchains (asked, default yes) and Blender with HIP (asked on AMD). The AUR browser is asked,
+  toolchains (always since D42) and Blender with HIP (asked on AMD). The AUR browser is asked,
   default no, and built with makepkg. Language servers outside the repos: `rice-lsp-setup`, run by
   the installer.
 - **Makes the rice the default environment**: greetd + ReGreet enabled as the display manager (any
@@ -362,6 +362,17 @@ Needed for D38 (Strawberry is a plain Qt Widgets app and would otherwise be ligh
 the rice fonts. Official repos (hyprqt6engine, the wiki's other suggestion, is AUR-only). Easy to
 undo: remove the line from `env.lua`. Details:
 [knowledge-base/theming.md](knowledge-base/theming.md#qt-apps-qt6ct).
+
+### D42. Programming languages always installed; Scala on JDK 25 (owner, 2026-10-30)
+
+Owner: the installer must install Elixir/Erlang, Haskell, SWI-Prolog, Fortran and Scala with
+"Java latest supported OpenJDK". The language question is gone: `packages/languages.txt` is
+always installed (OCaml from D27 stays). **JDK 25 (LTS)**: the Scala JDK compatibility page
+(docs.scala-lang.org, 2026-10-27) lists JDK 26 and 27 only for newer Scala 3 lines, while the
+tooling table (sbt, scala-cli, mill) and its "good choices" stop at 25, so 25 is the newest JDK
+the whole Scala toolchain supports. `archlinux-java` is pointed at it when another JDK is the
+default. Language servers outside the repositories come from `rice-lsp-setup` as before.
+Details: [knowledge-base/editors.md](knowledge-base/editors.md#toolchains-d42).
 
 ## Open
 

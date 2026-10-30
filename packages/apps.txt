@@ -35,3 +35,10 @@ thunderbird
 ?strawberry
 ?amberol
 ?kasts
+# GStreamer codecs: optional dependencies of the players above, without which most formats
+# (MP3, AAC, Opus in some containers) do not play
+gst-plugins-base
+gst-plugins-good
+gst-plugins-bad
+gst-plugins-ugly
+gst-libav

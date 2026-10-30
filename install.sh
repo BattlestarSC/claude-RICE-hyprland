@@ -20,7 +20,7 @@ REPO="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 PALETTE=quasar
 CURSOR_THEME="${RICE_CURSOR:-capitaine-cursors-light}"
 WORK_DIR="$(mktemp -d)"
-trap 'rm -rf -- "${WORK_DIR}"' EXIT
+trap 'stop_sudo_keepalive; rm -rf -- "${WORK_DIR}"' EXIT
 # set -E carries this into functions: any unexpected failure names its file and line.
 trap 'die "unexpected failure at ${BASH_SOURCE[0]#"${REPO}/"}:${LINENO}: ${BASH_COMMAND}"' ERR
 
@@ -39,7 +39,10 @@ source "${REPO}/lib/desktop.sh"
 # shellcheck source=lib/system.sh
 source "${REPO}/lib/system.sh"
 
-WANT_LANGUAGES=1
+# Java for Scala (D42): the newest JDK that Scala 3 LTS, sbt, scala-cli and Metals all support
+# (docs.scala-lang.org/overviews/jdk-compatibility, 2026-10-27). packages/languages.txt installs it.
+JDK_VERSION=25
+JDK_ENV="java-${JDK_VERSION}-openjdk"
 WANT_OFFICE=1
 WANT_BLENDER=0
 WANT_AUR_BROWSER=0
@@ -65,8 +68,6 @@ parse_args() {
 
 ask_plan() {
     step "Choices (Enter takes the default)"
-    ask_yn "Language toolchains and servers for Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran?" y \
-        || WANT_LANGUAGES=0
     ask_yn "Office: full TeX Live, TeXstudio, LibreOffice (about 7 GB)?" y || WANT_OFFICE=0
     if (( HAS_AMD )); then
         ask_yn "Blender with HIP (GPU) rendering?" y && WANT_BLENDER=1
@@ -85,8 +86,8 @@ ask_plan() {
     ask_yn "Use the graphical login screen (greetd + ReGreet) as the display manager?" y || WANT_GREETER=0
     ask_yn "Make zsh your login shell?" y || WANT_SHELL=0
 
-    PKG_LISTS=(desktop.txt shell.txt apps.txt editors.txt)
-    (( WANT_LANGUAGES )) && PKG_LISTS+=(languages.txt)
+    # Programming languages are always installed (owner, D42).
+    PKG_LISTS=(desktop.txt shell.txt apps.txt editors.txt languages.txt)
     (( WANT_OFFICE )) && PKG_LISTS+=(office.txt)
     [[ -z "${NET_MANAGER}" ]] && PKG_LISTS+=(network.txt)
     (( HAS_AMD )) && PKG_LISTS+=(amd-gpu.txt)
@@ -97,6 +98,7 @@ ask_plan() {
 show_plan() {
     step "Plan"
     info "packages: ${#PKG_REQUIRED[@]} from ${PKG_LISTS[*]} (one pacman -Syu, which also updates the system)"
+    info "languages: Elixir/Erlang, Haskell, SWI-Prolog, Fortran, Scala (JDK ${JDK_VERSION}), OCaml + their language servers"
     (( WANT_AUR_BROWSER )) && info "AUR: ungoogled-chromium-bin"
     info "your files: copied into ~/.config, ~/.local; replaced files backed up to ${BACKUP_DIR}"
     info "wallpaper: ${SKY_MODE}, ${SKY_LAYOUT}; cursor: ${CURSOR_THEME}"
@@ -106,6 +108,7 @@ show_plan() {
     (( WANT_SHELL )) && info "  - login shell: zsh"
     info "  - enable bluetooth$([[ -z "${NET_MANAGER}" ]] && printf ' and NetworkManager')"
     info "  - Firefox privacy policies: /etc/firefox/policies/policies.json"
+    info "  - default Java: ${JDK_ENV} (archlinux-java), if another JDK is the default"
     (( DRY_RUN )) && { info "dry run: nothing below is executed"; return 0; }
     ask_yn "Go ahead?" y || die "stopped; nothing was changed"
 }

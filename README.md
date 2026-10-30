@@ -36,12 +36,15 @@ What it does, in order ([details](docs/knowledge-base/arch-install.md#the-instal
 
 1. **Checks** Arch, a non-root user with working `sudo`, network, no pacman lock, free space;
    detects the GPU, the network manager and the current display manager.
-2. **Asks** a few questions (Enter takes the default): language toolchains (yes), office
+2. **Asks** a few questions (Enter takes the default): office
    (full TeX Live, TeXstudio, LibreOffice; yes), Blender with
    HIP on AMD (yes), the AUR backup browser (no), wallpaper mode and layout, login screen (yes),
    zsh as login shell (yes). Then shows the plan and asks once.
 3. **Installs** every package from the official repositories in one `pacman -Syu --needed`
-   (which also updates the system); the AUR browser only if you said yes.
+   (which also updates the system), always including the programming languages: Elixir/Erlang,
+   Haskell, SWI-Prolog, Fortran, Scala on OpenJDK 25, OCaml (D42); the AUR browser only if you said yes.
+   sudo stays authorized for the whole run, so an unattended `--yes` run never stops at a second
+   password prompt.
 4. **Copies** the configuration into your home. Any file it replaces is first backed up to
    `~/.local/state/rice/backups/<time>/` (with a manifest). Files already current are left alone.
 5. **Builds** the wallpaper shaders and images, sets GTK/KDE preferences and default apps
