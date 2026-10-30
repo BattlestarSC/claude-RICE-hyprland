@@ -9,6 +9,26 @@ local M = { binds = {}, submaps = {}, errors = {} }
 
 -- Valid option paths for hl.config, generated from the wiki (tests/lua/gen_options.py).
 local options = require("options")
+-- Window/layer rule keys and event names, generated from the wiki (tests/lua/gen_rules.py).
+local rules = require("rules")
+M.events = {}
+
+local function check_rule(kind, props, effects, t)
+    assert(type(t) == "table", kind .. ": expects a table")
+    for k, v in pairs(t) do
+        if k == "match" then
+            assert(type(v) == "table", kind .. ": match must be a table")
+            for prop in pairs(v) do
+                if not props[prop] then
+                    M.errors[#M.errors + 1] = ("unknown %s match prop '%s' (rule %s)"):format(kind, prop, tostring(t.name))
+                end
+            end
+        elseif k ~= "name" and k ~= "enabled" and not effects[k] then
+            M.errors[#M.errors + 1] = ("unknown %s effect '%s' (rule %s)"):format(kind, k, tostring(t.name))
+        end
+    end
+    return { set_enabled = function() end }
+end
 
 -- Walks nested and dotted keys; a known option is a leaf (gradients are tables too).
 local function check_config(prefix, t)
@@ -96,8 +116,15 @@ local hl = {
     end,
     dispatch = function(d) assert(type(d) == "table" and d.dsp, "hl.dispatch: expects a dispatcher table") end,
     get_active_window = function() return M.active_window end,
-    config = function(t) check_config("", t) end, env = function() end, monitor = function() end, on = function() end,
-    window_rule = function() return {} end, layer_rule = function() return {} end,
+    config = function(t) check_config("", t) end, monitor = function() end,
+    env = function(k, v) assert(type(k) == "string" and type(v) == "string", "hl.env: expects two strings") end,
+    on = function(event, fn)
+        if not rules.events[event] then M.errors[#M.errors + 1] = ("unknown event '%s' in hl.on"):format(tostring(event)) end
+        assert(type(fn) == "function", "hl.on: expects a function")
+        M.events[#M.events + 1] = { name = event, fn = fn }
+    end,
+    window_rule = function(t) return check_rule("window_rule", rules.window_props, rules.window_effects, t) end,
+    layer_rule = function(t) return check_rule("layer_rule", rules.layer_props, rules.layer_effects, t) end,
     workspace_rule = function() return {} end, curve = function() end, animation = function() end,
     gesture = function() end, device = function() end, exec_cmd = function() end,
 }

@@ -98,8 +98,18 @@ menu_screenshot() {
 }
 
 menu_monitors() {
-  # KVM helpers arrive with the monitor configuration (Phase 1). See docs/knowledge-base/hardware.md.
-  rofi -e "Monitor menu: not implemented yet (Phase 1)." -theme deck
+  # Panel identification for the KVM setup (bin/rice-monitors, docs/knowledge-base/hardware.md).
+  local pick
+  pick=$(printf '%s\n' \
+    "capture   remember both panels (left = the one shown left now)" \
+    "swap      exchange left and right" \
+    "login     copy the layout to the login screen (asks for your password)" |
+    deck monitors "panels are matched by EDID description, not by port") || exit 0
+  case $pick in
+    capture*) notify-send "Monitors" "$(rice-monitors 2>&1)" ;;
+    swap*)    notify-send "Monitors" "$(rice-monitors --swap 2>&1)" ;;
+    login*)   kitty --title "rice-monitors" sh -c 'rice-monitors --greeter; printf "\nPress Enter to close."; read -r _' ;;
+  esac
 }
 
 case ${1:-} in

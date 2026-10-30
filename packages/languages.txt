@@ -1,0 +1,18 @@
+# Elixir (ElixirLS itself: rice-lsp-setup)
+elixir
+# Haskell
+ghc
+cabal-install
+haskell-language-server
+# SWI-Prolog (lsp_server pack: rice-lsp-setup)
+swi-prolog
+# Scala (Metals via Coursier: rice-lsp-setup)
+jdk-openjdk
+sbt
+# OCaml (ocaml-lsp-server via opam: rice-lsp-setup)
+ocaml
+opam
+?bubblewrap
+# Fortran (fortls via pipx: rice-lsp-setup)
+gcc-fortran
+python-pipx

@@ -1,0 +1,29 @@
+# ReGreet (login form). Installed to /etc/greetd/regreet.toml. Colors: /etc/greetd/regreet.css
+# (generated from the palette). Keys: ReGreet 0.5.0 regreet.sample.toml.
+
+skip_selection = false
+
+[background]
+# The still ASCII sky, rendered by install.sh at 3840x2160.
+path = "/etc/greetd/background.png"
+fit = "Cover"
+
+[GTK]
+application_prefer_dark_theme = true
+cursor_theme_name = "capitaine-cursors-light"
+cursor_blink = true
+font_name = "IBM Plex Sans 16"
+icon_theme_name = "Papirus-Dark"
+theme_name = "adw-gtk3-dark"
+
+[commands]
+reboot = ["systemctl", "reboot"]
+poweroff = ["systemctl", "poweroff"]
+
+[appearance]
+greeting_msg = "Welcome back"
+
+[widget.clock]
+format = "%A %d %B   %H:%M"
+resolution = "500ms"
+label_width = 320

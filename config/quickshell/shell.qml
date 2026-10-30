@@ -1,3 +1,6 @@
+//@ pragma DataDir $BASE/rice/quickshell
+// DataDir: Quickshell.dataPath() resolves to ~/.local/share/rice/quickshell (not a path hash), so
+// install.sh can put the sky glyph atlases there (bin/rice-sky-atlas).
 // Rice shell: per screen, the ASCII sky wallpaper, the Orbit Glass bar and the screensaver
 // overlay (hidden until hypridle starts it); notification popups on
 // the primary (leftmost) screen. Screens come and go with the KVM; Variants creates and destroys

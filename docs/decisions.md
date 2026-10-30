@@ -244,9 +244,55 @@ ocaml-lsp-server, fortls) are installed per user by the opt-in `bin/rice-lsp-set
 default install path (installer rule 5). Each editor enables only servers that are installed.
 Details: [knowledge-base/editors.md](knowledge-base/editors.md).
 
+### D28. CLI tools: htop, btop, fastfetch; Blender installed, not themed (owner, 2026-10-30)
+
+First CLI round: **btop** gets a generated theme (all 48 keys from the palette) and vim keys;
+**htop** uses its default color scheme, which draws with the terminal's 16 ANSI colors (themed by
+kitty/foot), since htop cannot load custom colors; **fastfetch** gets a generated config (Arch logo
+in the palette, Nerd Font keys). Blender is installed with HIP (AMD GPU, asked) but gets no theme
+(owner). Details: [knowledge-base/cli-tools.md](knowledge-base/cli-tools.md).
+
+### D29. Installer: clone and run; copy with backups; installs and configures everything (owner, 2026-10-30)
+
+- `git clone … && ./install.sh` is the whole procedure; no manual pre-steps. As the user, never
+  root; sudo only for pacman and `/etc`.
+- **Copy, not symlink** (closes O6). An existing file that differs is backed up to
+  `~/.local/state/rice/backups/<time>/` (manifest included) before it is replaced; identical files
+  are skipped; `local.*` hooks are created empty and never touched; captured monitor IDs and the
+  cursor choice survive re-runs.
+- **All packages in one `pacman -Syu --needed`** (official repos), including the language
+  toolchains (asked, default yes) and Blender with HIP (asked on AMD). The AUR browser is asked,
+  default no, and built with makepkg. Language servers outside the repos: `rice-lsp-setup`, run by
+  the installer.
+- **Makes the rice the default environment**: greetd + ReGreet enabled as the display manager (any
+  other one disabled), zsh as login shell, Bluetooth (and NetworkManager if nothing manages the
+  network) enabled, default apps (Thunar, LibreWolf, Neovim), GTK/KDE settings, Firefox policies.
+  The owner authorized these system changes; the installer still lists them in its plan and asks
+  once (`--yes` skips the questions).
+- Verified by `tests/installer/run.sh` (file layer, idempotency, backups, dry run) and CI in
+  `archlinux:latest` (every package name, dry run on real Arch). Details:
+  [knowledge-base/arch-install.md](knowledge-base/arch-install.md#the-installer).
+
+### D30. Cursor: Capitaine (light) by default (2026-10-30; owner to confirm)
+
+Owner asked for suggestions. Default is the one in the official repos (D2):
+`capitaine-cursors`, light variant. Alternatives and how to switch:
+[knowledge-base/theming.md](knowledge-base/theming.md#cursor-themes).
+
 ## Open
 
-### ~~O5. Notifications~~ → D20 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22
+### ~~O5. Notifications~~ → D20 · ~~O9. v1 scope~~ → README status table, D28 · ~~O6. Deploy method~~ → D29 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22
+
+### O12. Hardware details still needed
+
+Answered: GPU RX 6000 / Navi 21 (gfx1030), 16 GB; KVM Level1Techs dual-monitor DisplayPort 1.4
+(two links per PC, no EDID emulation). Still open: exact ProArt model (true 10-bit or 8-bit+FRC,
+native gamut, refresh); it decides `cm` (see D16) and whether 10-bit stays on. Panel type
+answered 2026-10-30: **IPS** (D21).
+
+Closed: O6 → D29, O1 → D10, O2 → D7, O3 → D14, O4 → D12, O5 → D20, O14 → D21, O15 → D22, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
+
+## Closed questions (history)
 
 ### ~~O3. Status bar~~ → D14
 
@@ -278,24 +324,11 @@ if the bar goes Quickshell. Details: [knowledge-base/launcher.md](knowledge-base
 
 </details>
 
-### O6. Deploy method: symlink into the repo vs copy
-
-Symlinks make `git pull` an instant update and keep one source of truth, but break if the repo
-is moved or deleted. Copy is robust but makes updates explicit. **Blocked on** verifying that
-Hyprland's config watcher reacts to edits through symlinks ([knowledge-base/hyprland.md](knowledge-base/hyprland.md)).
-Leaning symlink, with the installer recording the repo path and warning if it moves.
-
-### O9. Scope beyond Hyprland + kitty + zsh for v1
+### ~~O9. Scope beyond Hyprland + kitty + zsh for v1~~ (superseded 2026-10-30)
 
 **Recommendation:** v1 = Hyprland, hyprlock, hypridle, hyprpaper, kitty, zsh + starship, bar,
 rofi + menus, notifications, SDDM (stock theme), GTK/Qt dark preference. v2: SDDM theme,
 neovim/btop/fastfetch themes, Blender UI theme from the palette.
 
-### O12. Hardware details still needed
-
-Answered: GPU RX 6000 / Navi 21 (gfx1030), 16 GB; KVM Level1Techs dual-monitor DisplayPort 1.4
-(two links per PC, no EDID emulation). Still open: exact ProArt model (true 10-bit or 8-bit+FRC,
-native gamut, refresh); it decides `cm` (see D16) and whether 10-bit stays on. Panel type
-answered 2026-10-30: **IPS** (D21).
-
-Closed: O1 → D10, O2 → D7, O3 → D14, O4 → D12, O5 → D20, O14 → D21, O15 → D22, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
+Superseded: login moved to greetd + ReGreet (D7); Neovim was set up in v1 (D27); btop and
+fastfetch are themed (D28); Blender is not themed (owner, D28).

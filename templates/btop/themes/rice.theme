@@ -1,0 +1,64 @@
+# {{ name }} for btop. Deployed to ~/.config/btop/themes/rice.theme; btop.conf selects it with
+# color_theme = "rice". Keys: btop v1.4.8 src/btop_theme.cpp (Default_theme); checked by
+# tests/cli/check_cli.py. Gradients run start -> mid -> end as values rise.
+
+theme[main_bg]="{{ base }}"
+theme[main_fg]="{{ text }}"
+theme[title]="{{ bright }}"
+theme[hi_fg]="{{ pink }}"
+theme[selected_bg]="{{ surface2 }}"
+theme[selected_fg]="{{ bright }}"
+theme[inactive_fg]="{{ overlay }}"
+theme[graph_text]="{{ subtext }}"
+theme[meter_bg]="{{ surface1 }}"
+theme[proc_misc]="{{ purple }}"
+
+# Box outlines: one accent per box, the same hues as the bar's pills.
+theme[cpu_box]="{{ blue }}"
+theme[mem_box]="{{ green }}"
+theme[net_box]="{{ purple }}"
+theme[proc_box]="{{ pink }}"
+theme[div_line]="{{ surface2 }}"
+
+theme[temp_start]="{{ green }}"
+theme[temp_mid]="{{ yellow }}"
+theme[temp_end]="{{ red }}"
+
+theme[cpu_start]="{{ cyan }}"
+theme[cpu_mid]="{{ blue }}"
+theme[cpu_end]="{{ purple }}"
+
+theme[free_start]="{{ surface2 }}"
+theme[free_mid]="{{ green }}"
+theme[free_end]="{{ bright_green }}"
+
+theme[cached_start]="{{ surface2 }}"
+theme[cached_mid]="{{ cyan }}"
+theme[cached_end]="{{ bright_cyan }}"
+
+theme[available_start]="{{ surface2 }}"
+theme[available_mid]="{{ yellow }}"
+theme[available_end]="{{ bright_yellow }}"
+
+theme[used_start]="{{ surface2 }}"
+theme[used_mid]="{{ red }}"
+theme[used_end]="{{ bright_red }}"
+
+theme[download_start]="{{ surface2 }}"
+theme[download_mid]="{{ blue }}"
+theme[download_end]="{{ cyan }}"
+
+theme[upload_start]="{{ surface2 }}"
+theme[upload_mid]="{{ purple }}"
+theme[upload_end]="{{ pink }}"
+
+theme[process_start]="{{ cyan }}"
+theme[process_mid]="{{ blue }}"
+theme[process_end]="{{ purple }}"
+
+theme[proc_pause_bg]="{{ red }}"
+theme[proc_follow_bg]="{{ blue }}"
+theme[proc_banner_bg]="{{ surface1 }}"
+theme[proc_banner_fg]="{{ text }}"
+theme[followed_bg]="{{ surface2 }}"
+theme[followed_fg]="{{ bright }}"

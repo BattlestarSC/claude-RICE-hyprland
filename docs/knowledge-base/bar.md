@@ -144,7 +144,11 @@ these rates, once, from singletons shared by both monitors' bars.
      tidally locked Moon, fixed-glyph twinkling stars, nebula dust. Output: rgb = color, a = ink.
   2. A `ShaderEffectSource` (nearest filtering, exact texture size) feeds `glyph.frag`, which picks
      one of 10 glyphs (` .:-=+*#%@`) from an atlas made by `bin/rice-sky-atlas` at the **physical**
-     cell size (12 × 24 px at scale 1.5), so glyphs are pixel-exact, never scaled.
+     cell size (12 × 24 px at scale 1.5), so glyphs are pixel-exact, never scaled. Atlases live in
+     `Quickshell.dataPath()`, which `shell.qml` pins to `~/.local/share/rice/quickshell` with
+     `//@ pragma DataDir $BASE/rice/quickshell` (otherwise it is keyed by an MD5 of the config
+     path [V: quickshell `src/launch/launch.cpp`, `src/core/paths.cpp` @ 9b0f339]); the installer
+     renders 8×16, 10×20, 12×24 and 16×32 there.
   - Time: `services/SkyClock.qml` computes angles from `Date.now() % 86400 s` in JS doubles and
     wraps them to [0, 2π) before they reach float uniforms; periods divide a day, so the animation
     is seamless across the wrap and identical on both monitors. 4 fps by default (`skyFps`).

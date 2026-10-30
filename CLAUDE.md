@@ -22,22 +22,26 @@ live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-us
 `~/.config/rice/settings.json`), 10-bit output, mild gaps + rounding, hyprlock + hypridle,
 Quickshell notifications, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
 ungoogled-chromium) with privacy policies, kitty + foot, Code - OSS (telemetry and AI off),
-Neovim (primary) + vis + Helix with LSPs for Elixir/Haskell/SWI-Prolog/Scala/OCaml/Fortran.
+Neovim (primary) + vis + Helix with LSPs for Elixir/Haskell/SWI-Prolog/Scala/OCaml/Fortran,
+htop/btop/fastfetch, Capitaine cursor (default, owner to confirm), installer that copies with
+backups and makes the rice the default environment (D29).
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
-`config/quickshell/` (bar, services, sky), `config/hypr/conf/{binds,monitors,layers,look,session}.lua`,
-`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,kitty,foot,code-oss,nvim,helix,vis}/`,
-`bin/rice-menu`, `bin/rice-sky-atlas`, `bin/rice-browser-setup`, `bin/rice-code-setup`,
-`bin/rice-lsp-setup`, tests.
+`config/quickshell/` (bar, services, sky), `config/hypr/hyprland.lua` + `conf/{binds,env,monitors,input,look,layers,rules,session,autostart}.lua`,
+`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,kitty,foot,code-oss,nvim,helix,vis,btop,htop,greetd}/`,
+`install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors}`,
+`.github/workflows/ci.yml`, tests.
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
-**Not yet present:** `install.sh`, the Hyprland entry point, window rules, autostart,
-greeter files. Quickshell code is render-tested
+**Nothing has run on real hardware yet**: the installer is tested with dry runs and a throwaway
+home, package names only by CI in `archlinux:latest`. **Not yet present:** `uninstall.sh`, a theme
+switcher. Quickshell code is render-tested
 with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
 `shell.qml` and `services/` as unverified. Decided and open questions are in
 [docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
 owner or implement behind an obvious, documented default.
 
 Primary target machine (D8): AMD RX 6000 / Navi 21 (gfx1030), two 27" 4K ASUS ProArt panels through a Level1Techs dual-DP KVM that
-**removes the outputs when switched away**, Blender with HIP/ROCm, SDDM login. Every
+**removes the outputs when switched away**, Blender with HIP/ROCm; it currently logs in through SDDM, which the rice replaces with greetd +
+ReGreet (D7). Every
 monitor-related change must consider hot-unplug; see [hardware.md](docs/knowledge-base/hardware.md).
 Keybindings follow i3's defaults ([docs/keybindings.md](docs/keybindings.md)); do not repurpose an
 i3 default key, and give every new bind a `description` (it feeds the in-session cheat sheet).
@@ -48,16 +52,17 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | --- | --- |
 | Any Hyprland config | [docs/knowledge-base/hyprland.md](docs/knowledge-base/hyprland.md) |
 | hyprlock / hypridle / hyprpaper / launcher | [docs/knowledge-base/hypr-ecosystem.md](docs/knowledge-base/hypr-ecosystem.md) |
-| Installer, packages, session startup | [docs/knowledge-base/arch-install.md](docs/knowledge-base/arch-install.md) |
+| Installer, packages, session startup | [docs/knowledge-base/arch-install.md](docs/knowledge-base/arch-install.md), [packages/README.md](packages/README.md) |
 | Colors, any app theme | [docs/knowledge-base/theming.md](docs/knowledge-base/theming.md), [docs/colors/proposals.md](docs/colors/proposals.md) |
 | kitty / foot / zsh | [docs/knowledge-base/kitty.md](docs/knowledge-base/kitty.md), [docs/knowledge-base/zsh.md](docs/knowledge-base/zsh.md) |
-| Monitors, GPU, ROCm, SDDM | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
+| Monitors, GPU, ROCm, login (greetd) | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
 | rofi, launcher, scripted menus | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) |
 | Status bar, telemetry sources, Quickshell, notifications, ASCII sky, screensaver | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) |
 | GTK/Qt app theming, file managers | [docs/knowledge-base/theming.md](docs/knowledge-base/theming.md) |
 | Browsers (policies, prefs, userChrome) | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
 | Code - OSS (settings, theme extension) | [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) |
 | Neovim / Helix / vis, language servers | [docs/knowledge-base/editors.md](docs/knowledge-base/editors.md) |
+| htop / btop / fastfetch | [docs/knowledge-base/cli-tools.md](docs/knowledge-base/cli-tools.md) |
 | Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
 ## Hard rules
@@ -94,10 +99,11 @@ home/                       files deployed directly under ~ (.zshenv, .zprofile,
 colors/                     palettes; proposals/ now, the chosen palette as colors/<name>.toml later
 templates/                  per-app theme templates ({{ role | filter }}), rendered by tools/render_theme.py
 themes/<palette>/           generated app themes (committed; never hand-edit)
-bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup, rice-code-setup)
+bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup, rice-code-setup, rice-lsp-setup, rice-monitors)
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
-tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind tests),
-                            quickshell/ (bar render with mocks), sky/ (ASCII sky frames + timing)
+tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind/rule/event tests),
+                            quickshell/ (bar render with mocks), sky/ (ASCII sky frames + timing),
+                            installer/ (file layer + dry run; package names in Arch), cli/, editors/, nvim/
 docs/                       knowledge-base/, colors/, decisions.md
 ```
 
@@ -106,9 +112,14 @@ docs/                       knowledge-base/, colors/, decisions.md
 ```sh
 python3 tools/render_theme.py colors/quasar.toml           # templates/ -> themes/quasar/
 python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed themes are stale
-lua5.4 tests/lua/run.lua config/hypr/conf/*.lua            # dispatchers, modifiers, duplicate keys, hl.config option names
+lua5.4 tests/lua/run.lua config/hypr/hyprland.lua         # whole config: dispatchers, keys, option names, rule keys, events
 python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
-shellcheck -x bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup bin/rice-lsp-setup tests/rofi-render.sh tests/zsh/run.sh
+python3 tests/lua/gen_rules.py <hyprland-wiki checkout> > tests/lua/rules.lua       # refresh rule keys + event names
+shellcheck -x install.sh lib/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh
+tests/installer/run.sh                                     # installer file layer in a throwaway home (+ dry run on Arch as non-root)
+tests/installer/check_packages.sh                          # inside Arch after pacman -Sy: every packages/*.txt name exists
+./install.sh --dry-run                                     # on Arch: every action printed, nothing changed
+python3 tests/cli/check_cli.py <htop 3.5.3> <btop v1.4.8> <fastfetch 2.70.0>   # checkouts; htoprc keys, btop theme/conf, fastfetch schema
 python3 tests/terminals/check_kitty.py <kitty checkout>/kitty/options/definition.py   # kitty keys
 python3 tests/vscode/check_theme.py <vscode checkout>            # theme colors + settings (see docstring)
 python3 tests/prompt/check_starship.py <starship v1.25.1 checkout>   # starship options, palette names
@@ -127,7 +138,7 @@ python3 tools/blend.py colors/proposals/round1/pulsar.toml colors/proposals/roun
     --bg 0.3 --fg 0.55 --accent 0.4 --name Quasar --gradient red purple --cursor yellow   # regenerates quasar.toml
 python3 tools/preview.py --standalone colors/proposals/round2/*.toml colors/proposals/round1/*.toml > docs/colors/preview.html
 python3 tools/launcher_preview.py --standalone colors/proposals/round2/quasar.toml > docs/launcher/concepts.html
-python3 tools/spacegen.py colors/quasar.toml ascii 3840 2160 --cell 12x24 > wallpaper.svg   # also: wallpaper, starfield, planet
+python3 tools/spacegen.py colors/quasar.toml ascii 3840 2160 --cell 12x24 > assets/sky/still-3840x2160.svg   # lock/login background; also: wallpaper, starfield, planet
 python3 tools/bar_preview.py --standalone colors/quasar.toml > docs/bar/concepts.html
 ```
 
@@ -136,12 +147,11 @@ Round-1 palettes fail the APCA rules by design (they predate them); only round 2
 the color math or blend constants, change both and confirm the dial's default output still equals
 `quasar.toml` (same hex values).
 
-Planned (add here when they exist): `shellcheck -x install.sh lib/*.sh`, `Hyprland --verify-config -c <file>`,
-package resolution in `archlinux:latest`. When the target Hyprland version changes, refresh the
+Planned (add here when they exist): `Hyprland --verify-config -c <file>`. When the target Hyprland version changes, refresh the
 dispatcher list in `tests/lua/hl_stub.lua` from `src/config/lua/bindings/LuaBindingsDispatchers.cpp`.
 
 Regenerate `docs/colors/preview.html` and `docs/launcher/concepts.html` whenever a palette or a
-generator changes, in the same commit.
+generator changes, in the same commit; also `assets/sky/still-3840x2160.svg` when the palette changes.
 
 ## Conventions
 
@@ -221,5 +231,17 @@ in an `archlinux:latest` container or on hardware.
   Helix: perl's `file-types` minus `pl`; vis: ftdetect tables). Keep them in sync.
 - Helix rejects unknown `[editor]` keys and silently falls back to defaults; Arch's binary is
   `helix`, not `hx`.
+- Installer: a new config file must be added to the deploy map in `lib/files.sh` (and the table in
+  arch-install.md#deploy-map), or it is never installed. Files it rewrites before comparing
+  (`env.lua` cursor, `monitors.lua` panel IDs, greeter files) must stay byte-identical across
+  re-runs, or every run makes a backup. A new package goes in `packages/*.txt`; prefix `?` until CI
+  has seen it in Arch.
+- Installer bash runs under `set -Eeuo pipefail` with an ERR trap: a function whose last command
+  is a false `[[ … ]] && …` returns 1 and aborts the install. End such functions with `return 0`.
+- The cursor theme name appears in `hypr/conf/env.lua`, `config/greetd/{hyprland.lua,regreet.toml}`
+  and gsettings; the installer substitutes `capitaine-cursors-light` in all of them. Keep that
+  literal as the default everywhere.
+- `shell.qml` pins Quickshell's data dir (`//@ pragma DataDir $BASE/rice/quickshell`); the sky
+  atlases are found there. Pragmas must come before the first `import` line.
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.

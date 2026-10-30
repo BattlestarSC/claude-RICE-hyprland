@@ -27,11 +27,14 @@ themes/<palette>/
   ├── gtk-3.0/gtk.css, gtk-4.0/gtk.css, kde/scheme.colors   → see "GTK and file managers"
   ├── firefox/userChrome.css, userContent.css                → browsers.md
   ├── chromium/policies.json   → managed policies incl. BrowserThemeColor
-  └── ...                       (mako/swaync, btop, nvim, bat as they get added)
+  ├── btop/themes/rice.theme, fastfetch/config.jsonc        → cli-tools.md
+  ├── nvim/, helix/, vis/       → editors.md
+  ├── greetd/regreet.css        → login screen (hardware.md)
+  └── ...
         │
-        │  install.sh           (install time; no generation, only linking)
+        │  install.sh           (install time; no generation, only copying: D29)
         ▼
-~/.config/...                   (symlinks to the selected theme's files)
+~/.config/..., /etc/greetd/     (copies; replaced files backed up; arch-install.md#deploy-map)
 ```
 
 Generated art is SVG (sharp at 4K, a few KB to ~50 KB). Consumers that need raster images (rofi
@@ -62,11 +65,11 @@ viable but moves template bugs onto user machines.
 
 ### Switching themes at runtime
 
-A `rice-theme <name>` script swaps the symlinks, then:
+A future `rice-theme <name>` script would copy the other palette's files over these (same backup rules), then:
 
 | App | How it picks up the change |
 | --- | --- |
-| Hyprland | auto-reload on file change (watch semantics through symlinks: [TODO-verify]); else `hyprctl reload` |
+| Hyprland | auto-reload on file change; else `hyprctl reload` |
 | kitty | `auto_reload_config` (default on) [V]; or `kitten @ set-colors --all` |
 | waybar | `pkill -SIGUSR2 waybar` reloads config + CSS [BK] |
 | zsh | new shells only; existing shells: `source ~/.config/zsh/theme.zsh` |
@@ -85,6 +88,7 @@ A `rice-theme <name>` script swaps the symlinks, then:
   qt6ct scheme or a KDE `.colors` file, which would theme every Qt app with the same file.
 - **Cursor:** set via `hl.env("XCURSOR_THEME", ...)`, `XCURSOR_SIZE`, `HYPRCURSOR_*`, and
   `hyprctl setcursor <theme> <size>` at runtime; also `gsettings ... cursor-theme` for GTK. [V wiki env vars]
+- **Cursor themes:** see [Cursor themes](#cursor-themes) below.
 - **Fonts:** a Nerd Font for terminal/bar glyphs; `noto-fonts` as the sans fallback (the wiki
   warns that without a sans-serif font text renders as boxes). [V wiki must-have]
 
@@ -128,3 +132,24 @@ Also set by the installer (they are user files, so merged, not overwritten):
    is checked; extend `tools/palette.py` before using others as fills).
 4. No pure `#000000` / `#FFFFFF` anywhere.
 5. Translucency only on chrome (bar, launcher, notifications), never on content windows by default.
+
+## Cursor themes
+
+Owner asked for suggestions (2026-10-30); default until they choose: **Capitaine, light variant**
+(D30). Where the theme name is set: `hypr/conf/env.lua` (`XCURSOR_THEME`; falls back to Adwaita if
+the theme is missing), gsettings `cursor-theme` (GTK apps), `/etc/greetd/{hyprland.lua,regreet.toml}`
+(login screen). The installer writes all of them from one value:
+`RICE_CURSOR=<theme directory name> ./install.sh`.
+
+| Theme | Look | Source | Notes |
+| --- | --- | --- | --- |
+| **Capitaine** (`capitaine-cursors`, light: `capitaine-cursors-light`) | macOS-like, Breeze-based; dark or white | official repos [V: upstream README "available in the official Arch Linux repositories"; S: archlinux.de extra 4-3] | default; light variant directory name on Arch [TODO-verify]: the installer checks and falls back to `capitaine-cursors`, then Adwaita |
+| Breeze (`breeze_cursors`, `Breeze_Light`) | KDE's, neutral | official (`breeze`, already installed for Dolphin) [BK names] | safest match for the Qt apps |
+| Adwaita | GNOME default, dark | official, always present | fallback |
+| Bibata Modern Ice / Classic | rounded, modern; white or black | AUR `bibata-cursor-theme(-bin)` [S] | most popular "riced" cursor; would need the AUR stage |
+| phinger-cursors | flat, minimal, light/dark | AUR `phinger-cursors` [S] | crisp at small sizes |
+| Catppuccin cursors (Mocha) | Bibata shapes in pastel accents | AUR [BK] | colors are Catppuccin's, not Quasar's |
+
+Hyprcursor (Hyprland's own scalable cursor format, `HYPRCURSOR_THEME`) needs a theme built for it;
+the ones above are XCursor themes, which Hyprland also renders. Size 24 logical (36 physical at
+scale 1.5).

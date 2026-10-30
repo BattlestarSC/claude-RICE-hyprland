@@ -1,0 +1,42 @@
+// {{ name }} for fastfetch: system summary with the Arch logo in the palette's border gradient
+// colors, Nerd Font icons on every key, one accent per group. Deployed to
+// ~/.config/fastfetch/config.jsonc. Keys: fastfetch 2.70.0 doc/json_schema.json (checked by
+// tests/cli/check_cli.py); "#RRGGBB" colors are accepted since 2.x (src/common/impl/option.c).
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "builtin",
+        "source": "arch",
+        "color": { "1": "{{ purple }}", "2": "{{ blue }}" },
+        "padding": { "top": 1, "left": 2, "right": 3 }
+    },
+    "display": {
+        "separator": "  ",
+        "color": { "keys": "{{ purple }}", "title": "{{ pink }}", "output": "{{ text }}", "separator": "{{ overlay }}" },
+        "key": { "width": 14 },
+        "bar": { "char": { "elapsed": "■", "total": "·" }, "color": { "elapsed": "{{ cyan }}", "total": "{{ surface2 }}" } },
+        "percent": { "type": ["num", "bar"], "color": { "green": "{{ green }}", "yellow": "{{ yellow }}", "red": "{{ red }}" } }
+    },
+    "modules": [
+        { "type": "title", "color": { "user": "{{ pink }}", "at": "{{ overlay }}", "host": "{{ purple }}" } },
+        { "type": "separator", "string": "─", "outputColor": "{{ surface2 }}" },
+        { "type": "os", "key": "󰣇 os", "keyColor": "{{ blue }}" },
+        { "type": "kernel", "key": " kernel", "keyColor": "{{ blue }}" },
+        { "type": "uptime", "key": "󰅐 uptime", "keyColor": "{{ blue }}" },
+        { "type": "packages", "key": "󰏖 packages", "keyColor": "{{ blue }}" },
+        "break",
+        { "type": "wm", "key": " wm", "keyColor": "{{ purple }}" },
+        { "type": "terminal", "key": " terminal", "keyColor": "{{ purple }}" },
+        { "type": "shell", "key": " shell", "keyColor": "{{ purple }}" },
+        { "type": "terminalfont", "key": " font", "keyColor": "{{ purple }}" },
+        { "type": "cursor", "key": "󰆿 cursor", "keyColor": "{{ purple }}" },
+        "break",
+        { "type": "cpu", "key": " cpu", "keyColor": "{{ cyan }}", "temp": true },
+        { "type": "gpu", "key": "󰢮 gpu", "keyColor": "{{ cyan }}", "temp": true },
+        { "type": "memory", "key": " memory", "keyColor": "{{ cyan }}" },
+        { "type": "disk", "key": "󰋊 disk", "keyColor": "{{ cyan }}" },
+        { "type": "display", "key": "󰍹 display", "keyColor": "{{ cyan }}" },
+        "break",
+        { "type": "colors", "symbol": "circle", "paddingLeft": 2 }
+    ]
+}

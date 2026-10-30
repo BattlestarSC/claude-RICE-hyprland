@@ -1,0 +1,48 @@
+# Checks that need no hardware. The packages job is the only place package names are verified
+# against Arch itself (the build environment cannot reach Arch mirrors).
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: sudo apt-get update && sudo apt-get install -y shellcheck lua5.4 zsh jq librsvg2-bin
+      - name: shellcheck
+        run: >
+          shellcheck -x install.sh lib/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup
+          bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors tests/rofi-render.sh tests/zsh/run.sh
+          tests/installer/run.sh tests/installer/check_packages.sh
+      - name: Generated themes are current
+        run: python3 tools/render_theme.py colors/quasar.toml --check
+      - name: Palette contrast rules
+        run: python3 tools/palette.py check colors/quasar.toml colors/proposals/round2/*.toml
+      - name: Hyprland config against the API stub
+        run: lua5.4 tests/lua/run.lua config/hypr/hyprland.lua
+      - name: Installer file layer
+        run: tests/installer/run.sh
+
+  packages:
+    runs-on: ubuntu-24.04
+    container: archlinux:latest
+    steps:
+      - name: Sync and tools
+        run: pacman -Syu --noconfirm --needed git sudo librsvg jq
+      - uses: actions/checkout@v4
+      - name: Every package name exists
+        run: tests/installer/check_packages.sh
+      - name: install.sh --dry-run as a normal user
+        run: |
+          useradd -m builder
+          cp -r "$GITHUB_WORKSPACE" /home/builder/rice
+          chown -R builder:builder /home/builder/rice
+          su builder -c 'cd ~/rice && ./install.sh --dry-run --yes'
+          su builder -c 'cd ~/rice && tests/installer/run.sh'

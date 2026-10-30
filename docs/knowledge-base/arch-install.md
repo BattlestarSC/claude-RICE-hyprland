@@ -26,8 +26,8 @@ booted into a TTY, with:
 3. **Never partial-upgrade.** On Arch, installing packages after `-Sy` without `-u` is
    unsupported and can break library sonames. Use `sudo pacman -Syu --needed <pkgs>` in one transaction. [BK; Arch wiki "System maintenance"]
 4. **Official repos only on the default path.** Every core package must come from `core`/`extra`.
-   AUR packages, if ever needed, go in an explicit opt-in stage that bootstraps `paru` or `yay`
-   from `base-devel` as the invoking user, never as root.
+   AUR packages go in an explicit opt-in stage (default no) built with `makepkg -si` as the
+   invoking user, never as root (no AUR helper is installed).
 5. **Avoid interactive provider prompts.** `pacman --noconfirm` silently picks the default
    provider, which is sometimes wrong (e.g. JACK implementation, font provider). Name the
    provider explicitly in the package list (`pipewire-jack`, `noto-fonts`) instead of relying on
@@ -37,8 +37,9 @@ booted into a TTY, with:
 7. **Back up, never clobber.** Any existing file at a target path is moved to
    `~/.local/state/<rice>/backups/<timestamp>/` with its relative path preserved, and listed in
    a manifest so `uninstall.sh` can restore it.
-8. **Don't touch `/etc` silently.** System-level changes (display manager, PAM, `/etc/environment`)
-   are opt-in prompts, documented in README.
+8. **Don't touch `/etc` silently.** System-level changes (display manager, login shell, services,
+   browser policies) are listed in the installer's plan and confirmed once; the owner asked for
+   them to be part of the default install (D29). Every replaced `/etc` file is backed up first.
 9. **Logs.** Tee all output to `~/.local/state/<rice>/install-<timestamp>.log`.
 10. **`set -Eeuo pipefail`, `shellcheck`-clean, bash only.** No python/node at install time.
 
@@ -60,24 +61,28 @@ systemd-detect-virt   # "none" on bare metal; "kvm", "oracle", "vmware", ...
 - **VM:** Hyprland needs 3D acceleration (virtio-gpu with GL / virgl, or GPU passthrough);
   otherwise it will not start. Detect and warn. [V: wiki master-tutorial.md]
 
-## Package set (draft, to be validated)
+## Package set
 
-Names are [BK] unless marked. Every name must be checked with `pacman -Si` inside an
-`archlinux:latest` container before it ships ([TODO-verify] all).
+The lists live in [`packages/`](../../packages/README.md), one name per line; the table below is
+the overview. Names are [BK] unless marked: Arch mirrors are unreachable from the build
+environment (proxy policy, 2026-10-30), so verification is done by CI
+(`tests/installer/check_packages.sh` in `archlinux:latest`). Names the build environment could not
+confirm carry a `?` in the lists and are skipped with a warning if missing, so one wrong guess
+cannot break the pacman transaction.
 
 | Group | Packages |
 | --- | --- |
 | Compositor + hypr stack | `hyprland` [V wiki], `xdg-desktop-portal-hyprland` [V wiki], `xdg-desktop-portal-gtk`, `hyprlock`, `hypridle`, `hyprpaper`, `hyprpolkitagent`, `hyprlauncher`, `hyprshutdown`, `hyprsunset`, `hyprpicker` |
 | Qt/GTK integration | `qt5-wayland`, `qt6-wayland` [V wiki must-have], `hyprqt6engine` or `qt6ct`, `nwg-look` |
 | Audio / media | `pipewire`, `wireplumber` [V wiki], `pipewire-pulse`, `pipewire-alsa`, `pipewire-jack`, `pavucontrol`, `playerctl`, `brightnessctl` |
-| Terminal + shell | `kitty`, `foot`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-history-substring-search`, `zsh-completions` [S: extra], `starship` [S: extra 1.25.1], `fzf`, `zoxide`, `eza`, `bat` |
-| Bar / wallpaper / notifications | `quickshell` [S], `qt6-shadertools` (`qsb`, compiles the sky shaders at install) [BK], `mako` or `swaync` (O5) |
+| Terminal + shell | `kitty`, `foot`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-history-substring-search`, `zsh-completions` [S: extra], `starship` [S: extra 1.25.1], `fzf`, `zoxide`, `eza`, `bat`; CLI tools `htop`, `btop`, `fastfetch` (D28) |
+| Bar / wallpaper / notifications | `quickshell` [S], `qt6-shadertools` (`qsb`, compiles the sky shaders at install) [BK]; notifications are Quickshell's own (D20) |
 | Bluetooth | `bluez`, `bluez-utils` [BK]; enabling `bluetooth.service` is a prompted system change |
 | Launcher / menus | `rofi` (≥ 2.0 for native Wayland), `jq`, `libnotify`, `librsvg` (`rsvg-convert` rasterizes generated art at install) |
 | Login | `greetd`, `greetd-regreet` (greeter runs inside Hyprland; no X server) |
-| GPU (AMD) | `mesa`, `vulkan-radeon`; opt-in Blender GPU step: `hip-runtime-amd`, `hiprt` [S: Arch blender optdepends] |
+| GPU (AMD) | `mesa`, `vulkan-radeon`; asked: `blender`, `hip-runtime-amd`, `hiprt` [S: Arch blender optdepends] |
 | Clipboard / screenshots | `wl-clipboard`, `cliphist`, `grim`, `slurp`, `satty` (verify repo) |
-| Fonts / icons / cursor | `ttf-jetbrains-mono` (terminal/editor text) [S: extra], `ttf-nerd-fonts-symbols-mono` (terminal icons) [S: extra 3.4.0], `ttf-ibm-plex` (bar text) [BK], `ttf-nerd-fonts-symbols` (bar icons) [BK], `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
+| Fonts / icons / cursor | `ttf-jetbrains-mono` (terminal/editor text) [S: extra], `ttf-nerd-fonts-symbols-mono` (terminal icons) [S: extra 3.4.0], `ttf-ibm-plex` (bar text) [BK], `ttf-nerd-fonts-symbols` (bar icons) [BK], `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, `capitaine-cursors` [V: upstream README: in the official repos] (D30) |
 | Network (only if none present) | `networkmanager`, `network-manager-applet` |
 | File managers | `thunar`, `thunar-volman`, `thunar-archive-plugin`, `xarchiver`, `tumbler`, `ffmpegthumbnailer`, `gvfs`, `gvfs-mtp`, `udisks2`; `dolphin`, `kio-extras`, `ffmpegthumbs`, `breeze` (Qt widget style Dolphin falls back to), `archlinux-xdg-menu`; theme `adw-gtk-theme` [S: extra 6.5-1] [others BK / TODO-verify] |
 | Editor | `code` (Code - OSS) [S: extra], `jq` (settings merge); `bsdtar` from `libarchive` (pacman dependency) [BK] |
@@ -85,14 +90,81 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Terminal editors | `neovim` [S: extra 0.12.3], `helix` [S: extra 25.07.1; binary `helix`, V: Helix book], `vis` (+ `vis-lexers`?) [S, TODO-verify], `tree-sitter-cli` (≥ 0.26.1) [S], `gcc`, `git`, `wl-clipboard` |
 | Language toolchains (prompted, per language) | `elixir`, `ghc` + `haskell-language-server` [S], `swi-prolog` [S: 10.0.2], `jdk-openjdk` (Metals) + `sbt`, `ocaml` + `opam`, `gcc-fortran`, `python-pipx` (fortls) [BK unless marked]; servers outside the repos: `bin/rice-lsp-setup` |
 
+## The installer
+
+```sh
+git clone <repo> && cd <repo> && ./install.sh      # --yes: defaults, no questions; --dry-run: print only
+```
+
+Order (`install.sh`, functions in `lib/`):
+
+| Step | What | Where |
+| --- | --- | --- |
+| preflight | not root, `/etc/arch-release`, pacman/sudo/git, no `db.lck`, a sync db, DNS, ≥ 12 GB free, `sudo -v`; detects GPU vendor (sysfs), active network manager, current display manager, VM | `lib/preflight.sh` |
+| questions | language toolchains (y), Blender + HIP on AMD (y), AUR ungoogled-chromium (n), wallpaper mode and layout, greetd (y), zsh login shell (y) | `install.sh` |
+| package check | every name against the **local** sync db (`pacman -Si`); no `-Sy` before the upgrade, so stopping here leaves the system consistent | `lib/packages.sh` |
+| plan | packages, files, system changes; one confirmation | `install.sh` |
+| packages | `sudo pacman -Syu --needed <all>` (one transaction); then makepkg for the AUR extra | `lib/packages.sh` |
+| files | copy into `$HOME` with backups (below) | `lib/deploy.sh`, `lib/files.sh` |
+| assets | `qsb` → `~/.config/quickshell/sky/shaders/*.frag.qsb`; `rice-sky-atlas` at 8×16 × {1, 1.25, 1.5, 2} → `~/.local/share/rice/quickshell/`; still sky → `~/.local/share/rice/lock.png` | `lib/files.sh` |
+| desktop | gsettings (through `dbus-run-session`: a TTY has no session bus), kwriteconfig6, `xdg-mime` defaults (Thunar, LibreWolf, Neovim), `rice-browser-setup`, `rice-code-setup`, `rice-lsp-setup` | `lib/desktop.sh` |
+| system | `/etc/greetd/*` + enable greetd (disable the previous display manager), `chsh` to zsh, enable bluetooth (+ NetworkManager if none active), Firefox policies | `lib/system.sh` |
+
+Not started now: greetd (it would take over the TTY running the installer); reboot instead.
+Log: `~/.local/state/rice/install-<time>.log`. Any unexpected failure prints file and line (ERR
+trap with `set -E`).
+
+### Copy with backups (D29)
+
+- A target that already exists and differs is copied to
+  `~/.local/state/rice/backups/<time>/home/<path>` (or `…/system/etc/<path>`) and listed in
+  `manifest.tsv` (`target<TAB>backup`) before it is replaced. Identical targets are skipped, so a
+  re-run with no changes writes nothing (tested).
+- `local.*` override hooks (`rofi/local.rasi`, `foot/local.ini`) are created empty if missing and
+  never written again. `~/.config/rice/settings.json` is written once (wallpaper answers).
+- `hypr/conf/monitors.lua` keeps the panel descriptions `rice-monitors` captured; `env.lua` and
+  the greeter files get the chosen cursor theme before comparison, so neither causes a backup on
+  every run.
+
+### Deploy map
+
+| Source | Target |
+| --- | --- |
+| `config/hypr/**`, `themes/<p>/hypr/colors.{lua,conf}` | `~/.config/hypr/**`, `~/.config/hypr/theme/` |
+| `config/quickshell/**`, `themes/<p>/quickshell/common/Theme.qml`, `assets/earth/land-1024x512.png` | `~/.config/quickshell/**`, `…/sky/land.png` |
+| `config/rofi/config.rasi`, `themes/<p>/rofi/*.rasi` | `~/.config/rofi/` |
+| `config/{kitty,foot,zsh}/**` + their `themes/<p>/` files; `home/.zsh*`; `themes/<p>/starship/starship.toml` | `~/.config/…`, `~/`, `~/.config/starship.toml` |
+| `config/{btop,htop}`, `themes/<p>/{btop,fastfetch}` | `~/.config/{btop,htop,fastfetch}/` |
+| `config/{nvim,helix,vis}/**` + `themes/<p>/{nvim,helix,vis}` | `~/.config/{nvim,helix,vis}/` |
+| `config/code-oss/*`, `themes/<p>/code-oss/extension` | `~/.local/share/rice/code-oss/` (read by `rice-code-setup`) |
+| `config/browsers/{user.js,librewolf.overrides.cfg}`, `themes/<p>/firefox/*.css` | `~/.local/share/rice/browsers/` (read by `rice-browser-setup`) |
+| `config/gtk-{3,4}.0/settings.ini`, `themes/<p>/gtk-{3,4}.0/gtk.css`, `themes/<p>/kde/scheme.colors`, `config/xfce4` | `~/.config/gtk-{3,4}.0/`, `~/.local/share/color-schemes/Quasar.colors`, `~/.config/xfce4/` |
+| `bin/*` | `~/.local/bin/` (0755) |
+| `config/greetd/*`, `themes/<p>/greetd/regreet.css`, `themes/<p>/hypr/colors.lua`, the user's `monitors.lua`, rendered sky | `/etc/greetd/` |
+| `config/browsers/firefox-policies.json` (+ `themes/<p>/chromium/policies.json` with the AUR browser) | `/etc/firefox/policies/policies.json` (`/etc/chromium/policies/managed/rice.json`) |
+
+### Monitors
+
+The panels' EDID descriptions are only known inside Hyprland (`hyprctl monitors all -j`), not on
+the TTY where the installer runs. `bin/rice-monitors --auto` runs at the first login (autostart),
+writes both descriptions into `monitors.lua` (left = the panel with the smaller x) and reloads;
+`rice-menu monitors` (Super+Shift+M) offers capture, swap and "copy to login screen"
+(`/etc/greetd/monitors.lua`, sudo). Until then the generic monitor rule applies.
+
 ## Installer questions (beyond packages)
 
 | Question | Choices | Stored in |
 | --- | --- | --- |
+| Language toolchains + servers | yes (default) · no | `packages/languages.txt`, `rice-lsp-setup` |
+| Blender with HIP | yes (default, AMD GPU only) · no | `packages/blender.txt` |
+| Optional AUR browser | ungoogled-chromium-bin | off by default (D2); makepkg |
 | Wallpaper | animated ASCII Earth/Moon (default) · still ASCII (no animation, zero cost) · your own image (path; e.g. a NASA Earth photo) | `~/.config/rice/settings.json` (`skyMode`, `skyImage`), written only if the file does not exist |
 | Wallpaper layout (two monitors) | mirror (default) · span | same file (`skyLayout`) |
-| Browser policies (system files) | write `/etc/firefox/policies/policies.json` (and `/etc/chromium/policies/managed/rice.json` if ungoogled-chromium is installed)? | prompt; root; see browsers.md |
-| Optional AUR browser | ungoogled-chromium | prompt; off by default (D2) |
+| Login screen | greetd + ReGreet (default) · keep the current one | `lib/system.sh` |
+| Login shell | zsh (default) · keep | `chsh` |
+| Cursor theme | env `RICE_CURSOR=<name> ./install.sh` (default `capitaine-cursors-light`) | `hypr/conf/env.lua`, gsettings, greeter |
+
+Browser policies are written without a separate question (part of the plan, D29).
 
 NASA imagery is generally not copyrighted [S: search summary of NASA's media guidelines;
 nasa.gov unreachable from the build environment], but the installer does not download it by
@@ -130,8 +202,11 @@ For TTY login, GNOME Keyring auto-unlock needs `pam_gnome_keyring.so` lines in
 
 ## Validation strategy (CI and local)
 
-- `shellcheck -x install.sh lib/*.sh`
-- Package existence: `docker run --rm archlinux:latest bash -c 'pacman -Sy --noconfirm >/dev/null; pacman -Si <pkgs>'`
+- `shellcheck -x install.sh lib/*.sh`; `tests/installer/run.sh` (file layer in a throwaway home:
+  first run, idempotent re-run, backups, user hooks, captured monitors, cursor; plus a full
+  `--dry-run` with stubbed pacman/sudo/systemctl when run on Arch as a normal user).
+- Package existence: `tests/installer/check_packages.sh` in `archlinux:latest` (CI job `packages`,
+  which also runs `install.sh --dry-run --yes` as a normal user).
 - Lua syntax: `luac -p` with a **5.5** compiler (Arch package name for Lua 5.5 [TODO-verify]).
   Semantic check: `Hyprland --verify-config -c <file>` if it runs headless [TODO-verify].
 - Full dry run: installer in an `archlinux` container with a `--dry-run` flag that prints every

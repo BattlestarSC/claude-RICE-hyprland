@@ -1,0 +1,21 @@
+# Terminals
+kitty
+foot
+
+# zsh and its plugins (config/zsh)
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+zsh-history-substring-search
+zsh-completions
+starship
+fzf
+zoxide
+eza
+bat
+
+# CLI tools
+htop
+btop
+fastfetch
+?lm_sensors

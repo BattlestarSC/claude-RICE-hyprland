@@ -1,0 +1,3 @@
+# Only installed (and enabled) when no network manager is active.
+networkmanager
+network-manager-applet

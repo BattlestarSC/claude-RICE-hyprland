@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# rice-monitors: write the two panels' EDID descriptions into ~/.config/hypr/conf/monitors.lua,
+# so each panel keeps its position, scale and workspaces across KVM switches and cable swaps
+# (docs/knowledge-base/hardware.md). Run inside Hyprland, with both panels connected.
+#
+#   rice-monitors            left = the panel Hyprland currently places further left
+#   rice-monitors --swap     exchange left and right (if the first guess was wrong)
+#   rice-monitors --auto     first login only: capture if monitors.lua still has placeholders,
+#                            otherwise do nothing (hyprland autostart runs this)
+#   rice-monitors --greeter  also copy monitors.lua to /etc/greetd/ for the login screen (sudo)
+set -Eeuo pipefail
+
+conf="${XDG_CONFIG_HOME:-${HOME}/.config}/hypr/conf/monitors.lua"
+placeholder='REPLACE-WITH-'
+
+die() { printf 'rice-monitors: %s\n' "$*" >&2; exit 1; }
+say() { printf 'rice-monitors: %s\n' "$*"; }
+
+# Current value of DESC_LEFT / DESC_RIGHT as written in the file (Lua-escaped, no desc: prefix).
+current() {
+    awk -v name="DESC_$1" '$1 == "local" && $2 == name {
+        sub(/^[^"]*"desc:/, ""); sub(/"[[:space:]]*$/, ""); print; exit }' "${conf}"
+}
+
+# Escape a description for a double-quoted Lua string.
+lua_escape() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    printf '%s' "${s}"
+}
+
+# Replace both lines; values arrive Lua-escaped and pass through ENVIRON (no further escaping).
+write_descs() {
+    local tmp
+    tmp="$(mktemp)"
+    RICE_LEFT="$1" RICE_RIGHT="$2" awk '
+        $1 == "local" && $2 == "DESC_LEFT"  { print "local DESC_LEFT  = \"desc:" ENVIRON["RICE_LEFT"] "\""; next }
+        $1 == "local" && $2 == "DESC_RIGHT" { print "local DESC_RIGHT = \"desc:" ENVIRON["RICE_RIGHT"] "\""; next }
+        { print }' "${conf}" > "${tmp}"
+    cat -- "${tmp}" > "${conf}"
+    rm -f -- "${tmp}"
+    say "left:  $1"
+    say "right: $2"
+}
+
+copy_to_greeter() {
+    say "copying monitors.lua to /etc/greetd/ (asks for your password)"
+    sudo install -m 0644 -- "${conf}" /etc/greetd/monitors.lua
+}
+
+main() {
+    (( EUID != 0 )) || die "run as your user, not root"
+    [[ -f "${conf}" ]] || die "${conf} not found (run the installer first)"
+    local mode="${1:-capture}"
+
+    case "${mode}" in
+        --greeter) copy_to_greeter; return 0 ;;
+        --swap)
+            local l r
+            l="$(current LEFT)"
+            r="$(current RIGHT)"
+            [[ -n "${l}" && -n "${r}" && "${l}" != "${placeholder}"* ]] || die "nothing captured yet; run rice-monitors first"
+            write_descs "${r}" "${l}"
+            hyprctl reload > /dev/null
+            return 0 ;;
+        --auto)
+            grep -q "${placeholder}" "${conf}" || return 0 ;;
+        capture) ;;
+        -h | --help) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; return 0 ;;
+        *) die "unknown option ${mode} (see --help)" ;;
+    esac
+
+    if ! command -v hyprctl > /dev/null || [[ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+        die "run this inside a Hyprland session"
+    fi
+    local -a descs
+    mapfile -t descs < <(hyprctl monitors all -j | jq -r 'sort_by(.x) | .[].description')
+    if (( ${#descs[@]} != 2 )); then
+        [[ "${mode}" == --auto ]] && return 0
+        die "found ${#descs[@]} monitor(s); connect both panels (switch the KVM here) and retry"
+    fi
+    write_descs "$(lua_escape "${descs[0]}")" "$(lua_escape "${descs[1]}")"
+    hyprctl reload > /dev/null
+    say "if left and right are the wrong way round: rice-monitors --swap"
+}
+
+main "$@"

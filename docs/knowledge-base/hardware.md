@@ -18,8 +18,15 @@ The owner's machine. The rice must work well here first; other hardware is best-
 number, so two identical ProArt panels stay distinguishable and keep their position even if
 cables are swapped between GPU ports. [V: hyprland-wiki `monitors/output-selection.md`, `_index.md`, 2026-10-29]
 
+Capture (2026-10-30): the installer runs on a TTY where Hyprland is not running, so it cannot
+read them. `rice-monitors --auto` runs from autostart at the first login and fills in
+`DESC_LEFT`/`DESC_RIGHT` in `~/.config/hypr/conf/monitors.lua` (left = the panel with the smaller
+x), once; `rice-monitors --swap` exchanges them; `rice-monitors --greeter` copies the file to
+`/etc/greetd/`. All three are in `rice-menu monitors` (Super+Shift+M). Re-running the installer
+keeps captured values.
+
 ```lua
--- Real strings come from `hyprctl monitors all` on the machine; the installer will offer to capture them.
+-- Real strings come from `hyprctl monitors all -j` (.description); bin/rice-monitors writes them at the first login.
 hl.monitor({ output = "desc:ASUSTek COMPUTER INC PA27xxxx SERIAL_LEFT",  mode = "3840x2160@60", position = "0x0",    scale = 1.5 })
 hl.monitor({ output = "desc:ASUSTek COMPUTER INC PA27xxxx SERIAL_RIGHT", mode = "3840x2160@60", position = "2560x0", scale = 1.5 })
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })  -- anything else
@@ -132,6 +139,16 @@ the primary plan.
   Devices → HIP shows it.
 
 ## Login: greetd + ReGreet
+
+Files (2026-10-30): `config/greetd/{config.toml,hyprland.lua,regreet.toml}`,
+`themes/<palette>/greetd/regreet.css` (generated), installed by `install.sh` into `/etc/greetd/`
+with `colors.lua`, the user's `monitors.lua` and `background.png` (the still ASCII sky,
+`assets/sky/still-3840x2160.svg` rendered with `rsvg-convert`). regreet.toml keys checked against
+ReGreet 0.5.0's `regreet.sample.toml` [V]; the CSS selectors (`frame`, `entry`, `button`,
+`.suggested-action`) are generic GTK4 node names, **not checked against ReGreet's widget tree**
+[TODO-verify on hardware with `GTK_DEBUG=interactive`]. `/var/lib/regreet` and `/var/log/regreet`
+are created owned by `greeter` (README: needed for state and logs).
+
 
 [V: ReGreet README @ 2026-10-29 (rharish101/ReGreet)] [S: Arch `extra` has `greetd` 0.10.3 and `greetd-regreet` 0.5.0]
 

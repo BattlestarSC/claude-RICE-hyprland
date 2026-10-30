@@ -1,0 +1,60 @@
+# Compositor and its companions (hyprland-wiki master-tutorial: must-haves)
+hyprland
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+hyprlock
+hypridle
+hyprpolkitagent
+?hyprland-guiutils
+?hyprshutdown
+qt5-wayland
+qt6-wayland
+xdg-utils
+xdg-user-dirs
+
+# Shell surfaces: bar, wallpaper, notifications, screensaver (Quickshell), launcher (rofi)
+quickshell
+qt6-shadertools
+librsvg
+rofi
+jq
+libnotify
+
+# Clipboard and screenshots (rice-menu)
+wl-clipboard
+cliphist
+grim
+slurp
+?satty
+
+# Audio: PipeWire with every compatibility layer named explicitly (no provider prompts)
+pipewire
+wireplumber
+pipewire-pulse
+pipewire-alsa
+pipewire-jack
+pavucontrol
+playerctl
+brightnessctl
+
+# Bluetooth (the bar's Bluetooth panel talks to BlueZ)
+bluez
+bluez-utils
+
+# Login screen
+greetd
+greetd-regreet
+
+# Fonts, icons, cursor
+ttf-jetbrains-mono
+ttf-nerd-fonts-symbols-mono
+ttf-nerd-fonts-symbols
+ttf-ibm-plex
+noto-fonts
+noto-fonts-emoji
+papirus-icon-theme
+capitaine-cursors
+
+# GTK and Qt look
+adw-gtk-theme
+?nwg-look

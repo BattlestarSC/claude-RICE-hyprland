@@ -1,8 +1,9 @@
 -- Load Hyprland config modules against tests/lua/hl_stub.lua and exercise every bind.
--- Usage: lua5.4 tests/lua/run.lua config/hypr/conf/binds.lua [...]
+-- Usage: lua5.4 tests/lua/run.lua config/hypr/hyprland.lua   (the entry point requires every module)
 -- Exit status 1 on any error. (Hyprland embeds Lua 5.5; 5.4 is syntax-compatible for this code.)
 
-package.path = "tests/lua/?.lua;" .. package.path
+-- config/hypr/ on the path so hyprland.lua's require("conf.x") resolves like in Hyprland.
+package.path = "tests/lua/?.lua;config/hypr/?.lua;" .. package.path
 local stub = require("hl_stub")
 -- `require("theme.colors")` in config files resolves to the generated palette.
 package.preload["theme.colors"] = function() return dofile("themes/quasar/hypr/colors.lua") end
@@ -40,11 +41,20 @@ for _, b in pairs(stub.binds) do
     end
 end
 
+-- Run every event handler once (autostart and friends).
+for _, e in ipairs(stub.events) do
+    local ok, err = pcall(e.fn)
+    if not ok then
+        print(("FAIL event '%s': %s"):format(e.name, err))
+        failed = true
+    end
+end
+
 for _, e in ipairs(stub.errors) do
     print("FAIL " .. e)
     failed = true
 end
 
 if failed then os.exit(1) end
-print(("OK: %d binds, submaps: %s"):format(count, table.concat((function()
+print(("OK: %d binds, %d event handlers, submaps: %s"):format(count, #stub.events, table.concat((function()
     local t = {} for k in pairs(stub.submaps) do t[#t + 1] = k end table.sort(t) return t end)(), ", ")))

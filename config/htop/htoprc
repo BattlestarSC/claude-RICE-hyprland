@@ -1,0 +1,17 @@
+# rice settings for htop (3.5 option names, Settings.c). htop rewrites this file with all of its
+# options when it exits, keeping these values; anything not set here (meters, columns) uses
+# htop's defaults. Colors: scheme 0 draws with the terminal's 16 ANSI colors, which kitty and
+# foot take from the palette, so htop matches the rest of the rice without its own theme.
+config_reader_min_version=3
+color_scheme=0
+enable_mouse=1
+screen_tabs=1
+highlight_base_name=1
+highlight_megabytes=1
+highlight_threads=1
+hide_userland_threads=1
+show_program_path=0
+show_cpu_frequency=1
+show_cpu_temperature=1
+cpu_count_from_one=1
+delay=15

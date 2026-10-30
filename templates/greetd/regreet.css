@@ -1,0 +1,59 @@
+/* {{ name }} for ReGreet (GTK4). Installed to /etc/greetd/regreet.css; ReGreet loads it as a
+   global stylesheet over adw-gtk3-dark. The form floats on the ASCII sky as a dark glass card,
+   like the bar's panels: mantle at 85 %, a surface2 hairline, purple focus and accent. */
+
+window {
+    background-color: transparent;
+}
+
+frame, frame > border {
+    background-color: {{ mantle | cssrgba:0.85 }};
+    border: 1px solid {{ surface2 }};
+    border-radius: 14px;
+    color: {{ text }};
+}
+
+label {
+    color: {{ text }};
+}
+
+entry, dropdown > button, combobox > box > button {
+    background-color: {{ surface0 }};
+    color: {{ bright }};
+    border: 1px solid {{ surface2 }};
+    border-radius: 8px;
+}
+
+entry:focus-within {
+    border-color: {{ purple }};
+    box-shadow: 0 0 0 1px {{ purple }};
+}
+
+button {
+    background-color: {{ surface1 }};
+    color: {{ text }};
+    border-radius: 8px;
+}
+
+button:hover {
+    background-color: {{ surface2 }};
+}
+
+button.suggested-action {
+    background-color: {{ purple }};
+    color: {{ crust }};
+}
+
+button.destructive-action {
+    background-color: {{ red }};
+    color: {{ crust }};
+}
+
+.error, label.error {
+    color: {{ red }};
+}
+
+infobar, infobar > revealer > box {
+    background-color: {{ surface0 }};
+    color: {{ yellow }};
+}

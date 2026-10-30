@@ -1,0 +1,11 @@
+# greetd: the login screen. Installed to /etc/greetd/config.toml by install.sh (the original is
+# backed up first). The greeter runs as user "greeter" inside its own small Hyprland session,
+# configured by /etc/greetd/hyprland.lua; ReGreet draws the login form.
+# Format and command: ReGreet README (Hyprland section), greetd 0.10.
+
+[terminal]
+vt = 1
+
+[default_session]
+command = "dbus-run-session start-hyprland -- -c /etc/greetd/hyprland.lua"
+user = "greeter"
