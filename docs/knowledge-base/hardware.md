@@ -5,7 +5,7 @@ The owner's machine. The rice must work well here first; other hardware is best-
 | Component | Detail | Still unknown |
 | --- | --- | --- |
 | Displays | 2 × ASUS ProArt 27" 4K | exact model (10-bit? wide gamut? refresh?) |
-| Connection | through a KVM; **outputs disappear when the KVM switches away** | KVM model; DP or HDMI; any MST hub |
+| Connection | Level1Techs dual-monitor DisplayPort 1.4 KVM: two DP links per PC, **outputs disappear when switched away** (no EDID emulation, confirmed by the vendor) | ProArt exact model |
 | GPU | AMD RX 6000 series, Navi 21 (gfx1030), 16 GB VRAM | exact SKU (6800 / 6800 XT / 6900 XT / 6950 XT) does not change anything below |
 | Compute | HIP / ROCm for Blender Cycles | |
 | Login | greetd + ReGreet inside Hyprland (D7) | |
@@ -85,9 +85,17 @@ Other components under hotplug:
 | hypridle | unaffected (input-idle based) | none |
 | Greeter (greetd + ReGreet in Hyprland) | same fallback/return logic as the desktop, since it is Hyprland | test a KVM switch at the login screen |
 
-**Hardware alternative:** a KVM with EDID emulation (or DP EDID-emulator dongles) keeps outputs
-"connected" while switched away, which avoids every item above. Worth knowing if the software
-mitigations prove flaky.
+**This KVM:** Level1Techs states its DP 1.4 KVMs do not emulate monitors (the EDID engine exists for
+HDCP re-keying) and recommends its DP 1.2 repeater where emulation is needed. [S: Level1Techs store
+pages and forum threads via search, 2026-10-30] Each PC gets two separate DP links (no MST), so
+connector names (`DP-1`, `DP-2`) stay stable across switches, which is what Hyprland's
+return-workspaces-home logic keys on.
+
+**Hardware alternative:** an EDID emulator keeps outputs "connected" while switched away, avoiding
+every item above. Bandwidth check for a DP 1.2 repeater: HBR2 carries ~17.3 Gbit/s of payload; 4K60
+needs ~12.5 Gbit/s at 8 bpc and ~15.6 Gbit/s at 10 bpc (RGB, reduced blanking) [arithmetic, approx.],
+so it fits. Users report third-party DP 1.4 emulators failing to resync [S]. Software handling stays
+the primary plan.
 
 ## AMD GPU
 

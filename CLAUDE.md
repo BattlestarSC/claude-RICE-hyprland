@@ -24,7 +24,7 @@ generator + templates, generated `themes/quasar/`, `config/rofi/`, `config/hypr/
 [docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
 owner or implement behind an obvious, documented default.
 
-Primary target machine (D8): AMD RX 6000 / Navi 21 (gfx1030), two 27" 4K ASUS ProArt panels through a KVM that
+Primary target machine (D8): AMD RX 6000 / Navi 21 (gfx1030), two 27" 4K ASUS ProArt panels through a Level1Techs dual-DP KVM that
 **removes the outputs when switched away**, Blender with HIP/ROCm, SDDM login. Every
 monitor-related change must consider hot-unplug; see [hardware.md](docs/knowledge-base/hardware.md).
 Keybindings follow i3's defaults ([docs/keybindings.md](docs/keybindings.md)); do not repurpose an
@@ -41,6 +41,7 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | kitty / zsh | [docs/knowledge-base/kitty.md](docs/knowledge-base/kitty.md), [docs/knowledge-base/zsh.md](docs/knowledge-base/zsh.md) |
 | Monitors, GPU, ROCm, SDDM | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
 | rofi, launcher, scripted menus | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) |
+| Status bar, telemetry sources | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) |
 | Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
 ## Hard rules
@@ -96,7 +97,8 @@ python3 tools/blend.py colors/proposals/round1/pulsar.toml colors/proposals/roun
     --bg 0.3 --fg 0.55 --accent 0.4 --name Quasar --gradient red purple --cursor yellow   # regenerates quasar.toml
 python3 tools/preview.py --standalone colors/proposals/round2/*.toml colors/proposals/round1/*.toml > docs/colors/preview.html
 python3 tools/launcher_preview.py --standalone colors/proposals/round2/quasar.toml > docs/launcher/concepts.html
-python3 tools/spacegen.py colors/proposals/round2/quasar.toml wallpaper 3840 2160 > wallpaper.svg   # also: starfield, planet
+python3 tools/spacegen.py colors/quasar.toml ascii 3840 2160 --cell 12x24 > wallpaper.svg   # also: wallpaper, starfield, planet
+python3 tools/bar_preview.py --standalone colors/quasar.toml > docs/bar/concepts.html
 ```
 
 Round-1 palettes fail the APCA rules by design (they predate them); only round 2 and later must pass.

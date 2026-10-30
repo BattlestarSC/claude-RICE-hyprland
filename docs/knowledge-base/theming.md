@@ -19,7 +19,7 @@ themes/<palette>/
   ├── zsh/theme.zsh             → syntax-highlight styles, FZF_DEFAULT_OPTS
   ├── waybar/colors.css         → @define-color ...
   ├── starship/palette.toml
-  ├── art/*.svg                 → tools/spacegen.py: wallpaper, panel starfield, planets (seeded)
+  ├── art/*.svg                 → tools/spacegen.py: wallpaper, panel starfield, planets, ASCII scene (seeded)
   ├── gtk/colors.css            → GTK3/4 @define-color overrides (libadwaita-compatible names)
   └── ...                       (mako/swaync, btop, nvim, bat as they get added)
         │

@@ -12,6 +12,9 @@ Retrieved 2026-10-29 unless noted. "Primary" = upstream source or upstream docum
 | `hyprwm/Hyprland` `v0.57.0` `src/state/FallbackState.cpp`, `src/state/workspace/LifecyclePolicy.cpp`, `LifecyclePolicyAdapter.cpp` | Monitor hot-unplug: `FALLBACK` headless output, workspace return keyed by connector name | sparse checkout `src/state` |
 | `davatorium/rofi` @ `master` (2026-10-29) | Wayland layer surface namespace `rofi`, anchored to all edges; rasi gradients, `url()` images, box widgets; default placeholder and drun format | `doc/rofi-theme.5.markdown`, `doc/default_theme.rasi`, `source/wayland/display.c` |
 | `sddm/sddm` @ `develop` (2026-10-20) | `DisplayServer` default `x11`; Wayland `CompositorCommand` default `weston --shell=kiosk`; `EnableHiDPI` default true; Wayland greeter "experimental" | `src/common/Configuration.h`, `ChangeLog` |
+| `quickshell-mirror/quickshell` @ 2026-10-21 (tag v0.3.2) | modules (pipewire, mpris, networking=NetworkManager, bluetooth, session lock, greetd, background effect), writable `preferredDefaultAudioSink`, layer enum, Hyprland `usingLua` | `src/services`, `src/network/module.md`, `src/wayland/*` |
+| `Alexays/Waybar` man pages @ 2026-10-28 (0.15.0) | module list, `disk` per path, `cpu` load fields, static XML `menu`, `cpu-graph`/`custom-graph` | `man/*.5.scd` |
+| `hyprwm/Hyprland` v0.57.0 `src/ipc/s1/Commands.cpp` | `hyprctl -j binds` fields (`modmask`, `key`, `description`, `has_description`, `submap`) | |
 | APCA-W3 0.0.98G constants | `tools/palette.py` `apca()`; checked against reference values (`#888` on `#fff` = 63.06, `#fff` on `#888` = −68.54) | |
 
 ## Secondary (not independently confirmed)
@@ -22,6 +25,9 @@ Retrieved 2026-10-29 unless noted. "Primary" = upstream source or upstream docum
 | [archlinux.org: quickshell](https://archlinux.org/packages/extra/x86_64/quickshell/) | `quickshell` 0.3.1 in `extra` |
 | [archlinux.org: blender](https://archlinux.org/packages/extra/x86_64/blender/), [ArchWiki: Blender](https://wiki.archlinux.org/title/Blender) | `hip-runtime-amd` and `hiprt` optdepends; GFX9/CDNA/RDNA supported; HIP viewport issues |
 | [noctalia-qs AUR](https://aur.archlinux.org/packages/noctalia-qs?all_deps=1) | Quickshell-based shells crashing when quickshell isn't rebuilt after Qt updates (motivation for a fork) |
+
+| [Level1Techs DP 1.4 dual-monitor KVM store page](https://www.store.level1techs.com/products/p/14-kvm-switch-dual-monitor-2computer-z5erd-n6mbj), [L1T forum: displays disconnect on switch](https://forum.level1techs.com/t/level-1-techs-kvm-switch-displays-disconnect-on-switch/150855) | No monitor emulation on DP 1.4 KVMs; DP 1.2 repeater recommended for emulation |
+| [r/unixporn "Orbiter"](https://www.reddit.com/r/unixporn/) (text supplied by the owner) | ASCII shader wallpaper, QML bar, token-file theming |
 
 ## Secondary, round 1
 

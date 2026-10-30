@@ -64,10 +64,10 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 | Lock / idle | hyprlock, hypridle | |
 | Wallpaper | hyprpaper | |
 | Login | greetd + ReGreet, inside Hyprland | same monitor config as the desktop; no X server |
-| Bar | Quickshell or waybar (next decision) | [O3](docs/decisions.md#o3-status-bar-quickshell-vs-waybar-next-topic) |
+| Bar | Quickshell, Telemetry design (recommended, pending) | [concepts](docs/bar/concepts.html), [O3](docs/decisions.md#o3-status-bar-recommendation-made-awaiting-confirmation) |
 | Launcher + menus | rofi 2.x: **Orbit** (apps, `$mod+d`) and **Flight Deck** (all scripted menus) | [concepts](docs/launcher/concepts.html) |
 | Keybindings | i3 defaults (`$mod` = Super, `j k l ;`) | [docs/keybindings.md](docs/keybindings.md) |
-| Wallpaper art | generated from the palette (`tools/spacegen.py`) | |
+| Wallpaper art | generated from the palette (`tools/spacegen.py`), incl. an Orbiter-style ASCII scene | shared by desktop, lock and login |
 | Notifications | mako (proposed) | [O5](docs/decisions.md#o5-notifications) |
 | Blender GPU | ROCm / HIP (`hip-runtime-amd`, `hiprt`) | opt-in |
 | Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing, file picker |
@@ -134,6 +134,7 @@ The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout
 | [docs/colors/proposals.md](docs/colors/proposals.md) | palette design and selection |
 | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) | dual 4K via KVM, AMD + ROCm, SDDM |
 | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) | rofi on Wayland: capabilities and limits |
+| [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) | bar engines compared, telemetry sources, ASCII plan |
 
 ## Development
 
@@ -149,4 +150,4 @@ python3 tools/launcher_preview.py --standalone colors/proposals/round2/quasar.to
 
 ## License
 
-Not chosen yet ([O10](docs/decisions.md#o10-license)). Until a license is added, all rights are reserved.
+Personal project; no license.

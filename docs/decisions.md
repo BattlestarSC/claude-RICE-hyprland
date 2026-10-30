@@ -90,14 +90,20 @@ theme for every `rofi -dmenu` menu (`bin/rice-menu`: session, clipboard, windows
 screenshot). Both rendered with real rofi (`tests/rofi-render.sh`). The launcher no longer
 forces a bar engine, so O3 is independent again.
 
+### D13. Name and license (owner, 2026-10-30)
+
+Project name stays `claude-RICE-hyprland`; short name `rice` for paths and commands
+(`~/.local/state/rice/`, `rice-menu`). Personal use: no license file.
+
 ## Open
 
-### O3. Status bar: Quickshell vs waybar (next topic, now independent of the launcher)
+### O3. Status bar: recommendation made, awaiting confirmation
 
-The owner is interested in Quickshell. Inputs so far: Arch `extra` ships `quickshell` 0.3.1 [S];
-per-screen instances suit the KVM hotplug case [BK]; it is a QML framework, so the bar is written
-rather than configured. waybar is the configured alternative with a weaker hotplug record [BK].
-To be researched properly before deciding.
+Owner's requirements: RAM, CPU, load averages, audio (play/pause, output selection, volume),
+network, per-NVMe disk usage; inspiration: the "Orbiter" ASCII space rice.
+Concepts in [bar/concepts.html](bar/concepts.html): Orbiter, Telemetry, Flight Deck, Orbit Glass,
+Twin HUD. **Recommendation: Quickshell, Telemetry design, split per screen (Twin HUD).** waybar
+cannot do live dropdown panels or a native output picker. Details: [knowledge-base/bar.md](knowledge-base/bar.md).
 
 ### ~~O4. Launcher~~ → D12
 
@@ -127,25 +133,15 @@ is moved or deleted. Copy is robust but makes updates explicit. **Blocked on** v
 Hyprland's config watcher reacts to edits through symlinks ([knowledge-base/hyprland.md](knowledge-base/hyprland.md)).
 Leaning symlink, with the installer recording the repo path and warning if it moves.
 
-### O8. Project name
-
-Used for state paths (`~/.local/state/<name>/`), the theme switcher command, menu script
-prefixes and README. Needs a short lowercase name. Placeholder in docs: `<rice>`.
-
 ### O9. Scope beyond Hyprland + kitty + zsh for v1
 
 **Recommendation:** v1 = Hyprland, hyprlock, hypridle, hyprpaper, kitty, zsh + starship, bar,
 rofi + menus, notifications, SDDM (stock theme), GTK/Qt dark preference. v2: SDDM theme,
 neovim/btop/fastfetch themes, Blender UI theme from the palette.
 
-### O10. License
-
-No license yet. Without one, the repo is "all rights reserved" by default. MIT is the common
-choice for dotfiles.
-
 ### O12. Hardware details still needed
 
-GPU answered: RX 6000 series, Navi 21 (gfx1030), 16 GB. Still open: exact ProArt model (10-bit,
-gamut, refresh), KVM model, DisplayPort or HDMI, and whether a dock/MST hub is in the chain.
+Answered: GPU RX 6000 / Navi 21 (gfx1030), 16 GB; KVM Level1Techs dual-monitor DisplayPort 1.4
+(two links per PC, no EDID emulation). Still open: exact ProArt model (10-bit, gamut, refresh).
 
-Closed: O1 → D10, O2 → D7, O4 → D12, O7 → D8, O11 → D11.
+Closed: O1 → D10, O2 → D7, O4 → D12, O7 → D8, O8 → D13, O10 → D13, O11 → D11.
