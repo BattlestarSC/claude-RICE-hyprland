@@ -59,7 +59,8 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 | Role | Choice | Notes |
 | --- | --- | --- |
 | Compositor | Hyprland ≥ 0.57 | Lua config, split into modules; mild gaps (6/3 px), 2 px gradient border, 6 px rounding |
-| Terminal | kitty | auto-reloads config; colors in a generated `theme.conf` |
+| Terminal | **kitty** (primary), **foot** (secondary) | both themed from the palette; kitty auto-reloads its config |
+| Editor | **Code - OSS** (`code`, open-source VS Code) | telemetry, experiments and AI features off; palette theme | 
 | Shell | zsh + starship | no framework; autosuggestions, syntax highlighting, fzf, zoxide |
 | Lock / idle | hyprlock (themed, PAM, crash-safe session lock), hypridle | lock at 10 min, monitors off at 11 min, no auto-suspend |
 | Wallpaper | **live ASCII Earth + Moon** (Quickshell, two GPU shader passes, 4 fps, both monitors in sync; animates only on empty workspaces) · or the same scene as a still · or your own image (installer question) | [D15](docs/decisions.md#d15-wallpaper-live-ascii-earth-and-moon-gpu-shaders-in-quickshell-owner-2026-10-30) |
@@ -71,7 +72,7 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 | Notifications | Quickshell's own server: Orbit Glass popups, history panel, do-not-disturb | [D20](docs/decisions.md#d20-notifications-quickshells-own-server-owner-2026-10-30) |
 | Screensaver | ASCII sky overlay at 5 min idle, whole scene drifts (anti burn-in), any input ends it | [D21](docs/decisions.md#d21-screensaver-ascii-overlay-burn-in-protection-on-ips-owner-2026-10-30) |
 | File managers | **Thunar** (default), **Dolphin** (secondary), both in the palette | [D22](docs/decisions.md#d22-file-managers-thunar-primary-dolphin-secondary-owner-2026-10-30) |
-| Browsers | **LibreWolf** (default), **Firefox** (telemetry off, NoScript + uBlock Origin), optional ungoogled-chromium and Zen | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
+| Browsers | **LibreWolf** (default), **Firefox** (telemetry off, NoScript + uBlock Origin), optional ungoogled-chromium | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
 | Blender GPU | ROCm / HIP (`hip-runtime-amd`, `hiprt`) | opt-in |
 | Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing, file picker |
 | Polkit | hyprpolkitagent | |
@@ -113,7 +114,8 @@ Pulsar (dark, saturated) and Event Horizon (soft), checked with two contrast mod
 CLAUDE.md                 guidance for AI-assisted development (rules, conventions, commands)
 bin/rice-menu             scripted menus (session, clipboard, windows, keys, screenshot)
 bin/rice-sky-atlas        renders the ASCII sky's glyph atlas at a monitor's exact cell size
-bin/rice-browser-setup    applies browser prefs and palette to every Firefox/LibreWolf/Zen profile
+bin/rice-browser-setup    applies browser prefs and palette to every Firefox/LibreWolf profile
+bin/rice-code-setup       installs the Code - OSS theme, merges the privacy settings
 colors/
 ├── quasar.toml           the palette: single source of truth for every app theme
 └── proposals/            design history (round 1 palettes, round 2 Quasar)
@@ -135,7 +137,8 @@ tools/                    dev only (Python 3.11+); the installer never uses thes
 └── render_theme.py       templates/ → themes/<palette>/ (with --check for drift)
 tests/                    rofi-render.sh (real rofi screenshots), lua/ (Hyprland API stub, bind tests),
                           quickshell/ (bar render, mock services), sky/ (ASCII sky frames + timing),
-                          browsers/ (policy names checked against Mozilla's and Chromium's sources)
+                          browsers/ (policy names checked against Mozilla's and Chromium's sources),
+                          terminals/ (kitty keys), vscode/ (theme colors and settings vs VS Code)
 ```
 
 The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout-target-create-directories-as-phases-need-them).
@@ -153,6 +156,7 @@ The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout
 | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) | rofi on Wayland: capabilities and limits |
 | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) | Quickshell bar, notifications, ASCII sky and screensaver: structure, data sources, tests |
 | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) | browser privacy settings and theming, and where each browser reads them |
+| [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) | Code - OSS: telemetry/AI settings and the generated theme |
 
 ## Development
 

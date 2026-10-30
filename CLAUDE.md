@@ -21,12 +21,12 @@ Orbit (apps) and Flight Deck (menus) themes, greetd + ReGreet login, Quickshell 
 live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-user
 `~/.config/rice/settings.json`), 10-bit output, mild gaps + rounding, hyprlock + hypridle,
 Quickshell notifications, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
-ungoogled-chromium, Zen) with privacy policies.
+ungoogled-chromium) with privacy policies, kitty + foot, Code - OSS (telemetry and AI off).
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
 `config/quickshell/` (bar, services, sky), `config/hypr/conf/{binds,monitors,layers,look,session}.lua`,
-`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers}/`,
-`bin/rice-menu`, `bin/rice-sky-atlas`, `bin/rice-browser-setup`, tests.
-**Not yet present:** `install.sh`, the Hyprland entry point, window rules, autostart, kitty, zsh,
+`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,kitty,foot,code-oss}/`,
+`bin/rice-menu`, `bin/rice-sky-atlas`, `bin/rice-browser-setup`, `bin/rice-code-setup`, tests.
+**Not yet present:** `install.sh`, the Hyprland entry point, window rules, autostart, zsh,
 greeter files. Quickshell code is render-tested
 with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
 `shell.qml` and `services/` as unverified. Decided and open questions are in
@@ -47,12 +47,13 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | hyprlock / hypridle / hyprpaper / launcher | [docs/knowledge-base/hypr-ecosystem.md](docs/knowledge-base/hypr-ecosystem.md) |
 | Installer, packages, session startup | [docs/knowledge-base/arch-install.md](docs/knowledge-base/arch-install.md) |
 | Colors, any app theme | [docs/knowledge-base/theming.md](docs/knowledge-base/theming.md), [docs/colors/proposals.md](docs/colors/proposals.md) |
-| kitty / zsh | [docs/knowledge-base/kitty.md](docs/knowledge-base/kitty.md), [docs/knowledge-base/zsh.md](docs/knowledge-base/zsh.md) |
+| kitty / foot / zsh | [docs/knowledge-base/kitty.md](docs/knowledge-base/kitty.md), [docs/knowledge-base/zsh.md](docs/knowledge-base/zsh.md) |
 | Monitors, GPU, ROCm, SDDM | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
 | rofi, launcher, scripted menus | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) |
 | Status bar, telemetry sources, Quickshell, notifications, ASCII sky, screensaver | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) |
 | GTK/Qt app theming, file managers | [docs/knowledge-base/theming.md](docs/knowledge-base/theming.md) |
 | Browsers (policies, prefs, userChrome) | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
+| Code - OSS (settings, theme extension) | [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) |
 | Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
 ## Hard rules
@@ -89,7 +90,7 @@ home/                       files deployed directly under ~ (.zshenv, .zprofile,
 colors/                     palettes; proposals/ now, the chosen palette as colors/<name>.toml later
 templates/                  per-app theme templates ({{ role | filter }}), rendered by tools/render_theme.py
 themes/<palette>/           generated app themes (committed; never hand-edit)
-bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup)
+bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup, rice-code-setup)
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
 tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind tests),
                             quickshell/ (bar render with mocks), sky/ (ASCII sky frames + timing)
@@ -103,7 +104,9 @@ python3 tools/render_theme.py colors/quasar.toml           # templates/ -> theme
 python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed themes are stale
 lua5.4 tests/lua/run.lua config/hypr/conf/*.lua            # dispatchers, modifiers, duplicate keys, hl.config option names
 python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
-shellcheck -x bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup tests/rofi-render.sh
+shellcheck -x bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup tests/rofi-render.sh
+python3 tests/terminals/check_kitty.py <kitty checkout>/kitty/options/definition.py   # kitty keys
+python3 tests/vscode/check_theme.py <vscode checkout>            # theme colors + settings (see docstring)
 python3 tests/browsers/check_policies.py <policy-templates checkout> <chromium policies.yaml>   # see its docstring
 # Quickshell (needs PySide6 + PySide6-Addons, an X server or Xvfb, IBM Plex + Symbols Nerd Font):
 python3 tests/quickshell/render.py /tmp/bar.png --background frame.png   # real bar QML + mocks; fails on any QML warning
@@ -187,10 +190,16 @@ in an `archlinux:latest` container or on hardware.
 - The wallpaper must stay cheap: anything that changes AsciiSky properties every frame on a
   frozen monitor defeats the freeze (Wallpaper.qml copies angles only while `animating`).
 - Firefox on Linux reads `/etc/<app>/policies/policies.json` **instead of** the install's
-  `distribution/policies.json`: never write `/etc/librewolf/...` or `/etc/zen/...` (it would
-  discard LibreWolf's/Zen's own policies).
+  `distribution/policies.json`: never write `/etc/librewolf/...` (it would discard LibreWolf's
+  own policies).
 - Firefox theme CSS variables are internals and get renamed; check `LightweightThemeConsumer.sys.mjs`.
 - Notification text must stay `Text.PlainText`; apps send markup regardless of advertised caps.
 - `Quickshell.screens` order is not "left first"; use `Screens.primary`.
+- foot ≥ 1.26 uses `[colors-dark]`; 1.28 refuses to start with the old `[colors]`. Most foot
+  examples online (and the gitlab mirror) are older. foot comments are `#` only.
+- foot/kitty includes: a missing `include` is an error in both; kitty's `globinclude` is not.
+- Code - OSS ships a Copilot `defaultChatAgent` even in the OSS build; `chat.disableAIFeatures`
+  is what hides it. VS Code `settings.json` is JSONC: never rewrite one jq cannot parse.
+- A VS Code extension folder copied into `~/.vscode-oss/extensions` is not picked up; install a VSIX.
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.

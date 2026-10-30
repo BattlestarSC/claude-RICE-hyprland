@@ -1,4 +1,4 @@
-// rice: privacy and appearance prefs for Firefox-family profiles (Firefox, Zen).
+// rice: privacy and appearance prefs for Firefox profiles.
 // bin/rice-browser-setup writes this between "rice" markers in each profile's user.js;
 // everything outside the markers is yours and is kept. user.js is applied at every start,
 // so changing one of these in about:config lasts only until the next start: change it here.

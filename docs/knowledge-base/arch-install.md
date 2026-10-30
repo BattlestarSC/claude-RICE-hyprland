@@ -70,7 +70,7 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Compositor + hypr stack | `hyprland` [V wiki], `xdg-desktop-portal-hyprland` [V wiki], `xdg-desktop-portal-gtk`, `hyprlock`, `hypridle`, `hyprpaper`, `hyprpolkitagent`, `hyprlauncher`, `hyprshutdown`, `hyprsunset`, `hyprpicker` |
 | Qt/GTK integration | `qt5-wayland`, `qt6-wayland` [V wiki must-have], `hyprqt6engine` or `qt6ct`, `nwg-look` |
 | Audio / media | `pipewire`, `wireplumber` [V wiki], `pipewire-pulse`, `pipewire-alsa`, `pipewire-jack`, `pavucontrol`, `playerctl`, `brightnessctl` |
-| Terminal + shell | `kitty`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-completions`, `starship`, `fzf`, `zoxide`, `eza`, `bat` |
+| Terminal + shell | `kitty`, `foot`, `zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-completions`, `starship`, `fzf`, `zoxide`, `eza`, `bat` |
 | Bar / wallpaper / notifications | `quickshell` [S], `qt6-shadertools` (`qsb`, compiles the sky shaders at install) [BK], `mako` or `swaync` (O5) |
 | Bluetooth | `bluez`, `bluez-utils` [BK]; enabling `bluetooth.service` is a prompted system change |
 | Launcher / menus | `rofi` (≥ 2.0 for native Wayland), `jq`, `libnotify`, `librsvg` (`rsvg-convert` rasterizes generated art at install) |
@@ -80,7 +80,8 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Fonts / icons / cursor | `ttf-jetbrains-mono-nerd`, `ttf-ibm-plex` (bar text) [BK], `ttf-nerd-fonts-symbols` (bar icons) [BK], `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
 | Network (only if none present) | `networkmanager`, `network-manager-applet` |
 | File managers | `thunar`, `thunar-volman`, `thunar-archive-plugin`, `xarchiver`, `tumbler`, `ffmpegthumbnailer`, `gvfs`, `gvfs-mtp`, `udisks2`; `dolphin`, `kio-extras`, `ffmpegthumbs`, `breeze` (Qt widget style Dolphin falls back to), `archlinux-xdg-menu`; theme `adw-gtk-theme` [S: extra 6.5-1] [others BK / TODO-verify] |
-| Browsers | `librewolf` [S: extra], `firefox`; optional AUR: `ungoogled-chromium`(-bin), `zen-browser-bin` [TODO-verify] |
+| Editor | `code` (Code - OSS) [S: extra], `jq` (settings merge); `bsdtar` from `libarchive` (pacman dependency) [BK] |
+| Browsers | `librewolf` [S: extra], `firefox`; optional AUR: `ungoogled-chromium`(-bin) |
 
 ## Installer questions (beyond packages)
 
@@ -89,7 +90,7 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Wallpaper | animated ASCII Earth/Moon (default) · still ASCII (no animation, zero cost) · your own image (path; e.g. a NASA Earth photo) | `~/.config/rice/settings.json` (`skyMode`, `skyImage`), written only if the file does not exist |
 | Wallpaper layout (two monitors) | mirror (default) · span | same file (`skyLayout`) |
 | Browser policies (system files) | write `/etc/firefox/policies/policies.json` (and `/etc/chromium/policies/managed/rice.json` if ungoogled-chromium is installed)? | prompt; root; see browsers.md |
-| Optional AUR browsers | ungoogled-chromium, Zen | prompt; off by default (D2) |
+| Optional AUR browser | ungoogled-chromium | prompt; off by default (D2) |
 
 NASA imagery is generally not copyrighted [S: search summary of NASA's media guidelines;
 nasa.gov unreachable from the build environment], but the installer does not download it by

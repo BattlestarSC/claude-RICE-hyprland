@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # rice-browser-setup: apply the rice's browser prefs and palette to every existing profile of
-# Firefox, LibreWolf and Zen. Safe to re-run; runs as your user, never as root.
+# Firefox and LibreWolf. Safe to re-run; runs as your user, never as root.
 #
 #   rice-browser-setup [SOURCE_DIR]      default: ~/.local/share/rice/browsers
 #
 # SOURCE_DIR holds what the installer deploys:
-#   user.js                    privacy + appearance prefs (Firefox, Zen)
+#   user.js                    privacy + appearance prefs (Firefox)
 #   librewolf.overrides.cfg    LibreWolf appearance prefs
 #   chrome/userChrome.css      palette for the browser UI (Firefox, LibreWolf)
 #   chrome/userContent.css     palette for blank/new-tab pages
@@ -121,8 +121,6 @@ main() {
         write_block "${HOME}/.librewolf/librewolf.overrides.cfg" "${src}/librewolf.overrides.cfg"
         say "librewolf: ${HOME}/.librewolf/librewolf.overrides.cfg"
     fi
-    # Zen: privacy prefs only; Zen has its own theming, which a userChrome.css would fight.
-    apply zen "${src}/user.js" 0 "${HOME}/.zen" "${config_home}/zen"
 
     printf 'Done: %d profile(s). Restart the browsers to apply.\n' "${changed}"
 }

@@ -1,4 +1,4 @@
-# Kitty
+# Terminals: kitty (primary) and foot (secondary)
 
 Option names below were checked against kitty's `kitty/options/definition.py` on the `master`
 branch (commit dated 2026-10-29). [V: kovidgoyal/kitty source, 2026-10-29]
@@ -67,3 +67,45 @@ kitty --version
 kitty +runpy 'from kitty.config import *; print("ok")'   # sanity: kitty's python runs
 kitty --debug-config | less                              # effective config incl. includes [BK]
 ```
+
+## This rice's kitty (`config/kitty/kitty.conf`, 2026-10-30)
+
+Every key checked against `kitty/options/definition.py` @ 02b2b10 (2026-10-29) by
+`tests/terminals/check_kitty.py`. [V]
+
+- `include theme.conf` (generated: `themes/<palette>/kitty/theme.conf`: colors, tab bar, marks,
+  `cursor_trail_color`, ANSI 0–15 per the palette's ANSI map).
+- Font `JetBrainsMono Nerd Font` 11 pt, ligatures off under the cursor.
+- Block cursor, no blink, `cursor_trail 3` (the trail follows jumps after the cursor rested 3 ms;
+  purple), `cursor_trail_decay 0.1 0.3`.
+- 10 000 lines scrollback, curly URL underlines, no copy-on-select, `strip_trailing_spaces smart`.
+- No audio or visual bell; `window_alert_on_bell yes` (urgency hint to Hyprland).
+- `window_padding_width 6 10` (pt: vertical, horizontal; one or two values like CSS [V]).
+- `confirm_os_window_close -1`: with shell integration, only windows running a command count [V].
+- Opaque (`background_opacity 1.0`); powerline tab bar with round separators, at the bottom.
+- `update_check_interval 0`: only official binaries check for updates at all [V], distro builds
+  never do; set anyway.
+- User overrides: `globinclude local.conf`. A plain `include` of a missing file logs an error;
+  `globinclude` with no match is silently empty [V: `kitty/conf/utils.py`].
+
+## foot (`config/foot/foot.ini`)
+
+Current release **1.28.0** [S: nixpkgs `pkgs/by-name/fo/foot/package.nix`, 2026-10-30]. foot's
+home is codeberg, which is unreachable from the build environment; the gitlab mirror stops at
+1.13.1 (2022). Facts below are labelled accordingly.
+
+- **Colors moved**: `[colors]` was deprecated in 1.26.0 in favor of `[colors-dark]` /
+  `[colors-light]`, and foot 1.28.0 reportedly refuses to start with `[colors]` [S: catppuccin/foot
+  PR #24, omarchy and DankMaterialShell issues, 2026]. Default theme is dark unless
+  `initial-color-theme=light` [S: foot.ini(5) via search]. The rice writes `[colors-dark]` only.
+- `[colors-dark]` keys used: `alpha`, `foreground`, `background`, `cursor=<text> <cursor>`
+  (the cursor color lives in the colors section now), `selection-foreground/-background`, `urls`,
+  `jump-labels`, `search-box-no-match`, `search-box-match`, `regular0-7`, `bright0-7`; values
+  `RRGGBB` without `#` [S: catppuccin/foot `themes/catppuccin-mocha.ini`, current].
+- `include=` accepts absolute paths and `~/`; a file that cannot be opened is a config error
+  [V: `config.c` @ 1.13.1 mirror]. Hence the installer creates an empty `~/.config/foot/local.ini`
+  if absent, and `foot.ini` includes `theme.ini` first and `local.ini` last.
+- Comments start with `#` only [V: same source]; the generated header uses `#`.
+- Other keys (`[main] font, pad`, `[scrollback] lines`, `[cursor] style, blink`,
+  `[mouse] hide-when-typing`, `[bell] urgent`) are present in 1.13.1 [V] and not reported as
+  changed since [S]. Verify with `foot --check-config` on the target [TODO-verify].

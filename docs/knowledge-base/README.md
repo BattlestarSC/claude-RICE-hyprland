@@ -25,10 +25,11 @@ Every non-trivial claim carries one of these labels. Keep them accurate when edi
 | [hardware.md](hardware.md) | The owner's machine: dual 4K ProArt via KVM (hot-unplug behavior from Hyprland source), Navi 21 + ROCm/HIP, greetd + ReGreet login. |
 | [bar.md](bar.md) | Quickshell shell: bar, notifications, ASCII sky wallpaper and screensaver; data sources; tests. |
 | [launcher.md](launcher.md) | rofi 2.x on Wayland: layer-surface facts, rasi capabilities and limits, menu layout. |
-| [kitty.md](kitty.md) | Kitty config keys relevant to theming, reload behavior, Hyprland interplay. |
+| [kitty.md](kitty.md) | Terminals: kitty (primary) and foot (secondary): verified keys, theming, reload. |
 | [zsh.md](zsh.md) | Zsh setup without a framework, plugin sourcing on Arch, prompt, ANSI-color dependencies. |
 | [theming.md](theming.md) | How one palette reaches every app: Hyprland, kitty, zsh, GTK, Qt, file managers (Thunar, Dolphin), cursors, fonts. |
-| [browsers.md](browsers.md) | LibreWolf, Firefox, ungoogled-chromium, Zen: policies, prefs, theming, where each browser reads them. |
+| [editor.md](editor.md) | Code - OSS: which build, telemetry/AI settings, the generated theme extension. |
+| [browsers.md](browsers.md) | LibreWolf, Firefox, ungoogled-chromium: policies, prefs, theming, where each browser reads them. |
 | [sources.md](sources.md) | Source list with retrieval dates and how to re-verify. |
 
 ## Ground rules for this knowledge base

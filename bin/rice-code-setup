@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# rice-code-setup: install the rice theme into Code - OSS and merge the rice settings
+# (telemetry off, AI features off, theme, fonts) into your settings.json. Safe to re-run.
+#
+#   rice-code-setup [SOURCE_DIR]      default: ~/.local/share/rice/code-oss
+#
+# SOURCE_DIR holds what the installer deploys:
+#   extension/package.json, extension/themes/*.json   the theme (generated from the palette)
+#   settings.json             enforced: telemetry, experiments, AI features, update checks off
+#   settings-defaults.json    preferences: theme, fonts, title bar; only where you have no value
+#
+# Theme: zipped into a .vsix (bsdtar, part of libarchive, which pacman itself needs) and installed
+# with `code --install-extension`; VS Code only reads extension/package.json from a VSIX.
+# Settings: merged into ~/.config/Code - OSS/User/settings.json with jq: defaults < your values <
+# enforced keys. Re-running never undoes your own font or theme choices, only privacy keys.
+# The original is kept once as settings.json.rice-bak. If your file has comments or trailing
+# commas (VS Code accepts them, jq does not), it is left alone and you are told what to add.
+set -Eeuo pipefail
+
+src="${1:-${HOME}/.local/share/rice/code-oss}"
+user_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/Code - OSS/User"
+
+die() { printf 'rice-code-setup: %s\n' "$*" >&2; exit 1; }
+say() { printf '  %s\n' "$*"; }
+
+find_cli() {
+    local c
+    for c in code code-oss; do
+        if command -v "${c}" > /dev/null; then printf '%s\n' "${c}"; return 0; fi
+    done
+    return 1
+}
+
+install_theme() {
+    local cli="$1" tmp
+    tmp="$(mktemp -d)"
+    # shellcheck disable=SC2064  # expand now: the trap must remove this run's directory
+    trap "rm -rf -- '${tmp}'" RETURN
+    bsdtar --format zip -cf "${tmp}/rice-theme.vsix" -C "${src}" extension
+    "${cli}" --install-extension "${tmp}/rice-theme.vsix" --force > /dev/null
+    say "theme installed (select it any time: Preferences > Color Theme > Rice)"
+}
+
+merge_settings() {
+    local target="${user_dir}/settings.json" tmp
+    mkdir -p -- "${user_dir}"
+    if [[ ! -s "${target}" ]]; then
+        jq -s '.[0] * .[1]' -- "${src}/settings-defaults.json" "${src}/settings.json" > "${target}"
+        say "settings: wrote ${target}"
+        return 0
+    fi
+    if ! jq empty -- "${target}" 2> /dev/null; then
+        say "settings: ${target} has comments or trailing commas; left unchanged."
+        say "          add the keys from ${src}/settings.json (and settings-defaults.json) yourself."
+        return 0
+    fi
+    [[ -f "${target}.rice-bak" ]] || cp -p -- "${target}" "${target}.rice-bak"
+    tmp="$(mktemp)"
+    jq -s '.[0] * .[1] * .[2]' -- "${src}/settings-defaults.json" "${target}" "${src}/settings.json" > "${tmp}"
+    mv -- "${tmp}" "${target}"
+    say "settings: merged into ${target} (original: settings.json.rice-bak)"
+}
+
+main() {
+    (( EUID != 0 )) || die "run as your user, not root"
+    [[ -f "${src}/extension/package.json" && -f "${src}/settings.json" && -f "${src}/settings-defaults.json" ]] \
+        || die "missing files in ${src} (run the installer, or pass the source dir)"
+    local cli
+    cli="$(find_cli)" || die "Code - OSS is not installed (package: code)"
+    command -v bsdtar > /dev/null || die "bsdtar not found (package: libarchive)"
+    command -v jq > /dev/null || die "jq not found (package: jq)"
+
+    printf 'Setting up Code - OSS (%s) from %s\n' "${cli}" "${src}"
+    install_theme "${cli}"
+    merge_settings
+    printf 'Done. Restart Code - OSS to apply.\n'
+}
+
+main "$@"

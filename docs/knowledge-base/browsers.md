@@ -1,7 +1,10 @@
 # Browsers: privacy configuration and theming
 
 Owner's order (2026-10-30): **LibreWolf** (primary; asked for as "IronWolf", see below), **Firefox**
-(secondary), **ungoogled-chromium** (backup), **Zen** (optional).
+(secondary), **ungoogled-chromium** (backup). Zen was optional and is **dropped** (owner, 2026-10-30:
+"if Zen is unavailable, skip it"): it exists only in the AUR (`zen-browser-bin`, `-twilight-bin`,
+`-git`) [S: aur.archlinux.org via search], whose comments also warn about a malicious look-alike
+package.
 
 Labels: [V] read in a primary source (date), [S] search result or secondary source, [BK]
 background knowledge not re-checked, [TODO-verify] must be checked on Arch or hardware.
@@ -21,7 +24,6 @@ one package name if the owner meant something else.
 | LibreWolf | `librewolf` | extra [S] | yes |
 | Firefox | `firefox` | extra [BK] | yes |
 | ungoogled-chromium | `ungoogled-chromium` / `-bin` | AUR (also OBS, archlinuxcn) [S] | prompted optional extra |
-| Zen | `zen-browser-bin` [TODO-verify name] | AUR | prompted optional extra |
 
 ## How Firefox-family browsers take settings
 
@@ -35,7 +37,6 @@ one package name if the owner meant something else.
      `distribution/policies.json` (telemetry off, updates off, uBlock Origin, search engines…
      [V: librewolf-community/settings `distribution/policies.json`, 2023 archive]); an `/etc`
      file would replace all of it.
-   - Zen: same reason (the AUR package disables updates through its distribution policies [S]).
 2. **Preferences**: `user.js` in the profile (applied at every start), or LibreWolf's
    `~/.librewolf/librewolf.overrides.cfg` (autoconfig syntax: `defaultPref`/`pref`/`lockPref`)
    [V: librewolf.cfg in librewolf-community/settings (2023): `autoadmin.global_config_url` =
@@ -46,7 +47,7 @@ one package name if the owner meant something else.
 Profile locations: Firefox uses `~/.mozilla/firefox` when it already exists, otherwise
 `$XDG_CONFIG_HOME/mozilla/firefox` [V: `nsXREDirProvider.cpp` `LegacyHomeExists`, main].
 LibreWolf: `~/.librewolf` or `~/.config/librewolf/librewolf` [S: LibreWolf docs listing].
-Zen: `~/.zen` or `~/.config/zen` [TODO-verify]. `bin/rice-browser-setup` checks all of them.
+`bin/rice-browser-setup` checks all of them.
 
 ## What this rice sets
 
@@ -74,7 +75,7 @@ Policy names and fields checked against mozilla/policy-templates `docs/index.md`
   (sync stays available), `DNSOverHTTPS` (left to the user: it moves DNS trust to a resolver),
   Safe Browsing stays **on** (it is a security feature; lookups use hashed prefixes [BK]).
 
-### Firefox and Zen profiles (`config/browsers/user.js`)
+### Firefox profiles (`config/browsers/user.js`)
 
 Telemetry, studies, crash reports, captive-portal and connectivity pings off; sponsored and
 AI features off; prefetch and speculative connections off; search suggestions off; GPC on; dark

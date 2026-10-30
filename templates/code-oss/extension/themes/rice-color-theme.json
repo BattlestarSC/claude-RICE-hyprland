@@ -1,0 +1,403 @@
+{
+  "$schema": "vscode://schemas/color-theme",
+  "name": "Rice ({{ name }})",
+  "type": "dark",
+  "semanticHighlighting": true,
+  "colors": {
+    "foreground": "{{ text }}",
+    "descriptionForeground": "{{ overlay }}",
+    "errorForeground": "{{ red }}",
+    "focusBorder": "{{ purple | hexa:0.6 }}",
+    "selection.background": "{{ purple | hexa:0.35 }}",
+    "widget.shadow": "{{ crust | hexa:0.6 }}",
+    "textLink.foreground": "{{ blue }}",
+    "textLink.activeForeground": "{{ bright_blue }}",
+    "progressBar.background": "{{ purple }}",
+    "badge.background": "{{ purple }}",
+    "badge.foreground": "{{ crust }}",
+    "button.background": "{{ purple }}",
+    "button.foreground": "{{ crust }}",
+    "button.hoverBackground": "{{ bright_purple }}",
+    "button.secondaryBackground": "{{ surface1 }}",
+    "button.secondaryForeground": "{{ text }}",
+    "button.secondaryHoverBackground": "{{ surface2 }}",
+    "input.background": "{{ crust }}",
+    "input.foreground": "{{ text }}",
+    "input.border": "{{ surface1 }}",
+    "input.placeholderForeground": "{{ overlay }}",
+    "inputOption.activeBorder": "{{ purple }}",
+    "inputOption.activeBackground": "{{ purple | hexa:0.2 }}",
+    "dropdown.background": "{{ surface0 }}",
+    "dropdown.border": "{{ surface1 }}",
+    "dropdown.foreground": "{{ text }}",
+    "scrollbarSlider.background": "{{ surface2 | hexa:0.5 }}",
+    "scrollbarSlider.hoverBackground": "{{ surface2 | hexa:0.8 }}",
+    "scrollbarSlider.activeBackground": "{{ overlay | hexa:0.5 }}",
+    "list.activeSelectionBackground": "{{ surface1 }}",
+    "list.activeSelectionForeground": "{{ bright }}",
+    "list.inactiveSelectionBackground": "{{ surface0 }}",
+    "list.hoverBackground": "{{ surface0 }}",
+    "list.focusOutline": "{{ purple | hexa:0.6 }}",
+    "list.highlightForeground": "{{ purple }}",
+    "menu.background": "{{ surface0 }}",
+    "menu.foreground": "{{ text }}",
+    "menu.selectionBackground": "{{ surface1 }}",
+    "menu.selectionForeground": "{{ bright }}",
+    "menu.separatorBackground": "{{ surface1 }}",
+    "menu.border": "{{ surface1 }}",
+    "quickInput.background": "{{ surface0 }}",
+    "quickInput.foreground": "{{ text }}",
+    "quickInputList.focusBackground": "{{ surface1 }}",
+    "editor.background": "{{ base }}",
+    "editor.foreground": "{{ text }}",
+    "editorLineNumber.foreground": "{{ overlay | hexa:0.55 }}",
+    "editorLineNumber.activeForeground": "{{ subtext }}",
+    "editorCursor.foreground": "{{ yellow }}",
+    "editor.selectionBackground": "{{ purple | hexa:0.28 }}",
+    "editor.inactiveSelectionBackground": "{{ purple | hexa:0.14 }}",
+    "editor.selectionHighlightBackground": "{{ purple | hexa:0.12 }}",
+    "editor.wordHighlightBackground": "{{ surface1 }}",
+    "editor.wordHighlightStrongBackground": "{{ surface2 }}",
+    "editor.findMatchBackground": "{{ yellow | hexa:0.3 }}",
+    "editor.findMatchHighlightBackground": "{{ yellow | hexa:0.15 }}",
+    "editor.lineHighlightBackground": "{{ surface0 | hexa:0.6 }}",
+    "editor.lineHighlightBorder": "{{ crust | hexa:0 }}",
+    "editorWhitespace.foreground": "{{ surface2 }}",
+    "editorIndentGuide.background1": "{{ surface1 }}",
+    "editorIndentGuide.activeBackground1": "{{ surface2 }}",
+    "editorRuler.foreground": "{{ surface1 }}",
+    "editorBracketMatch.background": "{{ surface1 }}",
+    "editorBracketMatch.border": "{{ purple | hexa:0.6 }}",
+    "editorError.foreground": "{{ red }}",
+    "editorWarning.foreground": "{{ yellow }}",
+    "editorInfo.foreground": "{{ blue }}",
+    "editorGutter.addedBackground": "{{ green }}",
+    "editorGutter.modifiedBackground": "{{ blue }}",
+    "editorGutter.deletedBackground": "{{ red }}",
+    "editorOverviewRuler.border": "{{ crust }}",
+    "editorWidget.background": "{{ surface0 }}",
+    "editorWidget.border": "{{ surface1 }}",
+    "editorSuggestWidget.background": "{{ surface0 }}",
+    "editorSuggestWidget.border": "{{ surface1 }}",
+    "editorSuggestWidget.selectedBackground": "{{ surface1 }}",
+    "editorSuggestWidget.highlightForeground": "{{ purple }}",
+    "editorHoverWidget.background": "{{ surface0 }}",
+    "editorHoverWidget.border": "{{ surface1 }}",
+    "peekView.border": "{{ purple }}",
+    "peekViewEditor.background": "{{ mantle }}",
+    "peekViewResult.background": "{{ surface0 }}",
+    "peekViewTitle.background": "{{ surface0 }}",
+    "diffEditor.insertedTextBackground": "{{ green | hexa:0.15 }}",
+    "diffEditor.removedTextBackground": "{{ red | hexa:0.15 }}",
+    "breadcrumb.foreground": "{{ overlay }}",
+    "breadcrumb.focusForeground": "{{ text }}",
+    "titleBar.activeBackground": "{{ crust }}",
+    "titleBar.activeForeground": "{{ subtext }}",
+    "titleBar.inactiveBackground": "{{ crust }}",
+    "titleBar.inactiveForeground": "{{ overlay }}",
+    "activityBar.background": "{{ crust }}",
+    "activityBar.foreground": "{{ text }}",
+    "activityBar.inactiveForeground": "{{ overlay }}",
+    "activityBar.activeBorder": "{{ purple }}",
+    "activityBarBadge.background": "{{ purple }}",
+    "activityBarBadge.foreground": "{{ crust }}",
+    "sideBar.background": "{{ mantle }}",
+    "sideBar.foreground": "{{ subtext }}",
+    "sideBar.border": "{{ crust }}",
+    "sideBarTitle.foreground": "{{ text }}",
+    "sideBarSectionHeader.background": "{{ mantle }}",
+    "sideBarSectionHeader.foreground": "{{ text }}",
+    "editorGroupHeader.tabsBackground": "{{ mantle }}",
+    "editorGroup.border": "{{ crust }}",
+    "tab.activeBackground": "{{ base }}",
+    "tab.inactiveBackground": "{{ mantle }}",
+    "tab.activeForeground": "{{ bright }}",
+    "tab.inactiveForeground": "{{ overlay }}",
+    "tab.activeBorderTop": "{{ purple }}",
+    "tab.border": "{{ crust }}",
+    "tab.hoverBackground": "{{ surface0 }}",
+    "panel.background": "{{ mantle }}",
+    "panel.border": "{{ surface1 }}",
+    "panelTitle.activeBorder": "{{ purple }}",
+    "panelTitle.activeForeground": "{{ text }}",
+    "panelTitle.inactiveForeground": "{{ overlay }}",
+    "statusBar.background": "{{ crust }}",
+    "statusBar.foreground": "{{ subtext }}",
+    "statusBar.border": "{{ crust }}",
+    "statusBar.noFolderBackground": "{{ crust }}",
+    "statusBar.debuggingBackground": "{{ orange }}",
+    "statusBar.debuggingForeground": "{{ crust }}",
+    "statusBarItem.remoteBackground": "{{ purple }}",
+    "statusBarItem.remoteForeground": "{{ crust }}",
+    "notifications.background": "{{ surface0 }}",
+    "notifications.border": "{{ surface1 }}",
+    "notificationCenterHeader.background": "{{ mantle }}",
+    "gitDecoration.modifiedResourceForeground": "{{ blue }}",
+    "gitDecoration.untrackedResourceForeground": "{{ green }}",
+    "gitDecoration.deletedResourceForeground": "{{ red }}",
+    "gitDecoration.ignoredResourceForeground": "{{ overlay }}",
+    "gitDecoration.conflictingResourceForeground": "{{ orange }}",
+    "terminal.background": "{{ base }}",
+    "terminal.foreground": "{{ text }}",
+    "terminalCursor.foreground": "{{ yellow }}",
+    "terminal.selectionBackground": "{{ surface1 }}",
+    "terminal.ansiBlack": "{{ surface1 }}",
+    "terminal.ansiBrightBlack": "{{ overlay }}",
+    "terminal.ansiRed": "{{ red }}",
+    "terminal.ansiBrightRed": "{{ bright_red }}",
+    "terminal.ansiGreen": "{{ green }}",
+    "terminal.ansiBrightGreen": "{{ bright_green }}",
+    "terminal.ansiYellow": "{{ yellow }}",
+    "terminal.ansiBrightYellow": "{{ bright_yellow }}",
+    "terminal.ansiBlue": "{{ blue }}",
+    "terminal.ansiBrightBlue": "{{ bright_blue }}",
+    "terminal.ansiMagenta": "{{ purple }}",
+    "terminal.ansiBrightMagenta": "{{ bright_purple }}",
+    "terminal.ansiCyan": "{{ cyan }}",
+    "terminal.ansiBrightCyan": "{{ bright_cyan }}",
+    "terminal.ansiWhite": "{{ subtext }}",
+    "terminal.ansiBrightWhite": "{{ bright }}"
+  },
+  "tokenColors": [
+    {
+      "name": "Comment",
+      "scope": [
+        "comment",
+        "punctuation.definition.comment"
+      ],
+      "settings": {
+        "foreground": "{{ overlay }}",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "name": "String",
+      "scope": [
+        "string",
+        "punctuation.definition.string"
+      ],
+      "settings": {
+        "foreground": "{{ yellow }}"
+      }
+    },
+    {
+      "name": "Escape, regex",
+      "scope": [
+        "constant.character.escape",
+        "string.regexp"
+      ],
+      "settings": {
+        "foreground": "{{ pink }}"
+      }
+    },
+    {
+      "name": "Number, constant",
+      "scope": [
+        "constant.numeric",
+        "constant.language",
+        "constant.character",
+        "constant.other"
+      ],
+      "settings": {
+        "foreground": "{{ purple }}"
+      }
+    },
+    {
+      "name": "Keyword, storage, operator",
+      "scope": [
+        "keyword",
+        "storage",
+        "keyword.operator"
+      ],
+      "settings": {
+        "foreground": "{{ red }}"
+      }
+    },
+    {
+      "name": "Storage type",
+      "scope": [
+        "storage.type"
+      ],
+      "settings": {
+        "foreground": "{{ cyan }}",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "name": "Function",
+      "scope": [
+        "entity.name.function",
+        "support.function",
+        "meta.function-call",
+        "entity.name.function.decorator"
+      ],
+      "settings": {
+        "foreground": "{{ green }}"
+      }
+    },
+    {
+      "name": "Type, class",
+      "scope": [
+        "entity.name.type",
+        "entity.name.class",
+        "support.type",
+        "support.class",
+        "entity.other.inherited-class",
+        "support.constant"
+      ],
+      "settings": {
+        "foreground": "{{ cyan }}"
+      }
+    },
+    {
+      "name": "Parameter",
+      "scope": [
+        "variable.parameter"
+      ],
+      "settings": {
+        "foreground": "{{ orange }}",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "name": "this/self",
+      "scope": [
+        "variable.language"
+      ],
+      "settings": {
+        "foreground": "{{ orange }}",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "name": "Tag",
+      "scope": [
+        "entity.name.tag"
+      ],
+      "settings": {
+        "foreground": "{{ red }}"
+      }
+    },
+    {
+      "name": "Attribute",
+      "scope": [
+        "entity.other.attribute-name"
+      ],
+      "settings": {
+        "foreground": "{{ green }}"
+      }
+    },
+    {
+      "name": "Heading",
+      "scope": [
+        "markup.heading",
+        "entity.name.section"
+      ],
+      "settings": {
+        "foreground": "{{ red }}",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "Bold",
+      "scope": [
+        "markup.bold"
+      ],
+      "settings": {
+        "foreground": "{{ orange }}",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "name": "Italic",
+      "scope": [
+        "markup.italic"
+      ],
+      "settings": {
+        "foreground": "{{ purple }}",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "name": "Link",
+      "scope": [
+        "markup.underline.link",
+        "string.other.link"
+      ],
+      "settings": {
+        "foreground": "{{ blue }}"
+      }
+    },
+    {
+      "name": "Inline code",
+      "scope": [
+        "markup.inline.raw",
+        "markup.fenced_code"
+      ],
+      "settings": {
+        "foreground": "{{ cyan }}"
+      }
+    },
+    {
+      "name": "Inserted",
+      "scope": [
+        "markup.inserted"
+      ],
+      "settings": {
+        "foreground": "{{ green }}"
+      }
+    },
+    {
+      "name": "Deleted",
+      "scope": [
+        "markup.deleted"
+      ],
+      "settings": {
+        "foreground": "{{ red }}"
+      }
+    },
+    {
+      "name": "Changed",
+      "scope": [
+        "markup.changed"
+      ],
+      "settings": {
+        "foreground": "{{ blue }}"
+      }
+    },
+    {
+      "name": "Invalid",
+      "scope": [
+        "invalid",
+        "invalid.illegal"
+      ],
+      "settings": {
+        "foreground": "{{ red }}",
+        "fontStyle": "underline"
+      }
+    }
+  ],
+  "semanticTokenColors": {
+    "parameter": {
+      "foreground": "{{ orange }}",
+      "italic": true
+    },
+    "type": "{{ cyan }}",
+    "class": "{{ cyan }}",
+    "interface": "{{ cyan }}",
+    "enum": "{{ cyan }}",
+    "enumMember": "{{ purple }}",
+    "function": "{{ green }}",
+    "method": "{{ green }}",
+    "macro": "{{ pink }}",
+    "keyword": "{{ red }}",
+    "string": "{{ yellow }}",
+    "number": "{{ purple }}",
+    "regexp": "{{ pink }}",
+    "property": "{{ text }}",
+    "namespace": "{{ cyan }}",
+    "*.deprecated": {
+      "strikethrough": true
+    }
+  }
+}

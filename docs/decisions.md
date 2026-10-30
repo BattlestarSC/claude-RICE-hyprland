@@ -197,16 +197,31 @@ ColorScheme`), so no AUR Qt platform theme is required (hyprqt6engine is AUR-onl
 "Open Terminal Here" uses kitty through `~/.config/xfce4/helpers.rc` [V: exo 4.20.0 and
 libxfce4ui main source]. Details: [knowledge-base/theming.md](knowledge-base/theming.md#gtk-and-file-managers).
 
-### D23. Browsers: LibreWolf, Firefox, ungoogled-chromium, Zen (owner, 2026-10-30)
+### D23. Browsers: LibreWolf, Firefox, ungoogled-chromium (owner, 2026-10-30)
 
 "IronWolf" does not exist as a desktop browser; LibreWolf (Arch `extra`) is taken as the
 intended primary (IronFox is Android-only). Firefox: system policies (telemetry/studies off,
 sponsored and AI features off, strict tracking protection, HTTPS-only, NoScript + uBlock Origin
 auto-installed) plus a `user.js` block; LibreWolf keeps its own hardening and gets only the
-look; ungoogled-chromium (AUR, optional) gets managed policies; Zen (AUR, optional) gets the
-privacy prefs only. Palette `userChrome.css` for Firefox and LibreWolf. Details:
-[knowledge-base/browsers.md](knowledge-base/browsers.md).
-- **Revisit if:** the owner meant a different browser by "IronWolf".
+look; ungoogled-chromium (AUR, optional) gets managed policies. Palette `userChrome.css` for
+Firefox and LibreWolf. Details: [knowledge-base/browsers.md](knowledge-base/browsers.md).
+- Owner confirmed LibreWolf (2026-10-30). Zen dropped: AUR-only, and the owner asked to skip it
+  if unavailable.
+
+### D24. Terminals: kitty primary, foot secondary (owner, 2026-10-30)
+
+Both themed from the palette (same ANSI map). kitty: opaque, JetBrainsMono Nerd Font 11, purple
+cursor trail, powerline tabs, no bell sound, update checks off. foot: the light Wayland-native
+fallback, `[colors-dark]` only (foot ≥ 1.26; 1.28 rejects the old `[colors]`). Details:
+[knowledge-base/kitty.md](knowledge-base/kitty.md).
+
+### D25. Editor: Code - OSS from `extra`, telemetry and AI off, palette theme (owner, 2026-10-30)
+
+Arch's `code` package (official repo, Open VSX) rather than VSCodium (AUR). Enforced settings
+turn off telemetry, crash reports, experiments, Copilot chat/agent/inline AI, online settings
+search and update checks; preferences (theme, fonts) are defaults the user can change.
+Theme: generated local extension installed as a VSIX. Details:
+[knowledge-base/editor.md](knowledge-base/editor.md).
 
 ## Open
 

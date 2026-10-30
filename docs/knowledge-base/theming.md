@@ -15,7 +15,8 @@ colors/<palette>.toml           (source of truth; roles, not app keys)
 themes/<palette>/
   ├── hypr/colors.lua           → Hyprland: return { base = "rgba(...)", ... }
   ├── hypr/colors.conf          → hyprlang $vars for hyprlock / hypridle / hyprtoolkit
-  ├── kitty/theme.conf
+  ├── kitty/theme.conf, foot/theme.ini ([colors-dark])
+  ├── code-oss/extension/      → Code - OSS theme extension (editor.md)
   ├── zsh/theme.zsh             → syntax-highlight styles, FZF_DEFAULT_OPTS
   ├── waybar/colors.css         → @define-color ...
   ├── starship/palette.toml
