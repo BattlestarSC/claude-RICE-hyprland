@@ -65,8 +65,10 @@ preflight() {
     [[ -f "${REPO}/config/hypr/hyprland.lua" ]] || die "run install.sh from a complete checkout"
     plat_preflight
     if (( ! DRY_RUN )); then
-        info "sudo is used for pacman and the system steps; it may ask for your password now"
-        sudo -v || die "sudo does not work for $(id -un); see the README (Requirements)"
+        info "sudo is used for packages and the system steps; it may ask for your password now"
+        # Run a command rather than `sudo -v`: Ubuntu 26.04's sudo-rs refuses -v without a
+        # terminal even under NOPASSWD (found by the Ubuntu full-install CI).
+        sudo true || die "sudo does not work for $(id -un); see the README (Requirements)"
         keep_sudo_alive
     fi
 

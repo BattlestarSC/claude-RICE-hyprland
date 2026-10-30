@@ -1,0 +1,80 @@
+# Platforms: one installer, five systems
+
+Owner (2026-10-30, D43): besides Arch, set up "this GUI, as closely as is possible" on Ubuntu 26.04
+LTS, Gentoo (OpenRC and systemd; source builds, binary packages only when no source build
+exists), FreeBSD and Fedora (latest stable), in that order; extra repositories and overlays are
+allowed. Labels as in [README.md](README.md#verification-labels).
+
+## Architecture
+
+`./install.sh` is the only entry point. `lib/platform.sh` detects the system (`ID` in
+`/etc/os-release`; `uname -s` = FreeBSD; Gentoo's init from the `make.profile` link) and sources
+`lib/platform/<id>.sh`, which implements a fixed interface (listed at the top of
+`lib/platform.sh`): package manager (`plat_available`, `plat_install`, `plat_installed`),
+repositories (`plat_setup_repos`, run after the plan is accepted), things packages cannot
+provide (`plat_extras`), services and the display manager, the default JDK, and system paths
+(`GREETD_DIR`, `GREETER_USER`, `PAM_DIR`, `FIREFOX_POLICY_DIR`, `ZSH_BIN`). Package lists:
+`packages/*.txt` for Arch (historical location), `packages/<id>/*.txt` for the others, same file
+names. Everything after the packages (configuration in `$HOME`, assets, desktop defaults, system
+setup) is shared.
+
+## Why source builds
+
+The configuration is Hyprland 0.57 Lua (hard rule 1). Hyprland 0.57.0 was released 2026-10-28 and
+only Arch packages it (2026-10-30):
+
+| System | Packaged Hyprland | Source |
+| --- | --- | --- |
+| Arch | 0.57.0 | [V: full-install CI] |
+| Ubuntu 26.04.1 | 0.53.3 (universe) | [V: probe CI] |
+| Fedora | 0.55 in COPRs, none official | [S: nett00n/hyprland-copr report] |
+| FreeBSD ports | 0.56.2 | [S: FreshPorts x11-wm/hyprland] |
+| Gentoo | not in the main tree (hyproverlay); no 0.57 ebuild found | [S: Gentoo wiki, gpo.zugaina.org] |
+
+So where the packaged version is older, `lib/extras.sh` builds the stack into `/usr/local` at the
+exact commits Hyprland v0.57.0's `flake.lock` pins (`lib/pins.sh`). Hyprland 0.57 needs a C++26
+compiler, Lua 5.5, wayland-protocols >= 1.49, libinput >= 1.29, xkbcommon >= 1.11, glaze (fetched
+by its CMake if absent), muparser, re2, lcms2, libcanberra, glslang [V: Hyprland v0.57.0
+`CMakeLists.txt`].
+
+### Source builds (`lib/extras.sh`)
+
+- `extras_build "name|url|ref|system|args"`: shallow fetch of the exact ref into
+  `~/.cache/rice/src/<name>`, CMake/Meson/Cargo build as the user, install with sudo into
+  `/usr/local` (`lib` as libdir on every system), `ldconfig`, stamp
+  `/usr/local/share/rice/built/<name>` = ref. A matching stamp skips the component on re-runs.
+- Upstream release files (Neovim, tree-sitter CLI, Symbols Nerd Font, adw-gtk3) are checked
+  against SHA-256 values recorded in `lib/pins.sh` (computed 2026-10-30 from the downloads).
+- Capitaine cursors: the r4 tag has only SVG sources and a `build.sh` written for the Inkscape
+  0.x command line; `extras_capitaine` follows its recipe (specs in `src/config`, sizes 1-3x,
+  `cursor-aliases`) with `rsvg-convert` and `xcursorgen`.
+- Files other programs look for only under `/usr` (the Hyprland session entry for ReGreet,
+  XDPH's `hyprland.portal`) are copied there with the usual backup (`extras_link_into_usr`).
+
+## Ubuntu
+
+Probe of the real `ubuntu:26.04` image (26.04.1, 2026-10-30, `tests/platforms/probe-ubuntu.sh`)
+[V]:
+
+- Packaged and recent enough: everything in `packages/ubuntu/*.txt`, including all build
+  dependencies of the Hyprland stack (`liblua5.5-dev` 5.5.0, gcc 15.2, Qt 6.10 with private
+  headers, sdbus-c++ 2.2.1, libinput 1.31, xkbcommon 1.13), greetd 0.10.3, rofi 2.0, kitty 0.45,
+  foot 1.25, starship 1.22, btop, fastfetch, imv 5.0, zathura, strawberry, amberol, kasts,
+  openjdk-25-jdk, texlive-full, texstudio, texlab, Helix as `hx` 25.07.1.
+- Too old: hyprland 0.53.3 (whole stack built), wayland-protocols 1.47 (1.49 built), neovim
+  0.11.6 (0.12.3 release), tree-sitter-cli 0.25.9 (release), libreoffice 26.2 (the theme targets
+  26.8: `ppa:libreoffice/ppa`).
+- Missing: quickshell, regreet (built), satty (unused by the rice), capitaine-cursors (rendered),
+  adw-gtk3 (release), zsh-history-substring-search (copied from its tag), zathura-pdf-mupdf
+  (Poppler plugin instead: no EPUB), haskell-language-server (ghcup, per user), sbt (Coursier),
+  librewolf and codium (extrepo), Firefox/Thunderbird debs (`firefox`/`thunderbird` are snap
+  shims: `ppa:mozillateam/ppa`, pinned at 1001, Ubuntu's shims at -1).
+- Greeter user `_greetd` (Debian's greetd packaging) [TODO-verify: CI].
+
+## Tests
+
+```sh
+tests/platforms/probe-ubuntu.sh     # in ubuntu:26.04: candidate names and versions
+tests/platforms/probe-fedora.sh     # in fedora:latest
+docker run --rm -v "$PWD:/src:ro" ubuntu:26.04 bash /src/tests/installer/full-install.sh
+```

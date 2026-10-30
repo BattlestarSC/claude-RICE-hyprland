@@ -55,7 +55,7 @@ keep_sudo_alive() {
     (
         while sleep 60; do
             kill -0 "$$" 2> /dev/null || exit 0
-            sudo -n -v 2> /dev/null || exit 0
+            sudo -n -v 2> /dev/null || sudo -n true 2> /dev/null || exit 0
         done
     ) &
     SUDO_KEEPALIVE=$!
