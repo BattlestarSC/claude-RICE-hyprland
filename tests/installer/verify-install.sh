@@ -56,6 +56,20 @@ else
     fail "Hyprland ${version:-?} >= 0.57"
 fi
 
+echo "== configs in the real programs"
+# Hyprland parses the Lua config without starting a compositor (src/Compositor.cpp initServer).
+check "Hyprland accepts ~/.config/hypr/hyprland.lua" Hyprland --verify-config -c "${cfg}/hypr/hyprland.lua"
+check "Hyprland accepts the login screen's /etc/greetd/hyprland.lua" Hyprland --verify-config -c /etc/greetd/hyprland.lua
+# Neovim: first start installs the pinned plugins (vim.pack, git) and loads every module.
+nvim_out="$(timeout 300 nvim --headless '+lua vim.defer_fn(function() vim.cmd("qa!") end, 20000)' 2>&1 || true)"
+if grep -qE 'E[0-9]+:|Error|error|stack traceback' <<< "${nvim_out}"; then
+    fail "Neovim starts without errors"; printf '%s\n' "${nvim_out}" | tail -n 20 | sed 's/^/     /'
+else
+    pass "Neovim starts without errors (plugins installed)"
+fi
+check "Neovim plugins present" test -d "${data}/nvim/site/pack/core/opt/nvim-tree.lua"
+check "Helix config loads" bash -c "helix --health 2>&1 | grep -q 'Config file'"
+
 echo "== office"
 for cmd in pdflatex lualatex xelatex biber texstudio texlab libreoffice; do
     if command -v "${cmd}" > /dev/null; then pass "command ${cmd}"; else fail "command ${cmd}"; fi

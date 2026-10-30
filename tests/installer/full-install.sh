@@ -47,6 +47,18 @@ printf 'first run: %d s\n' $((SECONDS - start)) | tee /tmp/full-install-time
 section "verify"
 as_user "/home/${user}/rice/tests/installer/verify-install.sh"
 
+section "Quickshell loads the shell (Xvfb; informational)"
+# No Wayland compositor can run here, so Hyprland/Pipewire/layer-shell features are missing, but
+# QML syntax, imports and type errors in the real shell show up in its log.
+pacman -S --noconfirm --needed xorg-server-xvfb > /dev/null
+# shellcheck disable=SC2016  # expanded by the user's shell, not this one
+as_user 'export XDG_RUNTIME_DIR=$(mktemp -d) DISPLAY=:99 QT_QPA_PLATFORM=xcb
+    Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 & xpid=$!
+    sleep 2
+    timeout 25 dbus-run-session -- quickshell > /tmp/qs.log 2>&1 || true
+    kill $xpid 2> /dev/null || true' || true
+grep -E '\.qml:[0-9]+|ReferenceError|TypeError|is not a type|is not installed|Cannot assign|Type .* unavailable|failed to load|ERROR' /tmp/qs.log | sort | uniq -c | head -n 60 || echo "(no QML errors in the log)"
+
 section "install.sh --yes (second run: must change nothing)"
 as_user 'cd ~/rice && ./install.sh --yes' 2>&1 | tee /tmp/run2.log
 if ! grep -qE '^ *0 written, [0-9]+ already current, 0 backed up' /tmp/run2.log; then
