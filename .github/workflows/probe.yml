@@ -28,3 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: tests/platforms/tags.sh
+  gentoo:
+    runs-on: ubuntu-24.04
+    container: gentoo/stage3:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: tests/platforms/probe-gentoo.sh
