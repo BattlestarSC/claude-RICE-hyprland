@@ -355,7 +355,8 @@ from the palette) with `mpd-mpris` for the bar's media pill.
 
 ### O18. Screen-share window picker
 
-XDPH's default `hyprland-share-picker` (hyprland-guiutils, themed by D35), or a rofi Flight Deck
+XDPH's default `hyprland-share-picker` (shipped in hyprland-guiutils and drawn with hyprtoolkit, so
+themed by D35 [BK; TODO-verify]), or a rofi Flight Deck
 picker via `screencopy:custom_picker_binary` (must print hyprland-share-picker's stdout format
 [V: hyprland-wiki `xdg-desktop-portal-hyprland.md`]). Recommendation: the rofi picker.
 
