@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Render the glyph atlas for the ASCII sky at an exact physical cell size.
+#
+#   rice-sky-atlas CELL_W CELL_H OUT.png [FONT]
+#
+# CELL_W x CELL_H are physical pixels (logical cell size x monitor scale, e.g. 8x16 at
+# scale 1.5 -> 12x24). Glyphs are ordered by ink density; the shader indexes them that way.
+# White ink on transparent; color is applied in the shader. Needs rsvg-convert (librsvg).
+set -Eeuo pipefail
+
+w=${1:?usage: rice-sky-atlas CELL_W CELL_H OUT.png [FONT]}
+h=${2:?usage: rice-sky-atlas CELL_W CELL_H OUT.png [FONT]}
+out=${3:?usage: rice-sky-atlas CELL_W CELL_H OUT.png [FONT]}
+font=${4:-JetBrainsMono Nerd Font, JetBrains Mono, IBM Plex Mono, monospace}
+
+ramp=(' ' '.' ':' '-' '=' '+' '*' '#' '%' '@')   # keep in sync with AsciiSky.glyphs (10)
+n=${#ramp[@]}
+size=$(awk -v h="$h" 'BEGIN { printf "%.2f", h * 0.78 }')
+base=$(awk -v h="$h" 'BEGIN { printf "%.2f", h * 0.76 }')
+
+{
+  printf '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d">' "$((w * n))" "$h"
+  printf '<g font-family="%s" font-size="%s" fill="#ffffff" text-anchor="middle">' "$font" "$size"
+  for i in "${!ramp[@]}"; do
+    g=${ramp[$i]}
+    [[ $g == ' ' ]] && continue
+    printf '<text x="%s" y="%s">%s</text>' "$(awk -v i="$i" -v w="$w" 'BEGIN { printf "%.2f", (i + 0.5) * w }')" "$base" "$g"
+  done
+  printf '</g></svg>\n'
+} | rsvg-convert -o "$out"
