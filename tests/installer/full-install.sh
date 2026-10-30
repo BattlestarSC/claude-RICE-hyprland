@@ -32,7 +32,9 @@ summary() {
     local rc=$?
     section "installer warnings"
     grep -h '^  ! ' /tmp/run1.log /tmp/run2.log 2> /dev/null | sort | uniq -c || echo "(none)"
-    df -h / 2> /dev/null | tail -n 1
+    section "size"
+    grep -h '^first run:' /tmp/full-install-time 2> /dev/null || true
+    du -sxh /usr /opt /var/lib/pacman /var/cache/pacman/pkg "/home/${user}" 2> /dev/null || true
     return "${rc}"
 }
 trap summary EXIT
@@ -40,7 +42,7 @@ trap summary EXIT
 section "install.sh --yes (first run)"
 start=${SECONDS}
 as_user 'cd ~/rice && ./install.sh --yes' 2>&1 | tee /tmp/run1.log
-printf 'first run: %d s\n' $((SECONDS - start))
+printf 'first run: %d s\n' $((SECONDS - start)) | tee /tmp/full-install-time
 
 section "verify"
 as_user "/home/${user}/rice/tests/installer/verify-install.sh"

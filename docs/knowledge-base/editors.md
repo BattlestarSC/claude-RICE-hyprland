@@ -164,7 +164,7 @@ Always installed by `install.sh` (owner, 2026-10-30). Package facts from `pacman
 | Language | From pacman (`packages/languages.txt`) | From `rice-lsp-setup` (per user, `~/.local/bin`) |
 | --- | --- | --- |
 | Elixir + Erlang/OTP | `elixir` 1.20 (needs only `erlang-core`), `erlang` 29.1 (meta: observer, debugger, dialyzer, wx …) | ElixirLS |
-| Haskell | `ghc`, `cabal-install`, `haskell-language-server` | (none) |
+| Haskell | `ghc`, `ghc-static`, `cabal-install`, `haskell-language-server` | (none) |
 | SWI-Prolog | `swi-prolog` | `lsp_server` pack |
 | Fortran | `gcc-fortran`, `python-pipx` | fortls |
 | Scala | `jdk25-openjdk` (25.0.5), `sbt` (2.0.12, needs `java-runtime-headless`) | `scala`, `scalac`, `scala-cli`, Metals via Coursier |
@@ -176,6 +176,9 @@ Always installed by `install.sh` (owner, 2026-10-30). Package facts from `pacman
   recommendation ("JDK 17, 21, and 25 are all good choices") end at 25. 25 is therefore the
   newest JDK the whole toolchain supports. `install.sh` runs `archlinux-java set java-25-openjdk`
   when another JDK is the default (env name [TODO-verify: full-install CI]).
+- **`ghc-static` is required:** Arch's `ghc` has only shared libraries; without `ghc-static`,
+  `ghc Main.hs` and default `cabal build` fail with "Could not find module 'Prelude'" (found by
+  the full-install CI, 2026-10-30).
 - **Scala is not packaged** (`scala`, `scala-cli`, `metals`, `coursier`: not in the repositories
   [V: CI]). Coursier, Scala's official installer, puts them in `~/.local/bin`; its launchers run on
   the system JDK.

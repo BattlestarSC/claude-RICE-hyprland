@@ -82,6 +82,7 @@ printf 'program hello\n  print *, sum([1,2,3,4,5,6,7,8,9,10])\nend program hello
 check "gfortran compiles and runs" bash -c "cd '${work}' && gfortran -o hello-f hello.f90 && ./hello-f | grep -q 55"
 expect "Java is OpenJDK 25" 'version "25' java -version
 expect "javac is 25" "javac 25" javac -version
+expect "archlinux-java default is java-25-openjdk" "java-25-openjdk" archlinux-java get
 printf 'public class Hello { public static void main(String[] a) { System.out.println(6 * 7); } }\n' > "${work}/Hello.java"
 check "javac compiles and java runs" bash -c "cd '${work}' && javac Hello.java && java -cp . Hello | grep -qx 42"
 check "Scala runs a program" bash -c "cd '${work}' && printf '@main def hi(): Unit = println(6 * 7)\n' > hi.scala && scala run hi.scala | grep -qx 42"
