@@ -119,12 +119,45 @@ these rates, once, from singletons shared by both monitors' bars.
      cell size (12 × 24 px at scale 1.5), so glyphs are pixel-exact, never scaled.
   - Time: `services/SkyClock.qml` computes angles from `Date.now() % 86400 s` in JS doubles and
     wraps them to [0, 2π) before they reach float uniforms; periods divide a day, so the animation
-    is seamless across the wrap and identical on both monitors. 10 fps (`Config.skyFps`).
-  - Pauses: each monitor hides its sky while its active workspace has a fullscreen window; the
-    clock stops only when every view is paused.
-  - Measured (llvmpipe, CPU): 200–474 ms per 4K frame; not representative of the GPU. Real cost on
-    Navi 21 to measure with `tests/sky/render.py` on hardware [TODO-verify]. The steady cost that
-    remains on any GPU is the compositor re-compositing two 4K outputs 10 times a second.
+    is seamless across the wrap and identical on both monitors. 4 fps by default (`skyFps`).
+  - Pauses: a monitor animates only while its workspace is empty (configurable), is hidden under
+    a fullscreen window, and keeps its last frame otherwise; SkyClock's timer runs only while at
+    least one monitor animates and the sky is not paused over IPC (lock screen). See "Cost".
+  - Measured (llvmpipe, CPU): 200–474 ms per 4K frame; not representative of the GPU.
+
+### Cost (2026-10-30; estimates, not measured on the target GPU)
+
+Per 4K monitor and frame: scene pass ~28.8k cells × ~1k ALU ops ≈ 30 MFLOP; glyph pass 8.3M
+pixels × ~20 ops + 2 texture reads ≈ 170 MFLOP and a 33 MB framebuffer write; then Hyprland
+re-composites the output (reads that buffer, re-blurs the bar region). At 4 fps on two monitors:
+≈ 1.6 GFLOP/s and ≈ 0.5 GB/s of memory traffic, against ~16–23 TFLOP/s and 512 GB/s on Navi 21
+(RX 6800 / 6900 XT): well under 1 % of the GPU [arithmetic]. CPU: Quickshell sets four uniforms
+and submits a handful of draw calls per frame; Hyprland renders the frame; both sub-millisecond
+per frame [estimate]. Memory: window buffers ≈ 3 × 33 MB per 4K monitor of VRAM [estimate];
+the static image modes need the same.
+
+What actually costs: **waking the GPU 4–8 times a second** keeps it out of its deepest idle
+states. On RDNA2 with two 4K panels the memory clock is usually pinned high anyway (display
+timing needs it) [S: amd-gfx list and forum reports via search, 2024], so the increment is
+likely small; measure, don't assume:
+
+```sh
+cat /sys/class/drm/card*/device/hwmon/hwmon*/power1_average   # µW; compare animated vs still
+cat /sys/class/drm/card*/device/gpu_busy_percent
+top -p "$(pidof quickshell),$(pidof Hyprland)"                # CPU per process
+cat /sys/class/drm/card*/device/pp_dpm_mclk                    # is the memory clock pinned?
+```
+
+Controls (all in `~/.config/rice/settings.json`, live): `skyMode` `animated` | `still` | `image`,
+`skyFps` (default 4), `skyAnimateWithWindows` (default false: animate only on an empty
+workspace; otherwise the last frame stays and costs nothing), `skyLayout` `mirror` | `span`.
+IPC: `qs ipc call sky pause|resume` (hypridle uses it while locked).
+
+Why not a compiled CPU language: Zig/Rust/OCaml would have to produce the same 8.3M pixels per
+frame on the CPU (llvmpipe, i.e. JIT-compiled SIMD, needs 200–474 ms per frame here) and upload
+them. Why not a Rust *GPU* client (wgpu + layer-shell): same shaders, same compositor cost; its
+one real advantage is partial damage (only changed cells are recomposited), which Qt Quick does
+not do; not worth a second process and GPU context for a cost already under 1 %.
   - Unverified on a real Quickshell: frame callbacks while hidden, `ShaderEffectSource` with
     `hideSource` + `visible: false` inside a `PanelWindow` [TODO-verify on hardware].
   - Dev test: `tests/sky/render.py OUTDIR [--size WxH] [--dpr 1.5] [--frames N] [--span]`

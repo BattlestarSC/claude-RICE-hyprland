@@ -13,8 +13,8 @@ A complete, soft-dark, space-themed Hyprland desktop for **vanilla Arch Linux**,
 | Phase | Scope | State |
 | --- | --- | --- |
 | 0. Foundation | knowledge base, `CLAUDE.md`, README, palette + contrast tooling, launcher concepts | **done** |
-| 1. Core | `install.sh` (preflight, packages, backup, deploy), Hyprland Lua config, kitty, zsh, theme generator | **in progress**: theme generator, rofi themes, keybindings, menu script, monitor + layer rules done |
-| 2. Desktop | bar, launcher, notifications, hyprlock, hypridle, wallpaper, screenshots, clipboard | **started**: Quickshell bar (Orbit Glass) and live ASCII sky written and render-tested off-hardware; not yet run on a real Quickshell |
+| 1. Core | `install.sh` (preflight, packages, backup, deploy), Hyprland Lua config, kitty, zsh, theme generator | **in progress**: theme generator, rofi themes, keybindings, menu script, monitors, layer rules, window look (gaps, borders, rounding) done |
+| 2. Desktop | bar, launcher, notifications, hyprlock, hypridle, wallpaper, screenshots, clipboard | **started**: Quickshell bar (Orbit Glass, power button) and ASCII sky written and render-tested off-hardware, not yet run in a real Quickshell; hyprlock + hypridle configs written |
 | 3. Polish | GTK/Qt theming, cursor, theme switcher, uninstaller, CI in an Arch container | planned |
 
 ## Planned usage
@@ -39,7 +39,7 @@ What the installer will do, in order:
 7. Log everything to `~/.local/state/<rice>/install-<timestamp>.log`.
 
 Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.lua`,
-`~/.config/zsh/local.zsh`) that the installer never touches.
+`~/.config/zsh/local.zsh`, `~/.config/rice/settings.json`) that the installer never overwrites.
 
 ## Requirements
 
@@ -58,17 +58,17 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 
 | Role | Choice | Notes |
 | --- | --- | --- |
-| Compositor | Hyprland ≥ 0.57 | Lua config, split into modules |
+| Compositor | Hyprland ≥ 0.57 | Lua config, split into modules; mild gaps (6/3 px), 2 px gradient border, 6 px rounding |
 | Terminal | kitty | auto-reloads config; colors in a generated `theme.conf` |
 | Shell | zsh + starship | no framework; autosuggestions, syntax highlighting, fzf, zoxide |
-| Lock / idle | hyprlock, hypridle | |
-| Wallpaper | **live ASCII Earth + Moon** (Quickshell, two GPU shader passes, 10 fps, both monitors in sync, pauses under fullscreen) | [D15](docs/decisions.md#d15-wallpaper-live-ascii-earth-and-moon-gpu-shaders-in-quickshell-owner-2026-10-30) |
+| Lock / idle | hyprlock (themed, PAM, crash-safe session lock), hypridle | lock at 10 min, monitors off at 11 min, no auto-suspend |
+| Wallpaper | **live ASCII Earth + Moon** (Quickshell, two GPU shader passes, 4 fps, both monitors in sync; animates only on empty workspaces) · or the same scene as a still · or your own image (installer question) | [D15](docs/decisions.md#d15-wallpaper-live-ascii-earth-and-moon-gpu-shaders-in-quickshell-owner-2026-10-30) |
 | Login | greetd + ReGreet, inside Hyprland | same monitor config as the desktop; no X server |
 | Bar | Quickshell, **Orbit Glass**: CPU/memory/load, GPU, per-drive disks, network, Bluetooth, volume + output picker, media | [render](docs/bar/renders/orbit-glass.png), [D14](docs/decisions.md#d14-bar-quickshell-orbit-glass-design-owners-call-2026-10-30) |
 | Launcher + menus | rofi 2.x: **Orbit** (apps, `$mod+d`) and **Flight Deck** (all scripted menus) | [concepts](docs/launcher/concepts.html) |
 | Keybindings | i3 defaults (`$mod` = Super, `j k l ;`) | [docs/keybindings.md](docs/keybindings.md) |
 | Static art | generated from the palette (`tools/spacegen.py`), incl. an Orbiter-style ASCII scene | lock and login screens |
-| Notifications | mako (proposed) | [O5](docs/decisions.md#o5-notifications) |
+| Notifications | Quickshell notification server recommended, mako as the simple option | [O5](docs/decisions.md#o5-notifications-owner-considering-dunst-2026-10-30) |
 | Blender GPU | ROCm / HIP (`hip-runtime-amd`, `hiprt`) | opt-in |
 | Portals | xdg-desktop-portal-hyprland + -gtk | screen sharing, file picker |
 | Polkit | hyprpolkitagent | |
@@ -154,7 +154,7 @@ Dev tools need Python 3.11+ (for `tomllib`). The installer itself will need only
 
 ```sh
 python3 tools/render_theme.py colors/quasar.toml --check
-lua5.4 tests/lua/run.lua config/hypr/conf/binds.lua config/hypr/conf/monitors.lua config/hypr/conf/layers.lua
+lua5.4 tests/lua/run.lua config/hypr/conf/*.lua
 python3 tools/palette.py check colors/quasar.toml
 python3 tools/preview.py --standalone colors/proposals/round2/*.toml colors/proposals/round1/*.toml > docs/colors/preview.html
 python3 tools/launcher_preview.py --standalone colors/proposals/round2/quasar.toml > docs/launcher/concepts.html

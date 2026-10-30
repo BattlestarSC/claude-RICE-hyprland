@@ -120,17 +120,51 @@ in a Quickshell `Background` layer**, not a CPU program in any language.
 - **Shape:** pass 1 evaluates the scene once per cell (cols × rows texture: color + ink density);
   pass 2 maps density to a glyph from a font atlas rendered at the exact physical cell size.
   Earth texture from Natural Earth land polygons (public domain). Angles come from the wall clock,
-  so both monitors (and restarts) stay in phase; 10 fps; hidden when the monitor's workspace has a
+  so both monitors (and restarts) stay in phase; 4 fps (was 10, see cost controls below); hidden when the monitor's workspace has a
   fullscreen window. Earth day 6 min, clouds 5 min, Moon orbit 30 min (`common/Config.qml`).
-- **Default `skyMode: "mirror"`** (the full scene on each monitor); `"span"` treats both monitors
+- **Default `skyLayout: "mirror"`** (the full scene on each monitor); `"span"` treats both monitors
   as one canvas with the Earth across the seam. Owner to confirm.
 - **Static art** (`tools/spacegen.py`) stays for hyprlock and the login screen.
+- **Cost controls (2026-10-30, after the owner asked about overhead):** a monitor animates only
+  while its workspace has **no windows** (tiled windows cover the sky; the frame freezes and costs
+  nothing), never under fullscreen, never while the screen is locked (hypridle → `qs ipc call sky
+  pause`). Default 4 fps: the Earth's surface moves ~1.7 character cells per second at 4K, so more
+  frames mostly redraw identical characters.
+- **Three modes, chosen by an installer question** and stored in `~/.config/rice/settings.json`
+  (user-owned, live-reloaded): `animated` (default), `still` (same scene rendered once), `image`
+  (any picture, e.g. a NASA Earth photo the user supplies).
+- **Not rewriting in Rust (or any CPU language):** the per-frame work is GPU shader code, already
+  compiled to native GPU instructions by the driver; QML only sets four numbers per frame. A Rust
+  client could send partial damage (only changed cells) to the compositor, saving compositor work
+  that is already small; it would add a second process and GPU context. See bar.md, "Cost".
 
 ### D16. Color depth: 10-bit, not 12 (2026-10-30)
 
 Owner asked for 12-bit if possible. Hyprland's `bitdepth` accepts 8 or 10 only [V: wiki
 `monitors/colors.md`]; the DP 1.4 link itself would carry 4K60 at 12 bpc (~18.7 of 25.92 Gbit/s),
 so this is a compositor limit. Configured: `bitdepth = 10`, `cm = "srgb"` (`config/hypr/conf/monitors.lua`).
+
+### D17. Window look: mild gaps, mild rounding (owner, 2026-10-30)
+
+`config/hypr/conf/look.lua`: `gaps_in` 3, `gaps_out` 6, border 2 with the Orbit gradient
+(red → purple, 45°) on the active window and `surface2` on inactive ones, rounding 6, soft
+shadow, no dimming, opaque windows. Two side-by-side windows lose ~1 % of the width. The bar
+sits `gaps_out` from the screen edge (`Theme.screenGap`), so bar and windows line up.
+Smart gaps (none with a single window) are a commented option.
+
+### D18. Lock: hyprlock, themed; idle via hypridle (owner delegated the choice, 2026-10-30)
+
+hyprlock over a Quickshell lock screen: a separate, small, widely used process, so a bar bug or
+crash cannot take the lock with it. Config verified key by key against hyprlock's source.
+Idle: lock at 10 min, monitors off at 11 min, no automatic suspend. Details:
+[knowledge-base/hypr-ecosystem.md](knowledge-base/hypr-ecosystem.md#lock-screen-this-rice-confighyprhyprlockconf).
+- **Revisit if:** the owner wants the animated sky *on* the lock screen; only a Quickshell
+  `WlSessionLock` can do that (trade-off in O14).
+
+### D19. Bar power button (owner, 2026-10-30)
+
+Rightmost pill on every monitor's bar; opens the Flight Deck session menu (lock, log out,
+suspend, reboot, shut down) rather than shutting down on one click.
 
 ## Open
 
@@ -164,10 +198,13 @@ if the bar goes Quickshell. Details: [knowledge-base/launcher.md](knowledge-base
 
 </details>
 
-### O5. Notifications
+### O5. Notifications (owner considering dunst, 2026-10-30)
 
-**Recommendation: mako**; swaync if a notification center is wanted. Now that the bar is
-Quickshell (D14), a Quickshell notification server is the third option (one theme, one codebase).
+**Recommendation: Quickshell's own notification server** (`Quickshell.Services.Notifications`,
+present in v0.3.2 source: actions, images, urgency, inline reply, resident/transient): popups in
+the Orbit Glass style, a bell pill with history and do-not-disturb in the bar. Simplest robust
+alternative: **mako**. dunst works on Wayland but several of its strengths are X11-era.
+Trade-offs in the chat reply of 2026-10-30; to be recorded here once decided.
 
 ### O6. Deploy method: symlink into the repo vs copy
 
@@ -175,6 +212,20 @@ Symlinks make `git pull` an instant update and keep one source of truth, but bre
 is moved or deleted. Copy is robust but makes updates explicit. **Blocked on** verifying that
 Hyprland's config watcher reacts to edits through symlinks ([knowledge-base/hyprland.md](knowledge-base/hyprland.md)).
 Leaning symlink, with the installer recording the repo path and warning if it moves.
+
+### O14. Screensaver (anti burn-in)
+
+Recommendation: hypridle at 5 min starts a **Quickshell overlay** that shows the ASCII sky
+full-screen in a drifting variant; any input dismisses it; lock follows at 10 min, DPMS off at
+11 min. Alternative: a full-screen kitty running a terminal animation. Note: a screensaver
+cannot run *behind* the lock screen (session lock draws only the locker), so after locking the
+monitors should go dark soon. Depends on the panel type (IPS vs OLED; O12).
+
+### O15. File manager
+
+Recommendation pending owner choice: Thunar (GTK3, light) or Nemo (GTK3, dual pane), themed with
+adw-gtk3 + generated `gtk.css` color overrides (same file serves libadwaita apps); Dolphin if
+KIO/power features matter more than dependencies. Details in the chat reply of 2026-10-30.
 
 ### O9. Scope beyond Hyprland + kitty + zsh for v1
 
@@ -186,6 +237,7 @@ neovim/btop/fastfetch themes, Blender UI theme from the palette.
 
 Answered: GPU RX 6000 / Navi 21 (gfx1030), 16 GB; KVM Level1Techs dual-monitor DisplayPort 1.4
 (two links per PC, no EDID emulation). Still open: exact ProArt model (true 10-bit or 8-bit+FRC,
-native gamut, refresh); it decides `cm` (see D16) and whether 10-bit stays on.
+native gamut, refresh, **IPS or OLED**); it decides `cm` (see D16), whether 10-bit stays on, and
+how aggressive burn-in protection must be (O14).
 
 Closed: O1 → D10, O2 → D7, O3 → D14, O4 → D12, O7 → D8, O8 → D13, O10 → D13, O11 → D11.

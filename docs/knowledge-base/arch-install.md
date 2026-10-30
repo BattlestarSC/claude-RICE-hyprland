@@ -80,6 +80,22 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | Fonts / icons / cursor | `ttf-jetbrains-mono-nerd`, `ttf-ibm-plex` (bar text) [BK], `ttf-nerd-fonts-symbols` (bar icons) [BK], `noto-fonts`, `noto-fonts-emoji`, `papirus-icon-theme`, a cursor theme (TBD; many are AUR-only) |
 | Network (only if none present) | `networkmanager`, `network-manager-applet` |
 
+## Installer questions (beyond packages)
+
+| Question | Choices | Stored in |
+| --- | --- | --- |
+| Wallpaper | animated ASCII Earth/Moon (default) · still ASCII (no animation, zero cost) · your own image (path; e.g. a NASA Earth photo) | `~/.config/rice/settings.json` (`skyMode`, `skyImage`), written only if the file does not exist |
+| Wallpaper layout (two monitors) | mirror (default) · span | same file (`skyLayout`) |
+
+NASA imagery is generally not copyrighted [S: search summary of NASA's media guidelines;
+nasa.gov unreachable from the build environment], but the installer does not download it by
+default (rule 4: no non-repo downloads on the default path); it asks for a local path.
+
+Deploy-time requirements found while writing configs: `~/.config/hypr/theme/colors.conf` must
+exist before hyprlock/hypridle run (they `source` it); `~/.local/share/rice/lock.png` is rendered
+from the generated ASCII art (falls back to a solid color if absent); `hypridle` must not be
+started before `hyprlock.conf` is in place.
+
 ## Starting the session
 
 | Method | Pros | Cons |

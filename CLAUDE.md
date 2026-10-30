@@ -18,11 +18,13 @@ Visual goal: a soft dark, space-themed palette with Monokai-style accents and me
 
 Phase 1 started. Decided: palette Quasar (`colors/quasar.toml`), i3 default keymap, rofi with the
 Orbit (apps) and Flight Deck (menus) themes, greetd + ReGreet login, Quickshell bar (Orbit Glass),
-live ASCII Earth/Moon wallpaper on GPU shaders, 10-bit output. Present beyond docs: theme
-generator + templates, generated `themes/quasar/`, `config/rofi/`, `config/quickshell/` (bar,
-services, sky), `config/hypr/conf/{binds,monitors,layers}.lua`, `bin/rice-menu`, `bin/rice-sky-atlas`,
-tests. **Not yet present:** `install.sh`, the rest of the Hyprland config (entry point, look,
-window rules, autostart), kitty, zsh, lock/idle, greeter files. Quickshell code is render-tested
+live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-user
+`~/.config/rice/settings.json`), 10-bit output, mild gaps + rounding, hyprlock + hypridle.
+Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
+`config/quickshell/` (bar, services, sky), `config/hypr/conf/{binds,monitors,layers,look,session}.lua`,
+`config/hypr/{hyprlock,hypridle}.conf`, `bin/rice-menu`, `bin/rice-sky-atlas`, tests.
+**Not yet present:** `install.sh`, the Hyprland entry point, window rules, autostart, kitty, zsh,
+greeter files, notifications, screensaver. Quickshell code is render-tested
 with PySide6 and mocks but has **never run inside Quickshell**; treat `Bar.qml`, `Wallpaper.qml`,
 `shell.qml` and `services/` as unverified. Decided and open questions are in
 [docs/decisions.md](docs/decisions.md). Do not guess answers to open decisions in code; ask the
@@ -94,7 +96,8 @@ docs/                       knowledge-base/, colors/, decisions.md
 ```sh
 python3 tools/render_theme.py colors/quasar.toml           # templates/ -> themes/quasar/
 python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed themes are stale
-lua5.4 tests/lua/run.lua config/hypr/conf/*.lua            # dispatcher names, modifiers, duplicate keys
+lua5.4 tests/lua/run.lua config/hypr/conf/*.lua            # dispatchers, modifiers, duplicate keys, hl.config option names
+python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
 shellcheck -x bin/rice-menu bin/rice-sky-atlas tests/rofi-render.sh
 # Quickshell (needs PySide6 + PySide6-Addons, an X server or Xvfb, IBM Plex + Symbols Nerd Font):
 python3 tests/quickshell/render.py /tmp/bar.png --background frame.png   # real bar QML + mocks; fails on any QML warning
@@ -172,5 +175,10 @@ in an `archlinux:latest` container or on hardware.
 - QML colors with alpha are `#AARRGGBB` (template filter `qcolor`), not `#RRGGBBAA`.
 - Sky shaders take angles pre-wrapped to [0, 2π) from JS doubles; never pass raw time into a float uniform.
 - Mocks in `tests/quickshell/mocks/` must keep the same interface as `config/quickshell/services/`.
+- hyprlock: a *missing* config leaves the session unlocked, but config *errors* are only logged.
+  Check new keys against `src/config/ConfigManager.cpp` (`addConfigValue`/`addSpecialConfigValue`).
+- hypridle/hyprlock `source` `~/.config/hypr/theme/colors.conf`; deploy it first.
+- The wallpaper must stay cheap: anything that changes AsciiSky properties every frame on a
+  frozen monitor defeats the freeze (Wallpaper.qml copies angles only while `animating`).
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.

@@ -46,6 +46,27 @@ general {                          # categories are braces
 
 [V: hyprland-wiki `hypr-ecosystem/user/hyprlock.md`, 2026-10-29]
 
+### Lock screen (this rice: `config/hypr/hyprlock.conf`)
+
+Read from hyprlock's source at `a9e26af` (2026-10-29) unless noted. [V: source]
+- **Config errors are not fatal**: hyprlang errors are logged ("Proceeding ignoring faulty
+  entries") and the lock still starts. Only a *missing* file is fatal (wiki).
+- `~` in `path` is expanded (`absolutePath`). A background image that is missing or fails to load
+  becomes an invalid texture and the widget draws `color` instead; locking is unaffected.
+- Outputs are bound from registry globals as they appear and dropped on removal, so a KVM
+  switch back adds lock surfaces for the returning monitors [behavior on hardware: TODO-verify].
+- `animation = fadeIn, 0` is accepted (on/off 0 disables). Every key in our file was checked
+  against `addConfigValue` / `addSpecialConfigValue` in `src/config/ConfigManager.cpp`.
+- PAM service `hyprlock`; Arch's `pambase` faillock: 3 failures → 10 min lockout (wiki).
+- Security properties come from `ext-session-lock-v1`: while locked only lock surfaces are drawn
+  (windows, notifications and the bar are not), and if the locker dies the session stays locked
+  behind the red "lockdead" screen. `misc.allow_session_lock_restore = true`
+  (`config/hypr/conf/session.lua`) lets a new hyprlock take over from a TTY:
+  `hyprctl --instance 0 eval 'hl.exec_cmd("hyprlock")'` [V: wiki `--instance` + `eval` usage].
+- Design: still ASCII sky (`~/.local/share/rice/lock.png`, rendered by the installer) dimmed by a
+  full-screen `$crust` shape at 45 %, mono clock, date, password field with the Orbit frame
+  (red → purple), yellow while checking, orange on Caps Lock, PAM failure text with attempt count.
+
 ## hypridle
 
 Upstream-recommended structure [V: hyprland-wiki `hypridle.md`, 2026-10-29]:
@@ -71,6 +92,10 @@ Design points:
 - Video players hold Wayland idle inhibitors; this pauses **all** listeners.
 - Lid handling belongs to logind (`HandleLidSwitch`), not Hyprland.
 - Note the **new `hyprctl dispatch` Lua syntax** in the dpms commands.
+- Hooks used here: `on_lock_cmd` / `on_unlock_cmd` (fire when a session-lock client locks or
+  unlocks) pause and resume the animated wallpaper over Quickshell IPC.
+- This rice (`config/hypr/hypridle.conf`): lock at 10 min, DPMS off at 11 min, **no automatic
+  suspend** (Blender renders do not inhibit idle). The screensaver slot at 5 min is pending (O14).
 
 ## hyprpaper
 
