@@ -1,0 +1,30 @@
+# Language overrides for the rice, merged by Helix over its built-in languages.toml (by language
+# name; a key set here replaces the built-in value). Deployed to ~/.config/helix/languages.toml.
+# Helix 25.07 already defines grammars and servers for every target language: elixir/heex/eex
+# (elixir-ls), haskell (haskell-language-server-wrapper), prolog (swipl), scala (metals),
+# ocaml/ocaml-interface (ocamllsp), fortran (fortls). Install the servers with rice-lsp-setup.
+
+# `.pl` is claimed by both prolog and perl; the later definition (perl) wins, so Helix opens
+# SWI-Prolog files as Perl. The rice gives `.pl` to Prolog: perl keeps every other extension
+# (the built-in list minus "pl"); a Perl script with a `#!/usr/bin/perl` shebang but no
+# extension is still detected as Perl.
+[[language]]
+name = "perl"
+file-types = ["pm", "t", "psgi", "raku", "rakumod", "rakutest", "rakudoc", "nqp", "p6", "pl6", "pm6"]
+
+# Prefer Expert (the official Elixir language server) when it is installed; Helix tries
+# the servers in order and uses every one that starts, so list only one of them.
+# Uncomment to switch:
+# [[language]]
+# name = "elixir"
+# language-servers = ["expert"]
+#
+# [language-server.expert]
+# command = "expert"
+# args = ["--stdio"]
+
+# Fortran: Helix's file-types lack the 2008 and 2018 extensions and the preprocessed upper-case
+# forms; fortls and the tree-sitter grammar handle all of them.
+[[language]]
+name = "fortran"
+file-types = ["f", "for", "f90", "f95", "f03", "f08", "f18", "F", "F90", "F95", "F03", "F08"]

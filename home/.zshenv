@@ -5,3 +5,7 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 typeset -U path PATH
 path=("$HOME/.local/bin" $path)
+# Default editor: Neovim if installed, unless something else already chose one.
+if [[ -z "${EDITOR:-}" ]] && (( $+commands[nvim] )); then
+    export EDITOR=nvim VISUAL=nvim
+fi

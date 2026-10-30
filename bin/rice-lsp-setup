@@ -1,0 +1,241 @@
+#!/usr/bin/env bash
+# rice-lsp-setup: install, per user, the language servers that are not in Arch's official repos,
+# for Neovim, Helix and vis. Nothing runs as root and nothing goes outside your home directory.
+#
+#   rice-lsp-setup                 show what is installed and what is missing (changes nothing)
+#   rice-lsp-setup LANG...         install the user-level parts for these languages
+#   rice-lsp-setup -n LANG...      dry run: print the commands instead of running them
+#
+# LANG: elixir haskell prolog scala ocaml fortran vis-lspc, or all.
+#
+#   language  server                 comes from                        lands in
+#   elixir    ElixirLS v0.31.1       GitHub release zip                ~/.local/share/rice/elixir-ls
+#   haskell   haskell-language-server pacman (checked only)            /usr/bin
+#   prolog    lsp_server pack         swipl pack install               SWI-Prolog's user pack dir
+#   scala     Metals                  Coursier (cs, downloaded if absent) ~/.local/bin
+#   ocaml     ocaml-lsp-server        opam (current switch)            ~/.opam; wrapper in ~/.local/bin
+#   fortran   fortls                  pipx (PyPI)                      ~/.local/bin
+#   vis-lspc  vis LSP plugin @9d0f7a0 git (gitlab.com/muhq/vis-lspc)   ~/.config/vis/plugins
+#
+# These come from GitHub, Maven Central, opam and PyPI, not from Arch: that is why this is a
+# separate, opt-in step (docs/knowledge-base/editors.md). Compilers and runtimes come from pacman;
+# missing ones are reported with the pacman command to run.
+set -Eeuo pipefail
+
+readonly elixir_ls_version='0.31.1'
+readonly vis_lspc_url='https://gitlab.com/muhq/vis-lspc.git'
+readonly vis_lspc_rev='9d0f7a0'
+readonly coursier_url='https://github.com/coursier/launchers/raw/master/cs-x86_64-pc-linux.gz'
+
+data_dir="${XDG_DATA_HOME:-${HOME}/.local/share}/rice"
+bin_dir="${HOME}/.local/bin"
+vis_plugins="${XDG_CONFIG_HOME:-${HOME}/.config}/vis/plugins"
+dry_run=0
+
+die() { printf 'rice-lsp-setup: %s\n' "$*" >&2; exit 1; }
+say() { printf '  %s\n' "$*"; }
+have() { command -v "$1" > /dev/null 2>&1; }
+
+# Run a command, or print it in dry-run mode.
+run() {
+    if (( dry_run )); then
+        printf '  would run:'; printf ' %q' "$@"; printf '\n'
+    else
+        "$@"
+    fi
+}
+
+need() {
+    local cmd="$1" pkg="$2"
+    have "${cmd}" && return 0
+    say "missing ${cmd}: sudo pacman -S --needed ${pkg}"
+    return 1
+}
+
+prolog_pack_ok() {
+    have swipl && swipl -g 'use_module(library(lsp_server))' -t halt > /dev/null 2>&1
+}
+
+status_line() {
+    local lang="$1" ok="$2" detail="$3"
+    if [[ "${ok}" == yes ]]; then
+        printf '  %-9s ok       %s\n' "${lang}" "${detail}"
+    else
+        printf '  %-9s missing  %s\n' "${lang}" "${detail}"
+    fi
+}
+
+show_status() {
+    printf 'Language servers (rice-lsp-setup LANG installs the missing user-level parts):\n'
+    status_line elixir "$(have elixir-ls && echo yes || echo no)" 'elixir-ls (needs elixir from pacman)'
+    status_line haskell "$(have haskell-language-server-wrapper && echo yes || echo no)" \
+        'haskell-language-server-wrapper (pacman: haskell-language-server ghc)'
+    status_line prolog "$(prolog_pack_ok && echo yes || echo no)" 'swipl + lsp_server pack (pacman: swi-prolog)'
+    status_line scala "$(have metals && echo yes || echo no)" 'metals (needs a JDK from pacman)'
+    status_line ocaml "$(have ocamllsp && echo yes || echo no)" 'ocamllsp (pacman: opam ocaml)'
+    status_line fortran "$(have fortls && echo yes || echo no)" 'fortls (pacman: python-pipx gcc-fortran)'
+    status_line vis-lspc "$([[ -f "${vis_plugins}/vis-lspc/init.lua" ]] && echo yes || echo no)" \
+        "${vis_plugins}/vis-lspc"
+    case ":${PATH}:" in
+        *":${bin_dir}:"*) ;;
+        *) printf '\n  note: %s is not on PATH; the editors will not find servers installed there.\n' "${bin_dir}" ;;
+    esac
+}
+
+setup_elixir() {
+    need elixir elixir || return 1
+    local dest="${data_dir}/elixir-ls/${elixir_ls_version}" tmp
+    local url="https://github.com/elixir-lsp/elixir-ls/releases/download/v${elixir_ls_version}/elixir-ls-v${elixir_ls_version}.zip"
+    if [[ -x "${dest}/language_server.sh" ]]; then
+        say "ElixirLS ${elixir_ls_version} already in ${dest}"
+    else
+        tmp="$(mktemp -d)"
+        # shellcheck disable=SC2064  # expand now: the trap must remove this run's directory
+        trap "rm -rf -- '${tmp}'" RETURN
+        run curl -fL --proto '=https' --tlsv1.2 -o "${tmp}/elixir-ls.zip" "${url}"
+        run mkdir -p -- "${dest}"
+        run bsdtar -xf "${tmp}/elixir-ls.zip" -C "${dest}"
+        run chmod +x -- "${dest}/language_server.sh" "${dest}/launch.sh"
+    fi
+    # language_server.sh resolves its own symlink, so a link in ~/.local/bin is enough.
+    run mkdir -p -- "${bin_dir}"
+    run ln -sfn -- "${dest}/language_server.sh" "${bin_dir}/elixir-ls"
+    say "elixir-ls -> ${dest}/language_server.sh (first start fetches its deps from Hex)"
+}
+
+setup_haskell() {
+    local ok=0
+    need ghc ghc || ok=1
+    need haskell-language-server-wrapper haskell-language-server || ok=1
+    (( ok == 0 )) && say "haskell-language-server: installed (Arch's build matches Arch's ghc only)"
+    return "${ok}"
+}
+
+setup_prolog() {
+    need swipl swi-prolog || return 1
+    if prolog_pack_ok; then
+        say "lsp_server pack already installed"
+    else
+        run swipl pack install -y lsp_server
+    fi
+}
+
+setup_scala() {
+    need java jdk-openjdk || return 1
+    local cs
+    if have cs; then
+        cs=cs
+    elif have coursier; then
+        cs=coursier
+    else
+        cs="${data_dir}/coursier/cs"
+        if [[ ! -x "${cs}" ]]; then
+            run mkdir -p -- "${data_dir}/coursier"
+            if (( dry_run )); then
+                say "would run: curl -fL ${coursier_url} | gzip -d > ${cs}"
+            else
+                curl -fL --proto '=https' --tlsv1.2 "${coursier_url}" | gzip -d > "${cs}.part"
+                mv -- "${cs}.part" "${cs}"
+            fi
+            run chmod +x -- "${cs}"
+        fi
+    fi
+    run mkdir -p -- "${bin_dir}"
+    run "${cs}" install --install-dir "${bin_dir}" metals
+}
+
+setup_ocaml() {
+    need opam opam || return 1
+    if [[ ! -d "${OPAMROOT:-${HOME}/.opam}" ]]; then
+        say "opam is not initialised. Run it yourself first (it asks before touching your shell):"
+        say "  opam init"
+        return 1
+    fi
+    run opam install -y ocaml-lsp-server
+    # ocamllsp must run inside the opam switch (it calls dune, ocamlfind...): a wrapper on PATH
+    # enters the current switch first. The guard variable stops a loop when the switch lacks it.
+    if (( dry_run )); then
+        say "would write ${bin_dir}/ocamllsp (runs: opam exec -- ocamllsp)"
+        return 0
+    fi
+    mkdir -p -- "${bin_dir}"
+    if [[ -e "${bin_dir}/ocamllsp" ]] && ! grep -q 'rice-lsp-setup' "${bin_dir}/ocamllsp"; then
+        say "${bin_dir}/ocamllsp exists and is not ours; left unchanged"
+        return 0
+    fi
+    cat > "${bin_dir}/ocamllsp" <<'EOF'
+#!/bin/sh
+# Written by rice-lsp-setup: run ocaml-lsp-server inside the current opam switch.
+if [ -n "${RICE_OCAMLLSP:-}" ]; then
+    echo "ocamllsp: not installed in the current opam switch (opam install ocaml-lsp-server)" >&2
+    exit 1
+fi
+export RICE_OCAMLLSP=1
+exec opam exec -- ocamllsp "$@"
+EOF
+    chmod +x -- "${bin_dir}/ocamllsp"
+    say "ocamllsp wrapper: ${bin_dir}/ocamllsp"
+}
+
+setup_fortran() {
+    need pipx python-pipx || return 1
+    need gfortran gcc-fortran || say "(fortls works without a compiler; you need it to build)"
+    if have fortls; then
+        run pipx upgrade fortls
+    else
+        run pipx install fortls
+    fi
+}
+
+setup_vis_lspc() {
+    need git git || return 1
+    local dest="${vis_plugins}/vis-lspc"
+    if [[ -d "${dest}/.git" ]]; then
+        run git -C "${dest}" fetch --quiet origin
+    elif [[ -e "${dest}" ]]; then
+        say "${dest} exists and is not a git checkout; left unchanged"
+        return 1
+    else
+        run mkdir -p -- "${vis_plugins}"
+        run git clone --quiet "${vis_lspc_url}" "${dest}"
+    fi
+    run git -C "${dest}" -c advice.detachedHead=false checkout --quiet "${vis_lspc_rev}"
+    say "vis-lspc ${vis_lspc_rev} in ${dest} (visrc.lua loads it)"
+}
+
+main() {
+    (( EUID != 0 )) || die "run as your user, not root"
+    if [[ "${1:-}" == -n || "${1:-}" == --dry-run ]]; then
+        dry_run=1
+        shift
+    fi
+    if (( $# == 0 )); then
+        show_status
+        return 0
+    fi
+    local langs=("$@") lang rc failed=()
+    [[ "${langs[*]}" == all ]] && langs=(elixir haskell prolog scala ocaml fortran vis-lspc)
+    for lang in "${langs[@]}"; do
+        case "${lang}" in
+            elixir | haskell | prolog | scala | ocaml | fortran) ;;
+            vis-lspc) lang=vis_lspc ;;
+            -h | --help) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'; return 0 ;;
+            *) die "unknown language: ${lang} (see rice-lsp-setup --help)" ;;
+        esac
+        printf '%s\n' "${lang/_/-}:"
+        # errexit is suspended inside a function called as `f || ...`, so run each step in its
+        # own subshell with errexit on: the first failing command ends that step.
+        set +e
+        ( set -e; "setup_${lang}" )
+        rc=$?
+        (( rc == 0 )) || failed+=("${lang/_/-}")
+        set -e
+    done
+    if (( ${#failed[@]} )); then
+        printf '\nNot done: %s (see the messages above).\n' "${failed[*]}"
+        return 1
+    fi
+    (( dry_run )) || printf '\nDone. Restart the editor; :checkhealth vim.lsp (Neovim) or helix --health LANG (hx --health on other distros) shows the result.\n'
+}
+
+main "$@"

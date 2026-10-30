@@ -18,3 +18,6 @@ fi
 if [[ -r /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
     check 'Up = substring search' '[[ "$(bindkey "^[[A")" == *history-substring-search-up* ]]'
 fi
+if (( $+commands[nvim] )); then
+    check 'EDITOR = nvim'        '[[ "$EDITOR" == nvim && "$VISUAL" == nvim ]]'
+fi

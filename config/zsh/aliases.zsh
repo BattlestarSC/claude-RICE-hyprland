@@ -12,3 +12,7 @@ fi
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip -color=auto'
+# Arch installs Helix as `helix` (`hx` belongs to the hex package); keep the upstream name too.
+if (( ! $+commands[hx] && $+commands[helix] )); then
+    alias hx='helix'
+fi

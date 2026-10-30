@@ -21,11 +21,13 @@ Orbit (apps) and Flight Deck (menus) themes, greetd + ReGreet login, Quickshell 
 live ASCII Earth/Moon wallpaper on GPU shaders (animated / still / image, per-user
 `~/.config/rice/settings.json`), 10-bit output, mild gaps + rounding, hyprlock + hypridle,
 Quickshell notifications, ASCII screensaver, Thunar + Dolphin, LibreWolf/Firefox (+ optional
-ungoogled-chromium) with privacy policies, kitty + foot, Code - OSS (telemetry and AI off).
+ungoogled-chromium) with privacy policies, kitty + foot, Code - OSS (telemetry and AI off),
+Neovim (primary) + vis + Helix with LSPs for Elixir/Haskell/SWI-Prolog/Scala/OCaml/Fortran.
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
 `config/quickshell/` (bar, services, sky), `config/hypr/conf/{binds,monitors,layers,look,session}.lua`,
-`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,kitty,foot,code-oss}/`,
-`bin/rice-menu`, `bin/rice-sky-atlas`, `bin/rice-browser-setup`, `bin/rice-code-setup`, tests.
+`config/hypr/{hyprlock,hypridle}.conf`, `config/{gtk-3.0,gtk-4.0,xfce4,browsers,kitty,foot,code-oss,nvim,helix,vis}/`,
+`bin/rice-menu`, `bin/rice-sky-atlas`, `bin/rice-browser-setup`, `bin/rice-code-setup`,
+`bin/rice-lsp-setup`, tests.
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
 **Not yet present:** `install.sh`, the Hyprland entry point, window rules, autostart,
 greeter files. Quickshell code is render-tested
@@ -55,6 +57,7 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | GTK/Qt app theming, file managers | [docs/knowledge-base/theming.md](docs/knowledge-base/theming.md) |
 | Browsers (policies, prefs, userChrome) | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
 | Code - OSS (settings, theme extension) | [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) |
+| Neovim / Helix / vis, language servers | [docs/knowledge-base/editors.md](docs/knowledge-base/editors.md) |
 | Keybindings | [docs/keybindings.md](docs/keybindings.md) |
 
 ## Hard rules
@@ -105,10 +108,12 @@ python3 tools/render_theme.py colors/quasar.toml           # templates/ -> theme
 python3 tools/render_theme.py colors/quasar.toml --check   # fails if committed themes are stale
 lua5.4 tests/lua/run.lua config/hypr/conf/*.lua            # dispatchers, modifiers, duplicate keys, hl.config option names
 python3 tests/lua/gen_options.py <hyprland-wiki checkout> > tests/lua/options.lua   # refresh valid option names
-shellcheck -x bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup tests/rofi-render.sh tests/zsh/run.sh
+shellcheck -x bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup bin/rice-code-setup bin/rice-lsp-setup tests/rofi-render.sh tests/zsh/run.sh
 python3 tests/terminals/check_kitty.py <kitty checkout>/kitty/options/definition.py   # kitty keys
 python3 tests/vscode/check_theme.py <vscode checkout>            # theme colors + settings (see docstring)
 python3 tests/prompt/check_starship.py <starship v1.25.1 checkout>   # starship options, palette names
+python3 tests/nvim/check_colorscheme.py <neovim v0.12.3 checkout>     # every tree-sitter capture + @lsp.type.* defined
+python3 tests/editors/check_helix.py <helix 25.07.1 checkout>         # config keys, theme scopes, languages.toml
 tests/zsh/run.sh                                           # loads the zsh config in real zsh; needs zsh (+ plugins)
 python3 tests/browsers/check_policies.py <policy-templates checkout> <chromium policies.yaml>   # see its docstring
 # Quickshell (needs PySide6 + PySide6-Addons, an X server or Xvfb, IBM Plex + Symbols Nerd Font):
@@ -209,5 +214,12 @@ in an `archlinux:latest` container or on hardware.
 - starship's directory segment ends differently inside git work trees (`repo_root_format`); if you
   touch the directory or git modules, keep the arrow hand-over intact (zsh.md#prompt-starship).
 - The starship config is fully generated (one file, inline palette): edit the template.
+- Neovim plugins are pinned commits in `config/nvim/lua/rice/plugins.lua` (`vim.pack`, 0.12 only).
+  nvim-treesitter is the **main** branch: no `require('nvim-treesitter.configs').setup`, needs
+  `tree-sitter-cli` ≥ 0.26.1 + a C compiler. Most nvim-treesitter examples online are `master`.
+- `.pl` is Prolog in all three editors, and each needs its own override (Neovim `g:filetype_pl`;
+  Helix: perl's `file-types` minus `pl`; vis: ftdetect tables). Keep them in sync.
+- Helix rejects unknown `[editor]` keys and silently falls back to defaults; Arch's binary is
+  `helix`, not `hx`.
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.

@@ -61,6 +61,7 @@ Re-running is safe. Your own tweaks go in override files (`~/.config/hypr/local.
 | Compositor | Hyprland ≥ 0.57 | Lua config, split into modules; mild gaps (6/3 px), 2 px gradient border, 6 px rounding |
 | Terminal | **kitty** (primary), **foot** (secondary) | JetBrains Mono with ligatures + Nerd Font icons; both themed from the palette |
 | Editor | **Code - OSS** (`code`, open-source VS Code) | telemetry, experiments and AI features off; palette theme | 
+| Terminal editors | **Neovim** (primary), **vis** (secondary), **Helix** | tree-sitter/lexer highlighting and LSP for Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran; palette themes; servers outside Arch's repos via opt-in `rice-lsp-setup` |
 | Shell | zsh + **starship** two-line rainbow prompt | full git status, exit code with signal name, meaning and pipeline status; fish-style Tab menu, autosuggestions, syntax highlighting, Up/Down history search, fzf, zoxide |
 | Lock / idle | hyprlock (themed, PAM, crash-safe session lock), hypridle | lock at 10 min, monitors off at 11 min, no auto-suspend |
 | Wallpaper | **live ASCII Earth + Moon** (Quickshell, two GPU shader passes, 4 fps, both monitors in sync; animates only on empty workspaces) · or the same scene as a still · or your own image (installer question) | [D15](docs/decisions.md#d15-wallpaper-live-ascii-earth-and-moon-gpu-shaders-in-quickshell-owner-2026-10-30) |
@@ -116,6 +117,7 @@ bin/rice-menu             scripted menus (session, clipboard, windows, keys, scr
 bin/rice-sky-atlas        renders the ASCII sky's glyph atlas at a monitor's exact cell size
 bin/rice-browser-setup    applies browser prefs and palette to every Firefox/LibreWolf profile
 bin/rice-code-setup       installs the Code - OSS theme, merges the privacy settings
+bin/rice-lsp-setup        opt-in, per user: language servers not in Arch's repos (ElixirLS, Metals, ocamllsp, fortls), vis-lspc
 colors/
 ├── quasar.toml           the palette: single source of truth for every app theme
 └── proposals/            design history (round 1 palettes, round 2 Quasar)
@@ -126,7 +128,7 @@ docs/
 ├── colors/               proposals.md, preview.html (generated, includes the blend dial)
 ├── launcher/             concepts.html (generated rofi launcher concepts)
 ├── decisions.md          decided architecture + open questions
-└── knowledge-base/       verified notes: Hyprland 0.57 Lua, hypr tools, Arch, hardware/KVM, rofi, kitty, zsh, theming
+└── knowledge-base/       verified notes: Hyprland 0.57 Lua, hypr tools, Arch, hardware/KVM, rofi, kitty, zsh, editors, theming
 tools/                    dev only (Python 3.11+); the installer never uses these
 ├── palette.py            color math, WCAG + APCA contrast rules, reports
 ├── blend.py              OKLCH blend of two palettes, normalized to the rules
@@ -139,7 +141,8 @@ tests/                    rofi-render.sh (real rofi screenshots), lua/ (Hyprland
                           quickshell/ (bar render, mock services), sky/ (ASCII sky frames + timing),
                           browsers/ (policy names checked against Mozilla's and Chromium's sources),
                           terminals/ (kitty keys), vscode/ (theme colors and settings vs VS Code),
-                          prompt/ (starship options vs its source), zsh/ (loads the config in real zsh)
+                          prompt/ (starship options vs its source), zsh/ (loads the config in real zsh),
+                          nvim/ (colorscheme vs Neovim's highlight groups), editors/ (Helix config, theme, languages)
 ```
 
 The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout-target-create-directories-as-phases-need-them).
@@ -158,6 +161,7 @@ The target layout for later phases is in [CLAUDE.md](CLAUDE.md#repository-layout
 | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) | Quickshell bar, notifications, ASCII sky and screensaver: structure, data sources, tests |
 | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) | browser privacy settings and theming, and where each browser reads them |
 | [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) | Code - OSS: telemetry/AI settings and the generated theme |
+| [docs/knowledge-base/editors.md](docs/knowledge-base/editors.md) | Neovim, Helix, vis: highlighting and language servers per language |
 
 ## Development
 

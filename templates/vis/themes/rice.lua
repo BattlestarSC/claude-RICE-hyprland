@@ -1,0 +1,80 @@
+-- {{ name }} for vis. Deployed to ~/.config/vis/themes/rice.lua; visrc.lua selects it with
+-- `set theme rice`. vis styles every token tag through lexers.STYLE_<TAG> (dots become
+-- underscores); attributes are bold, italics, underlined, reverse, dim, blink, keep_attribute.
+-- Same role mapping as the Neovim and Helix themes (docs/colors/proposals.md).
+local lexers = vis.lexers
+
+local c = {
+    crust = '{{ crust }}', mantle = '{{ mantle }}', base = '{{ base }}',
+    surface0 = '{{ surface0 }}', surface1 = '{{ surface1 }}', surface2 = '{{ surface2 }}',
+    overlay = '{{ overlay }}', subtext = '{{ subtext }}', text = '{{ text }}', bright = '{{ bright }}',
+    red = '{{ red }}', orange = '{{ orange }}', yellow = '{{ yellow }}', green = '{{ green }}',
+    cyan = '{{ cyan }}', blue = '{{ blue }}', purple = '{{ purple }}', pink = '{{ pink }}',
+}
+
+local function fg(name, attrs) return 'fore:' .. c[name] .. (attrs and (',' .. attrs) or '') end
+
+-- ---- Editor UI (vis-std.lua reads these) ------------------------------------------------
+lexers.STYLE_DEFAULT = 'back:' .. c.base .. ',fore:' .. c.text
+lexers.STYLE_NOTHING = 'back:' .. c.base
+lexers.STYLE_CURSOR = 'back:' .. c.subtext .. ',fore:' .. c.base
+lexers.STYLE_CURSOR_PRIMARY = 'back:' .. c.yellow .. ',fore:' .. c.base
+lexers.STYLE_CURSOR_LINE = 'back:' .. c.surface0
+lexers.STYLE_SELECTION = 'back:' .. c.surface2
+lexers.STYLE_LINENUMBER = fg('surface2')
+lexers.STYLE_LINENUMBER_CURSOR = fg('yellow', 'bold')
+lexers.STYLE_COLOR_COLUMN = 'back:' .. c.mantle
+lexers.STYLE_STATUS = 'back:' .. c.crust .. ',fore:' .. c.overlay
+lexers.STYLE_STATUS_FOCUSED = 'back:' .. c.crust .. ',fore:' .. c.subtext .. ',bold'
+lexers.STYLE_SEPARATOR = fg('crust')
+lexers.STYLE_INFO = fg('subtext', 'bold')
+lexers.STYLE_EOF = fg('surface2')
+lexers.STYLE_WHITESPACE = fg('surface1')
+
+-- ---- Default tags (lexer.lua) -----------------------------------------------------------
+lexers.STYLE_COMMENT = fg('overlay', 'italics')
+lexers.STYLE_STRING = fg('yellow')
+lexers.STYLE_NUMBER = fg('purple')
+lexers.STYLE_KEYWORD = fg('red')
+lexers.STYLE_IDENTIFIER = fg('text')
+lexers.STYLE_OPERATOR = fg('red')
+lexers.STYLE_ERROR = fg('red', 'bold')
+lexers.STYLE_PREPROCESSOR = fg('pink')             -- Prolog directives, C #if
+lexers.STYLE_CONSTANT = fg('purple')               -- Elixir atoms
+lexers.STYLE_CONSTANT_BUILTIN = fg('purple', 'bold')
+lexers.STYLE_VARIABLE = fg('orange')               -- Prolog variables
+lexers.STYLE_VARIABLE_BUILTIN = fg('orange', 'italics')
+lexers.STYLE_FUNCTION = fg('green')
+lexers.STYLE_FUNCTION_BUILTIN = fg('green', 'italics')
+lexers.STYLE_FUNCTION_METHOD = fg('green')
+lexers.STYLE_CLASS = fg('cyan', 'bold')
+lexers.STYLE_TYPE = fg('cyan')
+lexers.STYLE_LABEL = fg('red')
+lexers.STYLE_REGEX = fg('pink')
+lexers.STYLE_EMBEDDED = fg('pink')
+lexers.STYLE_TAG = fg('red')
+lexers.STYLE_ATTRIBUTE = fg('green')
+lexers.STYLE_ANNOTATION = fg('green', 'italics')
+lexers.STYLE_HEADING = fg('red', 'bold')
+for i = 1, 6 do lexers['STYLE_HEADING_H' .. i] = lexers.STYLE_HEADING end
+lexers.STYLE_BOLD = 'bold'
+lexers.STYLE_ITALIC = 'italics'
+lexers.STYLE_UNDERLINE = 'underlined'
+lexers.STYLE_CODE = fg('cyan')
+lexers.STYLE_LINK = fg('blue', 'underlined')
+lexers.STYLE_REFERENCE = fg('blue')
+lexers.STYLE_LIST = fg('red')
+
+-- ---- Common lexer-specific tags ---------------------------------------------------------
+lexers.STYLE_ADDITION = fg('green')
+lexers.STYLE_DELETION = fg('red')
+lexers.STYLE_CHANGE = fg('blue')
+lexers.STYLE_PROPERTY = fg('text')
+lexers.STYLE_MODULE = fg('cyan')
+lexers.STYLE_CHARACTER = fg('yellow')
+
+-- ---- vis-lspc diagnostics (read by visrc.lua; not a lexer tag) ------------------------------
+lexers.STYLE_DIAGNOSTIC_ERROR = fg('red', 'underlined')
+lexers.STYLE_DIAGNOSTIC_WARNING = fg('yellow', 'underlined')
+lexers.STYLE_DIAGNOSTIC_INFORMATION = fg('blue', 'underlined')
+lexers.STYLE_DIAGNOSTIC_HINT = fg('cyan', 'underlined')

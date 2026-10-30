@@ -82,6 +82,8 @@ Names are [BK] unless marked. Every name must be checked with `pacman -Si` insid
 | File managers | `thunar`, `thunar-volman`, `thunar-archive-plugin`, `xarchiver`, `tumbler`, `ffmpegthumbnailer`, `gvfs`, `gvfs-mtp`, `udisks2`; `dolphin`, `kio-extras`, `ffmpegthumbs`, `breeze` (Qt widget style Dolphin falls back to), `archlinux-xdg-menu`; theme `adw-gtk-theme` [S: extra 6.5-1] [others BK / TODO-verify] |
 | Editor | `code` (Code - OSS) [S: extra], `jq` (settings merge); `bsdtar` from `libarchive` (pacman dependency) [BK] |
 | Browsers | `librewolf` [S: extra], `firefox`; optional AUR: `ungoogled-chromium`(-bin) |
+| Terminal editors | `neovim` [S: extra 0.12.3], `helix` [S: extra 25.07.1; binary `helix`, V: Helix book], `vis` (+ `vis-lexers`?) [S, TODO-verify], `tree-sitter-cli` (≥ 0.26.1) [S], `gcc`, `git`, `wl-clipboard` |
+| Language toolchains (prompted, per language) | `elixir`, `ghc` + `haskell-language-server` [S], `swi-prolog` [S: 10.0.2], `jdk-openjdk` (Metals) + `sbt`, `ocaml` + `opam`, `gcc-fortran`, `python-pipx` (fortls) [BK unless marked]; servers outside the repos: `bin/rice-lsp-setup` |
 
 ## Installer questions (beyond packages)
 

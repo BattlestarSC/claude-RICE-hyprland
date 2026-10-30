@@ -232,6 +232,18 @@ selection, themed (fzf-tab is AUR-only). Plus autosuggestions, syntax highlighti
 substring search, fzf, zoxide. kitty: JetBrains Mono with all ligatures + Symbols Nerd Font Mono
 for icons. Details: [knowledge-base/zsh.md](knowledge-base/zsh.md).
 
+### D27. Terminal editors: Neovim primary, vis secondary, Helix; LSPs per user (owner, 2026-10-30)
+
+Target languages Elixir, Haskell, SWI-Prolog, Scala, OCaml, Fortran. **Neovim** (0.12): built-in
+`vim.pack` with two pinned plugins (nvim-treesitter main for parsers, nvim-lspconfig for server
+definitions), built-in LSP client and completion, no other plugins; Prolog uses Neovim's regex
+syntax (no tree-sitter parser). **Helix** 25.07: built-in grammars and server definitions; the
+rice only fixes `.pl` (Prolog, not Perl) and adds a generated theme. **vis**: generated theme,
+`.pl` → Prolog, vis-lspc (pinned) for LSP. Servers not in Arch's official repos (ElixirLS, Metals,
+ocaml-lsp-server, fortls) are installed per user by the opt-in `bin/rice-lsp-setup`, never by the
+default install path (installer rule 5). Each editor enables only servers that are installed.
+Details: [knowledge-base/editors.md](knowledge-base/editors.md).
+
 ## Open
 
 ### ~~O5. Notifications~~ → D20 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22

@@ -1,0 +1,151 @@
+# {{ name }} for Helix. Deployed to ~/.config/helix/themes/rice.toml; selected by theme = "rice"
+# in config.toml (or :theme rice). Same role mapping as the Neovim and Code - OSS themes:
+# keywords red, functions green, types cyan, strings yellow, constants and atoms purple,
+# parameters orange, macros and escapes pink (docs/colors/proposals.md).
+# Scopes: the Helix 25.07 book, themes.md (tests/editors/check_helix.py checks every key).
+
+# ---- Syntax ----------------------------------------------------------------------------
+"attribute" = "green"
+"type" = "cyan"
+"type.builtin" = { fg = "cyan", modifiers = ["italic"] }
+"type.parameter" = { fg = "cyan", modifiers = ["italic"] }
+"type.enum.variant" = "purple"
+"constructor" = "cyan"
+"constant" = "purple"
+"constant.builtin" = { fg = "purple", modifiers = ["bold"] }
+"constant.character.escape" = "pink"
+"constant.numeric" = "purple"
+"string" = "yellow"
+"string.regexp" = "pink"
+"string.special" = "pink"
+"string.special.path" = { fg = "blue", underline = { style = "line" } }
+"string.special.url" = { fg = "blue", underline = { style = "line" } }
+"string.special.symbol" = "purple"
+"comment" = { fg = "overlay", modifiers = ["italic"] }
+"comment.unused" = { fg = "overlay" }
+"variable" = "text"
+"variable.builtin" = { fg = "orange", modifiers = ["italic"] }
+"variable.parameter" = { fg = "orange", modifiers = ["italic"] }
+"variable.other.member" = "text"
+"label" = "red"
+"punctuation" = "subtext"
+"punctuation.special" = "pink"
+"keyword" = "red"
+"keyword.directive" = "pink"
+"keyword.function" = { fg = "cyan", modifiers = ["italic"] }
+"keyword.storage" = { fg = "cyan", modifiers = ["italic"] }
+"operator" = "red"
+"function" = "green"
+"function.builtin" = { fg = "green", modifiers = ["italic"] }
+"function.macro" = "pink"
+"function.special" = "pink"
+"tag" = "red"
+"tag.builtin" = { fg = "red", modifiers = ["italic"] }
+"namespace" = "cyan"
+"special" = "pink"
+
+"markup.heading" = { fg = "red", modifiers = ["bold"] }
+"markup.heading.marker" = "overlay"
+"markup.list" = "red"
+"markup.list.checked" = "green"
+"markup.list.unchecked" = "overlay"
+"markup.bold" = { modifiers = ["bold"] }
+"markup.italic" = { modifiers = ["italic"] }
+"markup.strikethrough" = { modifiers = ["crossed_out"] }
+"markup.link.url" = { fg = "blue", underline = { style = "line" } }
+"markup.link.label" = "blue"
+"markup.link.text" = "purple"
+"markup.quote" = { fg = "overlay", modifiers = ["italic"] }
+"markup.raw" = "cyan"
+"markup.normal" = "text"
+
+"diff.plus" = "green"
+"diff.minus" = "red"
+"diff.delta" = "blue"
+"diff.delta.moved" = "purple"
+"diff.delta.conflict" = "orange"
+
+# ---- Interface -------------------------------------------------------------------------
+"ui.background" = { bg = "base" }
+"ui.background.separator" = "surface2"
+"ui.text" = "text"
+"ui.text.focus" = { fg = "bright", bg = "surface1", modifiers = ["bold"] }
+"ui.text.inactive" = "overlay"
+"ui.text.info" = "subtext"
+"ui.text.directory" = "blue"
+"ui.cursor" = { fg = "base", bg = "subtext" }
+"ui.cursor.primary" = { fg = "base", bg = "yellow" }
+"ui.cursor.primary.insert" = { fg = "base", bg = "green" }
+"ui.cursor.primary.select" = { fg = "base", bg = "purple" }
+"ui.cursor.match" = { fg = "yellow", bg = "surface1", modifiers = ["bold"] }
+"ui.cursorline.primary" = { bg = "surface0" }
+"ui.cursorline.secondary" = { bg = "mantle" }
+"ui.cursorcolumn.primary" = { bg = "surface0" }
+"ui.selection" = { bg = "surface1" }
+"ui.selection.primary" = { bg = "surface2" }
+"ui.highlight" = { bg = "surface1" }
+"ui.highlight.frameline" = { bg = "surface1" }
+"ui.gutter" = { bg = "base" }
+"ui.gutter.selected" = { bg = "surface0" }
+"ui.linenr" = "surface2"
+"ui.linenr.selected" = { fg = "yellow", modifiers = ["bold"] }
+"ui.statusline" = { fg = "subtext", bg = "crust" }
+"ui.statusline.inactive" = { fg = "overlay", bg = "crust" }
+"ui.statusline.normal" = { fg = "crust", bg = "blue", modifiers = ["bold"] }
+"ui.statusline.insert" = { fg = "crust", bg = "green", modifiers = ["bold"] }
+"ui.statusline.select" = { fg = "crust", bg = "purple", modifiers = ["bold"] }
+"ui.statusline.separator" = "surface2"
+"ui.bufferline" = { fg = "overlay", bg = "crust" }
+"ui.bufferline.active" = { fg = "bright", bg = "base", modifiers = ["bold"] }
+"ui.bufferline.background" = { bg = "crust" }
+"ui.popup" = { fg = "text", bg = "mantle" }
+"ui.popup.info" = { fg = "text", bg = "mantle" }
+"ui.picker.header" = { fg = "subtext", modifiers = ["bold"] }
+"ui.picker.header.column" = "overlay"
+"ui.picker.header.column.active" = { fg = "purple", modifiers = ["bold"] }
+"ui.window" = "crust"
+"ui.help" = { fg = "text", bg = "mantle" }
+"ui.menu" = { fg = "text", bg = "surface0" }
+"ui.menu.selected" = { fg = "crust", bg = "purple", modifiers = ["bold"] }
+"ui.menu.scroll" = { fg = "surface2", bg = "surface0" }
+"ui.virtual.ruler" = { bg = "mantle" }
+"ui.virtual.whitespace" = "surface1"
+"ui.virtual.indent-guide" = "surface1"
+"ui.virtual.inlay-hint" = { fg = "overlay", bg = "mantle" }
+"ui.virtual.wrap" = "surface2"
+"ui.virtual.jump-label" = { fg = "pink", modifiers = ["bold"] }
+"ui.debug.breakpoint" = "red"
+"ui.debug.active" = "yellow"
+
+"error" = "red"
+"warning" = "yellow"
+"info" = "blue"
+"hint" = "cyan"
+"diagnostic" = { underline = { style = "curl" } }
+"diagnostic.error" = { underline = { color = "red", style = "curl" } }
+"diagnostic.warning" = { underline = { color = "yellow", style = "curl" } }
+"diagnostic.info" = { underline = { color = "blue", style = "curl" } }
+"diagnostic.hint" = { underline = { color = "cyan", style = "curl" } }
+"diagnostic.unnecessary" = { modifiers = ["dim"] }
+"diagnostic.deprecated" = { modifiers = ["crossed_out"] }
+"tabstop" = { bg = "surface1", modifiers = ["italic"] }
+
+[palette]
+crust = "{{ crust }}"
+mantle = "{{ mantle }}"
+base = "{{ base }}"
+surface0 = "{{ surface0 }}"
+surface1 = "{{ surface1 }}"
+surface2 = "{{ surface2 }}"
+overlay = "{{ overlay }}"
+subtext = "{{ subtext }}"
+text = "{{ text }}"
+bright = "{{ bright }}"
+red = "{{ red }}"
+orange = "{{ orange }}"
+yellow = "{{ yellow }}"
+green = "{{ green }}"
+cyan = "{{ cyan }}"
+blue = "{{ blue }}"
+purple = "{{ purple }}"
+pink = "{{ pink }}"

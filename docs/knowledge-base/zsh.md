@@ -27,7 +27,7 @@ renamed file degrades to "plugin missing" instead of a broken shell. [TODO-verif
 
 | File | Loaded for | Contents |
 | --- | --- | --- |
-| `~/.zshenv` | every zsh | `ZDOTDIR` (optional), `XDG_*` defaults, `EDITOR`. Keep tiny; no output. |
+| `~/.zshenv` | every zsh | `ZDOTDIR` (optional), `XDG_*` defaults, `EDITOR`/`VISUAL` = `nvim` if installed and unset. Keep tiny; no output. |
 | `~/.zshrc` | interactive shells | options, history, completion, keybinds, plugins, prompt |
 | `~/.config/zsh/*.zsh` | sourced from `.zshrc`, in this order | `options`, `history`, `theme` (generated), `completion`, `keybinds`, `aliases`, `plugins`, `prompt`, `local` (yours), `late` |
 | `~/.config/zsh/local.zsh` | sourced last if it exists | user overrides; never touched by the installer |
@@ -93,7 +93,7 @@ zsh's own menu selection (`zsh/complist`), no extra package (fzf-tab exists only
 zsh-autosuggestions (grey history/completion suggestion; Right/End accept, Alt+Right one word),
 zsh-syntax-highlighting (main + brackets, Monokai roles from the palette),
 zsh-history-substring-search (Up/Down match what is typed), fzf (Ctrl+R, Ctrl+T, Alt+C,
-`source <(fzf --zsh)` [V: fzf man page]), zoxide (`z`), eza for `ls` (`--icons=auto` [V: eza man]).
+`source <(fzf --zsh)` [V: fzf man page]), zoxide (`z`), eza for `ls` (`--icons=auto` [V: eza man]); `hx` → `helix` when only Arch's `helix` binary exists (editors.md).
 
 ### Prompt (starship)
 
