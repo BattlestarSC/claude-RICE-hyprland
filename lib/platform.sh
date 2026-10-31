@@ -23,6 +23,13 @@
 PLAT_ID=""      # arch | ubuntu | gentoo | freebsd | fedora
 PLAT_INIT=""    # systemd | openrc | rc
 
+# os_release KEY: a value from /etc/os-release. The file is shell syntax and systems quote
+# differently (Gentoo: ID='gentoo'), so it is read by a shell, in a subshell.
+os_release() {
+    # shellcheck source=/dev/null
+    (. /etc/os-release && printf '%s' "${!1:-}")
+}
+
 detect_platform() {
     if [[ "$(uname -s)" == FreeBSD ]]; then
         PLAT_ID=freebsd
@@ -30,7 +37,7 @@ detect_platform() {
     else
         [[ -r /etc/os-release ]] || die "cannot tell which system this is (/etc/os-release is missing)"
         local id
-        id="$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"')"
+        id="$(os_release ID)"
         case "${id}" in
             arch | ubuntu | gentoo | fedora) PLAT_ID="${id}" ;;
             *) die "unsupported system '${id}': this installer knows Arch, Ubuntu 26.04, Gentoo, FreeBSD and Fedora" ;;

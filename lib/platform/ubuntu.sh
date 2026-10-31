@@ -18,7 +18,7 @@ ubuntu_apt() {
 
 plat_preflight() {
     local version
-    version="$(sed -n 's/^VERSION_ID=//p' /etc/os-release | tr -d '"')"
+    version="$(os_release VERSION_ID)"
     [[ "${version}" == 26.04 ]] || die "this installer supports Ubuntu 26.04 LTS (this is ${version})"
     command -v apt-get > /dev/null || die "apt-get not found"
     [[ "$(dpkg --print-architecture)" == amd64 ]] || die "only amd64 is supported (upstream release files)"

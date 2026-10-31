@@ -15,7 +15,8 @@ user=builder
 section() { printf '\n######## %s\n' "$*"; }
 
 section "base system"
-distro="$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"')"
+# shellcheck source=/dev/null
+distro="$(. /etc/os-release && printf '%s' "${ID}")"
 admin_group=wheel
 case "${distro}" in
     arch)
