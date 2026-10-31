@@ -88,7 +88,9 @@ listener { timeout = 1800; on-timeout = systemctl suspend }
 
 Design points:
 - The locker is named in exactly one place (`lock_cmd`); everything else calls
-  `loginctl lock-session`. Our lock keybind must do the same.
+  `loginctl lock-session`. Our lock keybind must do the same. The rice calls it through
+  `rice-session lock`, which starts hyprlock itself where there is no logind/elogind (FreeBSD;
+  there `before_sleep_cmd` never fires either).
 - Video players hold Wayland idle inhibitors; this pauses **all** listeners.
 - Lid handling belongs to logind (`HandleLidSwitch`), not Hyprland.
 - Note the **new `hyprctl dispatch` Lua syntax** in the dpms commands.

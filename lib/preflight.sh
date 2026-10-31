@@ -47,7 +47,7 @@ detect_display_manager() {
 check_space() {
     local need=18 free_gb
     (( WANT_OFFICE )) && need=$((need + 12))
-    free_gb=$(( $(df --output=avail -k / | tail -n 1) / 1024 / 1024 ))
+    free_gb=$(( $(df -Pk / | awk 'NR == 2 { print $4 }') / 1024 / 1024 ))
     if (( free_gb < need )); then
         warn "only ${free_gb} GB free on /; this selection needs about ${need} GB"
     fi

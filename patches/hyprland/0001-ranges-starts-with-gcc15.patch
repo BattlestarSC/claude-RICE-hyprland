@@ -1,0 +1,19 @@
+Hyprland v0.57.0 uses std::ranges::starts_with (P1659), which Ubuntu 26.04's libstdc++ (GCC 15.2)
+does not have (found by the Ubuntu full-install CI, 2026-10-31; Arch builds with GCC 16). Equivalent C++20:
+compare the first prefix.size() elements (shorter input -> lengths differ -> false).
+Applied by lib/extras.sh after fetching the pinned tag.
+
+diff --git a/src/helpers/MiscFunctions.cpp b/src/helpers/MiscFunctions.cpp
+index 299d219..2ede865 100644
+--- a/src/helpers/MiscFunctions.cpp
++++ b/src/helpers/MiscFunctions.cpp
+@@ -474,7 +474,8 @@ bool truthy(const std::string& str) {
+     });
+ 
+     return [&](auto&&... prefixes) -> bool {
+-        return (... || std::ranges::starts_with(str_view, prefixes));
++        // std::ranges::starts_with needs libstdc++ 16; same test with C++20 ranges.
++        return (... || std::ranges::equal(str_view | std::views::take(prefixes.size()), prefixes));
+     }("true"sv, "yes"sv, "on"sv);
+     // clang-format on
+ }

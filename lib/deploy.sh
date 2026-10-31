@@ -57,7 +57,8 @@ deploy_file() {
             record_backup "${dest}" "${backup}"
         fi
     fi
-    run install -D -m "${mode}" -- "${src}" "${dest}"
+    run mkdir -p -- "$(dirname -- "${dest}")"
+    run install -m "${mode}" -- "${src}" "${dest}"
     DEPLOYED=$((DEPLOYED + 1))
 }
 
@@ -82,7 +83,8 @@ deploy_once() {
 # ensure_file DEST: the user's override hook; create it empty, never touch an existing one.
 ensure_file() {
     [[ -e "$1" ]] && return 0
-    run install -D -m 0644 /dev/null "$1"
+    run mkdir -p -- "$(dirname -- "$1")"
+    run install -m 0644 /dev/null "$1"
 }
 
 # deploy_system_file SRC DEST [MODE]: same as deploy_file, for paths outside $HOME (sudo).
@@ -103,7 +105,9 @@ deploy_system_file() {
             record_backup "${dest}" "${backup}"
         fi
     fi
-    as_root install -D -m "${mode}" -- "${src}" "${dest}"
+    # mkdir + install, not install -D: BSD install's -D is a destdir option.
+    as_root mkdir -p -- "$(dirname -- "${dest}")"
+    as_root install -m "${mode}" -- "${src}" "${dest}"
     DEPLOYED=$((DEPLOYED + 1))
 }
 

@@ -90,7 +90,11 @@ ask_plan() {
         fi
     fi
     ask_choice SKY_LAYOUT "Two monitors" mirror mirror span
-    ask_yn "Use the graphical login screen (greetd + ReGreet) as the display manager?" y || WANT_GREETER=0
+    if [[ "${PLAT_GREETER}" == greetd ]]; then
+        ask_yn "Use the graphical login screen (greetd + ReGreet) as the display manager?" y || WANT_GREETER=0
+    else
+        ask_yn "Start Hyprland when you log in on ${PLAT_FIRST_TTY#/dev/} (${PLAT_NAME} has no greetd)?" y || WANT_GREETER=0
+    fi
     ask_yn "Make zsh your login shell?" y || WANT_SHELL=0
 
     # Programming languages are always installed (owner, D42).
@@ -111,8 +115,12 @@ show_plan() {
     info "your files: copied into ~/.config, ~/.local; replaced files backed up to ${BACKUP_DIR}"
     info "wallpaper: ${SKY_MODE}, ${SKY_LAYOUT}; cursor: ${CURSOR_THEME}"
     info "system (sudo):"
-    (( WANT_GREETER )) && info "  - login screen: ${GREETD_DIR}/*, enable greetd${DISPLAY_MANAGER:+ (disable ${DISPLAY_MANAGER})}"
-    (( WANT_GREETER )) && info "  - keyring unlocked at login: pam_gnome_keyring in ${PAM_DIR}/greetd"
+    if (( WANT_GREETER )) && [[ "${PLAT_GREETER}" == greetd ]]; then
+        info "  - login screen: ${GREETD_DIR}/*, enable greetd${DISPLAY_MANAGER:+ (disable ${DISPLAY_MANAGER})}"
+        info "  - keyring unlocked at login: pam_gnome_keyring in ${PAM_DIR}/greetd"
+    elif (( WANT_GREETER )); then
+        info "  - Hyprland after a console login on ${PLAT_FIRST_TTY#/dev/}${DISPLAY_MANAGER:+ (disable ${DISPLAY_MANAGER})}"
+    fi
     (( WANT_SHELL )) && info "  - login shell: zsh"
     info "  - enable bluetooth$([[ -z "${NET_MANAGER}" && -f "${PKG_DIR}/network.txt" ]] && printf ' and NetworkManager')"
     info "  - Firefox privacy policies: ${FIREFOX_POLICY_DIR}/policies.json"

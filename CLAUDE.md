@@ -108,6 +108,8 @@ home/                       files deployed directly under ~ (.zshenv, .zprofile,
 colors/                     palettes; proposals/ now, the chosen palette as colors/<name>.toml later
 templates/                  per-app theme templates ({{ role | filter }}), rendered by tools/render_theme.py
 themes/<palette>/           generated app themes (committed; never hand-edit)
+ports/                      FreeBSD port overlays (x11-wm/hyprland at 0.57 while FreeBSD has 0.56)
+patches/<component>/        small portability patches applied after extras_build fetches a pin
 bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup, rice-code-setup, rice-lsp-setup, rice-monitors, rice-share-picker, rice-session)
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
 tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind/rule/event tests),
@@ -295,3 +297,10 @@ in an `archlinux:latest` container or on hardware.
   `<?xml`); TeXstudio's INI header uses `;` (`HEADER_BY_NAME` in render_theme.py).
 - The greeter runs as user `greeter`: anything it needs (monitor config, CSS, wallpaper) must be
   copied under `/etc/greetd/`, not referenced from `~`.
+- The installer runs on GNU and BSD userlands (FreeBSD): no `install -D`, `find -printf`,
+  `df --output`, `sed -i`; read `/etc/os-release` with `os_release KEY` (Gentoo single-quotes).
+  Session plumbing that systemd/logind provide elsewhere goes through `rice-session`
+  (`start`, `lock`, `power`, `hyprland`); never call `systemctl`/`loginctl` directly in configs.
+- Non-Arch platforms: `lib/platform/<id>.sh`, lists in `packages/<id>/`, facts in
+  [platforms.md](docs/knowledge-base/platforms.md). Gentoo keywords/USE live in `config/portage/`
+  and come from what Portage asks for in the gentoo workflow.

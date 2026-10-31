@@ -19,6 +19,8 @@
 #   ZSH_BIN, GREETD_DIR, GREETER_USER, PAM_DIR, FIREFOX_POLICY_DIR, DATA_DIRS
 #   POWER_CTL                          program with reboot/poweroff verbs for the greeter
 #   GREETD_VT                          virtual terminal greetd runs on (free of gettys)
+#   PLAT_GREETER, PLAT_FIRST_TTY       greetd, or tty: no greetd here, so Hyprland starts after a
+#                                      console login on PLAT_FIRST_TTY (config/zsh/session.zsh)
 
 PLAT_ID=""      # arch | ubuntu | gentoo | freebsd | fedora
 PLAT_INIT=""    # systemd | openrc | rc
@@ -56,7 +58,7 @@ detect_platform() {
 # shellcheck disable=SC2034  # used by install.sh and the other lib/ modules
 declare -g ZSH_BIN=/usr/bin/zsh GREETD_DIR=/etc/greetd GREETER_USER=greeter PAM_DIR=/etc/pam.d \
     FIREFOX_POLICY_DIR=/etc/firefox/policies POWER_CTL=systemctl \
-    GREETD_VT=1
+    GREETD_VT=1 PLAT_GREETER=greetd PLAT_FIRST_TTY=/dev/tty1
 # shellcheck disable=SC2034  # used by lib/desktop.sh
 declare -ga DATA_DIRS=(/usr/local/share /usr/share)
 

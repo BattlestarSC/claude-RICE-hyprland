@@ -22,7 +22,8 @@ extras_env() {
 extras_stamp_ok() { [[ "$(cat "${EXTRAS_STAMPS}/$1" 2> /dev/null)" == "$2" ]]; }
 extras_stamp() {
     (( DRY_RUN )) && return 0
-    printf '%s\n' "$2" | sudo install -D -m 0644 /dev/stdin "${EXTRAS_STAMPS}/$1"
+    sudo mkdir -p -- "${EXTRAS_STAMPS}"
+    printf '%s\n' "$2" | sudo tee -- "${EXTRAS_STAMPS}/$1" > /dev/null
 }
 
 # extras_fetch NAME URL REF: a clean checkout of REF (tag or commit) in the source cache.
@@ -51,13 +52,21 @@ extras_build() {
     info "building ${name} (${ref})"
     extras_fetch "${name}" "${url}" "${ref}"
     dir="${EXTRAS_SRC}/${name}"
+    # patches/<name>/*.patch: small portability fixes on top of upstream (see each file's header).
+    local patch
+    for patch in "${REPO}/patches/${name}"/*.patch; do
+        [[ -f "${patch}" ]] || continue
+        note "patch: ${patch#"${REPO}/"}"
+        run git -C "${dir}" apply -- "${patch}"
+    done
     local extra=()
     [[ -n "${args}" ]] && read -r -a extra <<< "${args}"
     case "${system}" in
         cmake)
             run cmake -S "${dir}" -B "${dir}/build" -G Ninja -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_INSTALL_PREFIX="${EXTRAS_PREFIX}" -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF "${extra[@]}"
-            run cmake --build "${dir}/build" -j "${EXTRAS_JOBS}"
+            # -k 0: on a compile error, finish every other unit first, so one log shows all errors.
+            run cmake --build "${dir}/build" -j "${EXTRAS_JOBS}" -- -k 0
             as_root cmake --install "${dir}/build"
             ;;
         meson)
@@ -69,7 +78,8 @@ extras_build() {
         cargo)
             # ReGreet reads GREETD_CONFIG_DIR at compile time (FreeBSD: /usr/local/etc/greetd).
             run env GREETD_CONFIG_DIR="${GREETD_DIR}" cargo build --release --locked --manifest-path "${dir}/Cargo.toml" "${extra[@]}"
-            as_root install -D -m 0755 "${dir}/target/release/${name}" "${EXTRAS_PREFIX}/bin/${name}"
+            as_root mkdir -p -- "${EXTRAS_PREFIX}/bin"
+            as_root install -m 0755 "${dir}/target/release/${name}" "${EXTRAS_PREFIX}/bin/${name}"
             ;;
         copy)
             as_root install -d "${EXTRAS_PREFIX}/share/${name}"
@@ -186,7 +196,7 @@ extras_capitaine() {
         [[ "${variant}" == light ]] && theme=capitaine-cursors-light
         as_root rm -rf "${EXTRAS_PREFIX}/share/icons/${theme}"
         as_root install -d "${EXTRAS_PREFIX}/share/icons/${theme}/cursors"
-        as_root cp -P "${build}/out/." "${EXTRAS_PREFIX}/share/icons/${theme}/cursors/"
+        as_root cp -RP "${build}/out/." "${EXTRAS_PREFIX}/share/icons/${theme}/cursors/"
         printf '[Icon Theme]\nName=Capitaine Cursors%s\nComment=A stylish cursor for humans\n' \
             "$([[ "${variant}" == light ]] && printf ' - White')" \
             | as_root install -m 0644 /dev/stdin "${EXTRAS_PREFIX}/share/icons/${theme}/index.theme"

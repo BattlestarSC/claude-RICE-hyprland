@@ -6,7 +6,14 @@ system_setup() {
     step "System setup (sudo)"
     local theme="${REPO}/themes/${PALETTE}" g="${GREETD_DIR}"
 
-    if (( WANT_GREETER )); then
+    if (( WANT_GREETER )) && [[ "${PLAT_GREETER}" == tty ]]; then
+        # No greetd on this system: log in on the first console and the session starts there
+        # (config/zsh/session.zsh reads this file; deleting it turns the autostart off).
+        info "session: Hyprland after a console login on ${PLAT_FIRST_TTY#/dev/}"
+        printf '%s\n' "${PLAT_FIRST_TTY}" > "${WORK_DIR}/tty-autostart"
+        deploy_file "${WORK_DIR}/tty-autostart" "${XDG_CONFIG_HOME:-${HOME}/.config}/rice/tty-autostart"
+        plat_set_display_manager "" "${DISPLAY_MANAGER}"
+    elif (( WANT_GREETER )); then
         info "login screen: greetd + ReGreet"
         deploy_system_file "$(with_system_paths "${REPO}/config/greetd/config.toml")" "${g}/config.toml"
         deploy_system_file "$(with_system_paths "$(with_cursor "${REPO}/config/greetd/hyprland.lua")")" "${g}/hyprland.lua"

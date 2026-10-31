@@ -125,7 +125,7 @@ hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_S
 -------------------------------------------------------------------------------
 
 hl.bind(key(mod, "SHIFT", "d"), hl.dsp.exec_cmd(runner), { description = "Run a command" })
-hl.bind(key(mod, "SHIFT", "x"), hl.dsp.exec_cmd("loginctl lock-session"), { description = "Lock" })
+hl.bind(key(mod, "SHIFT", "x"), hl.dsp.exec_cmd("rice-session lock"), { description = "Lock" })
 hl.bind(key(mod, "SHIFT", "v"), hl.dsp.exec_cmd(menu .. " clipboard"), { description = "Clipboard history" })
 hl.bind(key(mod, "Tab"),        hl.dsp.exec_cmd(menu .. " windows"),   { description = "Switch window" })
 hl.bind(key(mod, "SHIFT", "m"), hl.dsp.exec_cmd(menu .. " monitors"),  { description = "Monitors (KVM)" })

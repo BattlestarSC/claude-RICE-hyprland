@@ -36,7 +36,8 @@ desktop_defaults() {
         run xdg-mime default nvim.desktop text/plain
         # Thunderbird's desktop file name changed across releases; use whichever is installed.
         local mail_desktop
-        mail_desktop="$(find /usr/share/applications -maxdepth 1 -iname '*thunderbird*.desktop' -printf '%f\n' 2> /dev/null | sort | head -n 1)"
+        mail_desktop="$(desktop_file '*[Tt]hunderbird*.desktop')"
+        mail_desktop="${mail_desktop##*/}"
         if [[ -n "${mail_desktop}" ]]; then
             run xdg-mime default "${mail_desktop}" x-scheme-handler/mailto message/rfc822
         fi
@@ -75,17 +76,29 @@ desktop_defaults() {
 # set_default_app GLOB PREFIX...: make the first installed desktop file matching GLOB the default
 # for every MIME type it declares (its MimeType= line) that starts with one of PREFIX. Desktop file
 # names and MIME lists differ between versions and plugins, so they are read, not assumed.
+# desktop_file GLOB: path of the first installed desktop file matching GLOB (data dirs in order:
+# /usr/local/share first, where FreeBSD and the source builds install them).
+desktop_file() {
+    local dir f
+    for dir in "${DATA_DIRS[@]}"; do
+        for f in "${dir}/applications/"$1; do
+            [[ -f "${f}" ]] && { printf '%s' "${f}"; return 0; }
+        done
+    done
+    return 0
+}
+
 set_default_app() {
     local glob="$1" file line mime prefix all=() mimes=()
     shift
-    file="$(find /usr/share/applications -maxdepth 1 -name "${glob}" -printf '%f\n' 2> /dev/null | sort | head -n 1)"
+    file="$(desktop_file "${glob}")"
     if [[ -z "${file}" ]]; then
         (( DRY_RUN )) && note "would make ${glob} the default for $* (once installed)"
         return 0
     fi
     # A here-string always gives read a line (read fails at EOF, which set -e would turn into an
     # abort when the file has no MimeType= line).
-    line="$(sed -n 's/^MimeType=//p' "/usr/share/applications/${file}" | head -n 1)"
+    line="$(sed -n 's/^MimeType=//p' "${file}" | head -n 1)"
     IFS=';' read -ra all <<< "${line}"
     for mime in "${all[@]}"; do
         for prefix in "$@"; do
@@ -96,9 +109,9 @@ set_default_app() {
         done
     done
     if (( ${#mimes[@]} )); then
-        run xdg-mime default "${file}" "${mimes[@]}"
+        run xdg-mime default "${file##*/}" "${mimes[@]}"
     else
-        warn "${file} declares no MIME type starting with $*; not made the default"
+        warn "${file##*/} declares no MIME type starting with $*; not made the default"
     fi
     return 0
 }

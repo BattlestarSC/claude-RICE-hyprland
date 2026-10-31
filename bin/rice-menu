@@ -27,7 +27,7 @@ menu_session() {
     "  lock" "󰍃  log out" "󰤄  suspend" "  reboot" "  shut down" |
     deck session "up $up") || exit 0
   case $choice in
-    *lock)      loginctl lock-session ;;
+    *lock)      rice-session lock ;;
     *"log out") graceful_exit ;;
     *suspend)   rice-session power suspend ;;
     *reboot)    graceful_exit "Restarting..." "rice-session power reboot" ;;

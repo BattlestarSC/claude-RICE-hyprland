@@ -45,7 +45,7 @@ Keys i3's default config leaves free.
 | Keys | Action |
 | --- | --- |
 | `$mod+Shift+d` | run a command (rofi `run`) |
-| `$mod+Shift+x` | lock (`loginctl lock-session` → hypridle → hyprlock) |
+| `$mod+Shift+x` | lock (`rice-session lock`: `loginctl lock-session` → hypridle → hyprlock; hyprlock directly without logind) |
 | `$mod+Shift+v` | clipboard history |
 | `$mod+Tab` | window switcher |
 | `$mod+Shift+m` | monitor menu: KVM helpers (Phase 1) |
