@@ -63,7 +63,8 @@ chown -R "${user}:${user}" "/home/${user}/rice"
 
 # su - starts a clean environment: the desktop choice (FreeBSD: i3 or hyprland) goes in by hand.
 desktop_env=""
-[[ -n "${RICE_DESKTOP:-}" ]] && desktop_env="RICE_DESKTOP=${RICE_DESKTOP} "
+# An export, not a VAR=x prefix: the commands below start with cd, which would get it alone.
+[[ -n "${RICE_DESKTOP:-}" ]] && desktop_env="export RICE_DESKTOP=${RICE_DESKTOP}; "
 as_user() { su - "${user}" -c "${desktop_env}$1"; }
 
 # Whatever happens, end with the installer's warnings (lines starting with "!"), so they are
