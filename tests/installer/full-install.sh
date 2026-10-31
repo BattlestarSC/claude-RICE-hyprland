@@ -38,7 +38,8 @@ case "${distro}" in
         xvfb=(apt-get install -y -q xvfb)
         ;;
     fedora)
-        dnf -y -q install sudo git
+        # util-linux-script: script(1) for the verifier's zsh check (split out on Fedora)
+        dnf -y -q install sudo git util-linux-script
         xvfb=(dnf -y -q install xorg-x11-server-Xvfb)
         ;;
     freebsd)

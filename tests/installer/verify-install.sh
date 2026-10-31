@@ -63,7 +63,13 @@ optional_cmds=()
 for cmd in Hyprland hyprlock hypridle quickshell rofi kitty foot zsh starship nvim "${helix_cmd##*/}" vis \
     librewolf firefox thunderbird thunar dolphin imv zathura strawberry amberol kasts qt6ct \
     gnome-keyring-daemon seahorse btop htop fastfetch slurp grim wl-copy jq "${optional_cmds[@]}"; do
-    if command -v "${cmd}" > /dev/null; then pass "command ${cmd}"; else fail "command ${cmd}"; fi
+    if command -v "${cmd}" > /dev/null; then
+        pass "command ${cmd}"
+    elif [[ "${cmd}" == amberol ]] && flatpak info io.bassi.Amberol > /dev/null 2>&1; then
+        pass "Amberol (Flatpak)"   # Fedora: Flathub, no command on PATH
+    else
+        fail "command ${cmd}"
+    fi
 done
 version="$(Hyprland --version 2> /dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || true)"
 if [[ -n "${version}" && "$(printf '%s\n' 0.57.0 "${version}" | sort -V | head -n 1)" == 0.57.0 ]]; then
