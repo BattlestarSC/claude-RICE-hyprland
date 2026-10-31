@@ -155,6 +155,14 @@ does not switch profiles: that rebuilds the world and is the owner's call.
   service is removed from the runlevel and `greetd` added. Session bus, polkit agent, PipeWire and
   power actions: [Sessions without systemd](#sessions-without-systemd).
 - **Greeter user:** `greetd` [TODO-verify: the ebuild's acct-user].
+- **Resolved** [V: gentoo workflow, systemd profile, 2026-10-31]: the whole selection is 1002
+  packages (981 new on a stage3), about 10 GB of sources, every one an ebuild built from source;
+  `go-bootstrap` and `openjdk-bin:25` (bootstrap compilers) are the only binary payloads. What it
+  took, all in `config/portage/` and `lib/platform/gentoo.sh`: testing keywords for the Haskell
+  stack, Elixir 1.20 (stable Erlang is 29, stable Elixir needs < 29), the opam family, Neovim's
+  luv, zsh 5.9.2, sdbus-c++, nss/aom; USE flags for texlive-core, lpeg, libvpx, zlib;
+  Quickshell without the crash handler, Thunar without the panel plugin; and building
+  dev-python/pillow without truetype first (docutils/pillow/harfbuzz/glib cycle on a fresh system).
 - **CI:** `.github/workflows/gentoo.yml` runs the real module up to the package transaction for
   both init systems and lets Portage resolve it (`tests/platforms/gentoo-pretend.sh`); compiling
   the desktop (Qt, three Mozilla browsers, LibreOffice, GHC, TeX Live) takes many hours and does
