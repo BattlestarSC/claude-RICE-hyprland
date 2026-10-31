@@ -29,5 +29,6 @@ dev-lang/ghc ~amd64
 dev-haskell/* ~amd64
 app-admin/haskell-updater ~amd64
 
-# opam 2.5 needs the matching opam-installer (2.1.6 is stable and pins opam 2.1.6).
-dev-ml/opam-installer ~amd64
+# opam is split into opam, opam-common, opam-installer, ...; all must be the same version, and
+# the stable opam-installer (2.1.6) pins an old opam.
+dev-ml/opam* ~amd64

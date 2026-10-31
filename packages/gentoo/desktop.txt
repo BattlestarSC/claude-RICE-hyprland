@@ -44,6 +44,9 @@ media-fonts/noto-emoji
 x11-themes/papirus-icon-theme
 x11-themes/adw-gtk3::guru
 app-misc/nwg-look::guru
+# Bootstrap compiler for Go (cliphist and nwg-look are Go programs; Portage cannot build Go with
+# the Go it is building). Binary, like openjdk-bin for the JDK.
+dev-lang/go-bootstrap
 # Capitaine build (rsvg-convert comes with librsvg)
 x11-apps/xcursorgen
 # kreadconfig6/kwriteconfig6 (Dolphin and Kasts color scheme)
