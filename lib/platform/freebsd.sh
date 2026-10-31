@@ -15,7 +15,8 @@ declare -g PKG_DIR="${REPO}/packages/freebsd" ZSH_BIN=/usr/local/bin/zsh \
 # shellcheck disable=SC2034
 declare -ga PLAT_EXTRA_LISTS=(build.txt)
 
-# The ports framework (Mk/, Templates/, Keywords/) at the commit the overlay was taken from.
+# The ports framework (Mk/, Templates/, Keywords/, a few lang/ ports it reads) at the commit the
+# overlay was taken from.
 declare -g FREEBSD_PORTS_URL=https://github.com/freebsd/freebsd-ports \
     FREEBSD_PORTS_COMMIT=e3ae9611c587f6fbb0127a1201fdeac130057797
 declare -g FREEBSD_CACHE="${XDG_CACHE_HOME:-${HOME}/.cache}/rice/freebsd"
@@ -79,7 +80,10 @@ freebsd_build_hyprland() {
     fi
     mkdir -p -- "${ports}"
     git -C "${ports}" init -q
-    git -C "${ports}" sparse-checkout set Mk Templates Keywords
+    # The framework also reads some ports' version files (USES=python: lang/python3*/
+    # Makefile.version; found by the FreeBSD CI), so those directories come along.
+    git -C "${ports}" sparse-checkout set Mk Templates Keywords lang/python311 lang/python312 \
+        lang/python313 lang/python314 lang/lua54 lang/lua55
     git -C "${ports}" fetch -q --depth 1 --filter=blob:none "${FREEBSD_PORTS_URL}" "${FREEBSD_PORTS_COMMIT}"
     git -C "${ports}" -c advice.detachedHead=false checkout -q --force FETCH_HEAD
     rm -rf -- "${port}"
