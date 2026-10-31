@@ -32,6 +32,19 @@ cd claude-RICE-hyprland
 That is all; reboot when it finishes. `./install.sh --yes` takes every default without asking;
 `./install.sh --dry-run` shows everything it would do and changes nothing.
 
+### Other systems (in progress)
+
+The same `./install.sh` detects the system and installs as close an equivalent as each one
+allows ([platforms.md](docs/knowledge-base/platforms.md)). Arch is the reference and the only
+one with a passing real install in CI so far.
+
+| System | How | State |
+| --- | --- | --- |
+| Ubuntu 26.04 LTS | apt + PPAs/extrepo; Hyprland 0.57 stack, Quickshell, ReGreet built from source into `/usr/local` (30-60 min) | real install in CI: being fixed |
+| Gentoo (OpenRC, systemd) | Portage with GURU, hyproverlay, librewolf overlays; everything compiled (many hours) | dependency resolution in CI for both init systems |
+| FreeBSD 15 | pkg; Hyprland 0.57 from the FreeBSD port moved to 0.57; no greetd, so Hyprland starts after a console login | written; real install in a CI VM |
+| Fedora | not started | |
+
 What it does, in order ([details](docs/knowledge-base/arch-install.md#the-installer)):
 
 1. **Checks** Arch, a non-root user with working `sudo`, network, no pacman lock, free space;
@@ -151,7 +164,9 @@ Pulsar (dark, saturated) and Event Horizon (soft), checked with two contrast mod
 CLAUDE.md                 guidance for AI-assisted development (rules, conventions, commands)
 install.sh                the installer (clone and run); lib/ holds its modules
 lib/                      log, preflight, packages, deploy (copy + backup), files (deploy map), desktop, system
-packages/                 package lists per group; ?name = optional (see packages/README.md)
+lib/platform/             one module per system (package manager, services, paths); lib/extras.sh + pins.sh: source builds
+packages/                 package lists per group; ?name = optional (see packages/README.md); packages/<system>/ for non-Arch
+ports/                    FreeBSD port overlay (Hyprland 0.57); patches/: portability patches for source builds
 bin/rice-menu             scripted menus (session, clipboard, windows, keys, screenshot)
 bin/rice-sky-atlas        renders the ASCII sky's glyph atlas at a monitor's exact cell size
 bin/rice-browser-setup    applies prefs and palette to every Firefox/LibreWolf/Thunderbird profile

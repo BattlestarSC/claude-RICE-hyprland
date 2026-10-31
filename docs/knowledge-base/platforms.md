@@ -28,7 +28,7 @@ only Arch packages it (2026-10-30):
 | Arch | 0.57.0 | [V: full-install CI] |
 | Ubuntu 26.04.1 | 0.53.3 (universe) | [V: probe CI] |
 | Fedora | 0.55 in COPRs, none official | [S: nett00n/hyprland-copr report] |
-| FreeBSD ports | 0.56.2 | [S: FreshPorts x11-wm/hyprland] |
+| FreeBSD 15.1 packages | 0.56.2 (every library of the 0.57 stack is current) | [V: probe CI 2026-10-31] |
 | Gentoo | not in the main tree; hyproverlay has 0.57.0 | [V: probe CI 2026-10-31] |
 
 So where the packaged version is older, `lib/extras.sh` builds the stack into `/usr/local` at the
@@ -133,6 +133,65 @@ does not switch profiles: that rebuilds the world and is the owner's call.
   the desktop (Qt, three Mozilla browsers, LibreOffice, GHC, TeX Live) takes many hours and does
   not fit a CI job, so the builds themselves are unverified.
 
+## FreeBSD
+
+FreeBSD 15.1-RELEASE, amd64 (`tests/platforms/probe-freebsd.sh` in a FreeBSD VM, 2026-10-31)
+[V]. 15.x names the ports package repository `FreeBSD-ports`, and its default URL is already
+`latest`, so quarterly and latest gave the same versions.
+
+- **Packaged and current:** the whole Hyprland 0.57 library stack (hyprutils 0.14.3, hyprlang
+  0.6.8, aquamarine 0.15.1, hyprgraphics 0.5.1, hyprcursor 0.1.13, hyprwire 0.3.1,
+  hyprland-protocols 0.8.0, wayland-protocols 1.49, lua55 5.5.1), hyprlock 0.9.6, hypridle 0.1.8,
+  hyprpolkitagent, hyprland-guiutils, hyprshutdown, hyprtoolkit, Quickshell 0.3.2, kitty 0.49,
+  foot 1.28, starship 1.27, neovim 0.12.6, tree-sitter-cli 0.26.13, htop 3.5.3, btop 1.4.8,
+  fastfetch 2.70, LibreWolf/Firefox/Thunderbird 159, LibreOffice 26.8.1, texlive-full, texlab,
+  Haskell (GHC 9.12 + haskell-language-server), openjdk25, sbt, scala, Amberol, Kasts, Strawberry.
+- **Hyprland 0.56.2 only**, which cannot read the Lua config. `ports/x11-wm/hyprland` is the
+  FreeBSD port (freebsd-ports `e3ae9611c587`) moved to 0.57.0: the release tarball's SHA-256 in
+  `distinfo`, two patches regenerated against 0.57.0 (Linux capability headers in
+  `src/init/initHelpers.cpp`; hyprpm's headers check), two unchanged; the 0.56 port's
+  `alloca.h` patch is upstream now (`Eis.cpp` handles FreeBSD), and its `post-patch` file list
+  follows 0.57's moves (`src/desktop/view/window/Window.cpp`, `src/helpers/SystemInfo.cpp`,
+  `src/render/types.hpp`) [V: patches applied to the 0.57.0 tarball with `patch --dry-run`;
+  the build itself: FreeBSD full-install CI]. The installer fetches the ports framework (`Mk`,
+  `Templates`, `Keywords`) at that commit, builds the port as the user, generates `pkg-plist` from
+  the staged files (`make makeplist`), and installs the package. Once FreeBSD's package reaches
+  0.57, `pkg install hyprland` is used instead.
+- **No greetd:** greetd uses Linux VT ioctl numbers and `/proc/self/exe` [V: greetd master
+  `greetd/src/terminal/ioctl.rs`, `src/session/interface.rs`], so it has no FreeBSD port. The
+  login-screen question becomes "start Hyprland after a console login on ttyv0":
+  `~/.config/rice/tty-autostart` names the console, `config/zsh/session.zsh` runs
+  `rice-session hyprland` there (XDG_RUNTIME_DIR if nothing set one, `dbus-run-session
+  start-hyprland`). An enabled display manager in `rc.conf` is disabled. The keyring is not
+  unlocked at login (no greeter PAM service to add it to): gnome-keyring asks on first use.
+- **Seat and services:** `seatd_enable`, `dbus_enable` (sysrc), the user joins group `video`
+  (seatd's socket group [BK]); AMD GPUs: `drm-kmod` and `amdgpu` in `kld_list`. Bluetooth and
+  NetworkManager are skipped (FreeBSD's own stacks; configured by the owner).
+- **Missing, handled:** capitaine-cursors (rendered), adw-gtk3 (release),
+  zsh-history-substring-search (copied), brightnessctl (not used by the rice), `gfortran` (gcc15
+  installs `gfortran15`; linked in `~/.local/bin`).
+- **Missing, skipped (`?` in the lists):** Code - OSS / VSCodium (no binary package), biber,
+  IBM Plex, Tumbler, Breeze, ffmpegthumbs under these names [TODO-verify: FreeBSD names].
+- **Paths:** zsh `/usr/local/bin/zsh`; Firefox policies in
+  `/usr/local/lib/firefox/distribution/policies.json` [BK: the distribution directory is read on
+  every platform; TODO-verify on FreeBSD]; data dirs `/usr/local/share` first.
+- **Locking:** no logind, so `rice-session lock` starts hyprlock itself and hypridle's
+  `before_sleep_cmd` never fires.
+
+## Shared portability rules (from the FreeBSD port)
+
+The installer runs on GNU and BSD userlands: no `install -D` (BSD `install -D` is a destdir
+option), no `find -printf`, `df -P` instead of `df --output`, `cp -R` for directories, desktop
+files searched in every `DATA_DIRS` entry. `/etc/os-release` is read by a shell
+(`os_release KEY`), because Gentoo single-quotes its values (`ID='gentoo'`) [V: Gentoo resolve CI].
+
+## Source patches
+
+`patches/<component>/*.patch` are applied with `git apply` after `extras_build` fetches the
+pinned ref. `patches/hyprland/0001-ranges-starts-with-gcc15.patch`: Hyprland 0.57.0 calls
+`std::ranges::starts_with`, missing from Ubuntu 26.04's libstdc++ (GCC 15.2) [V: Ubuntu
+full-install CI]; replaced by the equivalent `ranges::equal` over `views::take`.
+
 ## Tests
 
 ```sh
@@ -140,4 +199,6 @@ tests/platforms/probe-ubuntu.sh     # in ubuntu:26.04: candidate names and versi
 tests/platforms/probe-fedora.sh     # in fedora:latest
 tests/platforms/gentoo-resolve.sh default/linux/amd64/23.0/desktop   # in gentoo/stage3: emerge --pretend
 docker run --rm -v "$PWD:/src:ro" ubuntu:26.04 bash /src/tests/installer/full-install.sh
+tests/platforms/probe-freebsd.sh    # in a FreeBSD VM: package names, quarterly and latest
+SRC=$PWD bash tests/installer/full-install.sh   # as root in a FreeBSD 15 VM (CI: full-install.yml)
 ```

@@ -1,0 +1,8 @@
+texlive-full
+texstudio
+?biber
+texlab
+libreoffice
+en-hunspell
+hyphen
+mythes

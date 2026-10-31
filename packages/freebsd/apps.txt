@@ -1,0 +1,25 @@
+thunar
+thunar-archive-plugin
+xarchiver
+?xfce4-tumbler
+ffmpegthumbnailer
+gvfs
+dolphin
+kio-extras
+?ffmpegthumbs
+?plasma6-breeze
+librewolf
+firefox
+thunderbird
+# Code - OSS: FreeBSD's editors/vscode has no binary package (build it from ports if wanted)
+?vscode
+imv
+zathura
+zathura-pdf-mupdf
+strawberry
+amberol
+kasts
+gstreamer1-plugins-good
+gstreamer1-plugins-bad
+gstreamer1-plugins-ugly
+gstreamer1-libav

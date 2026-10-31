@@ -15,9 +15,16 @@ user=builder
 section() { printf '\n######## %s\n' "$*"; }
 
 section "base system"
-# shellcheck source=/dev/null
-distro="$(. /etc/os-release && printf '%s' "${ID}")"
+# The repository: /src in the Linux containers; the FreeBSD VM job passes its checkout in SRC.
+src="${SRC:-/src}"
+if [[ "$(uname -s)" == FreeBSD ]]; then
+    distro=freebsd
+else
+    # shellcheck source=/dev/null
+    distro="$(. /etc/os-release && printf '%s' "${ID}")"
+fi
 admin_group=wheel
+sudoers_d=/etc/sudoers.d
 case "${distro}" in
     arch)
         pacman -Syu --noconfirm --needed sudo git
@@ -30,13 +37,23 @@ case "${distro}" in
         admin_group=sudo
         xvfb=(apt-get install -y -q xvfb)
         ;;
+    freebsd)
+        env ASSUME_ALWAYS_YES=yes pkg install -y sudo git bash
+        sudoers_d=/usr/local/etc/sudoers.d
+        xvfb=(true)   # the Quickshell check below is Linux-only
+        ;;
     *) echo "full-install.sh: no base setup for ${distro}"; exit 2 ;;
 esac
-useradd -m -G "${admin_group}" -s /bin/bash "${user}"
+if [[ "${distro}" == freebsd ]]; then
+    pw useradd "${user}" -m -G "${admin_group}" -s /usr/local/bin/bash
+else
+    useradd -m -G "${admin_group}" -s /bin/bash "${user}"
+fi
 # A sudo user whose sudo does not ask for a password stands in for "types the password once".
-printf '%%%s ALL=(ALL:ALL) NOPASSWD: ALL\n' "${admin_group}" > /etc/sudoers.d/10-admin
-chmod 0440 /etc/sudoers.d/10-admin
-cp -r /src "/home/${user}/rice"
+mkdir -p "${sudoers_d}"
+printf '%%%s ALL=(ALL:ALL) NOPASSWD: ALL\n' "${admin_group}" > "${sudoers_d}/10-admin"
+chmod 0440 "${sudoers_d}/10-admin"
+cp -r "${src}" "/home/${user}/rice"
 chown -R "${user}:${user}" "/home/${user}/rice"
 
 as_user() { su - "${user}" -c "$1"; }
@@ -65,6 +82,7 @@ section "verify"
 as_user "/home/${user}/rice/tests/installer/verify-install.sh"
 
 section "Quickshell loads the shell (Xvfb; informational)"
+if [[ "${distro}" != freebsd ]]; then
 # No Wayland compositor can run here, so Hyprland/Pipewire/layer-shell features are missing, but
 # QML syntax, imports and type errors in the real shell show up in its log.
 "${xvfb[@]}" > /dev/null
@@ -75,6 +93,7 @@ as_user 'export XDG_RUNTIME_DIR=$(mktemp -d) DISPLAY=:99 QT_QPA_PLATFORM=xcb
     timeout 25 dbus-run-session -- quickshell > /tmp/qs.log 2>&1 || true
     kill $xpid 2> /dev/null || true' || true
 { grep -E '\.qml:[0-9]+|ReferenceError|TypeError|is not a type|is not installed|Cannot assign|Type .* unavailable|failed to load|ERROR' /tmp/qs.log | sort | uniq -c | head -n 60 || echo "(no QML errors in the log)"; } | tee /tmp/qs-summary.txt
+fi
 
 section "install.sh --yes (second run: must change nothing)"
 as_user 'cd ~/rice && ./install.sh --yes' 2>&1 | tee /tmp/run2.log

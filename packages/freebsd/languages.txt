@@ -1,0 +1,14 @@
+# D42: JDK 25. gcc15 brings gfortran15 (linked as gfortran in ~/.local/bin). HLS is packaged.
+erlang
+elixir
+ghc
+hs-cabal-install
+hs-haskell-language-server
+swi-pl
+openjdk25
+sbt
+scala
+ocaml
+ocaml-opam
+gcc15
+?py312-pipx

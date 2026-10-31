@@ -1,0 +1,3 @@
+# amdgpu.ko (loaded at boot through kld_list) and the Mesa drivers
+drm-kmod
+mesa-dri
