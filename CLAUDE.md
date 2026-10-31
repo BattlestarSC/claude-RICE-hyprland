@@ -35,8 +35,10 @@ Present beyond docs: theme generator + templates, generated `themes/quasar/`, `c
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
 **Nothing has run on real hardware yet**: the installer is tested with dry runs and a throwaway
 home, and for real (`./install.sh --yes` as a sudo user, then `verify-install.sh` and an
-idempotent re-run) by the `full-install` workflow in an `archlinux:latest` container, which cannot
-start Hyprland, greetd or any GUI. **Not yet present:** `uninstall.sh`, a theme
+idempotent re-run) by the `full-install` workflow in `archlinux:latest`, `ubuntu:26.04` and
+`fedora:latest` containers and by the `freebsd` workflow in a FreeBSD 15 VM (all passing
+2026-10-31), none of which can start Hyprland, greetd or any GUI; Gentoo is checked by
+dependency resolution only (`gentoo` workflow, OpenRC and systemd). **Not yet present:** `uninstall.sh`, a theme
 switcher. Quickshell code is render-tested
 with PySide6 and mocks, and the real shell loads in real Quickshell under Xvfb (CI, X11: no layer
 shell, Hyprland IPC or Pipewire), but has **never run on Wayland**; treat the window, IPC and
