@@ -34,3 +34,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: tests/platforms/probe-gentoo.sh
+      - run: tests/platforms/probe-gentoo-2.sh
