@@ -29,7 +29,7 @@ only Arch packages it (2026-10-30):
 | Ubuntu 26.04.1 | 0.53.3 (universe) | [V: probe CI] |
 | Fedora | 0.55 in COPRs, none official | [S: nett00n/hyprland-copr report] |
 | FreeBSD ports | 0.56.2 | [S: FreshPorts x11-wm/hyprland] |
-| Gentoo | not in the main tree (hyproverlay); no 0.57 ebuild found | [S: Gentoo wiki, gpo.zugaina.org] |
+| Gentoo | not in the main tree; hyproverlay has 0.57.0 | [V: probe CI 2026-10-31] |
 
 So where the packaged version is older, `lib/extras.sh` builds the stack into `/usr/local` at the
 exact commits Hyprland v0.57.0's `flake.lock` pins (`lib/pins.sh`). Hyprland 0.57 needs a C++26
@@ -96,10 +96,48 @@ Probe of the real `ubuntu:26.04` image (26.04.1, 2026-10-30, `tests/platforms/pr
   shims: `ppa:mozillateam/ppa`, pinned at 1001, Ubuntu's shims at -1).
 - Greeter user `_greetd` (Debian's greetd packaging) [TODO-verify: CI].
 
+## Gentoo
+
+Source-first, as the owner asked: Portage builds everything; the only binary package is
+VSCodium (no source ebuild exists). Requirements checked by `plat_preflight`: amd64, a 23.0
+desktop profile (`default/linux/amd64/23.0/desktop` for OpenRC, `.../desktop/systemd`), and
+`/etc/portage/package.{accept_keywords,use,license}` as directories (or absent). The installer
+does not switch profiles: that rebuilds the world and is the owner's call.
+
+- **Overlays** (`eselect repository enable`, then `emaint sync`): `guru` (Quickshell, ReGreet,
+  cliphist, brightnessctl, adw-gtk3, nwg-look, Amberol, texlab, two zsh plugins), `hyproverlay`
+  (Hyprland 0.57.0 with its libraries, hyprlock, hypridle, XDPH, hyprpolkitagent,
+  hyprland-guiutils, hyprshutdown), `librewolf`.
+- **Portage files** (`config/portage/`, deployed with a backup as `/etc/portage/package.*/rice`):
+  `~amd64` for the three overlays (GURU has no stable keywords by policy) and for the few
+  main-tree packages whose stable version is too old; USE flags (Hyprland's Lua target, rofi
+  Wayland, PipeWire sound server, `pam` for gnome-keyring, gvfs MTP, TeX Live collections).
+- **Facts from the probe** (Gentoo tree, GURU, hyproverlay, librewolf synced 2026-10-31,
+  `tests/platforms/probe-gentoo{,-2}.sh`) [V]:
+  - hyproverlay `gui-wm/hyprland-0.57.0`: `LUA_COMPAT=( lua5-4 lua5-5 )`; the tree has Lua up to
+    5.4.8 only. Hyprland's own CMake accepts 5.4 too (`pkg_search_module(LUA ... lua>=5.5 lua<5.6)`:
+    the last alternative matches 5.4) [V: Hyprland v0.57.0 `CMakeLists.txt`].
+  - `dev-java/openjdk:25` exists as a source ebuild (25.0.5); `openjdk-bin` is not needed.
+  - Not packaged: `capitaine-cursors` (rendered by `lib/extras.sh`), `pipx` (rice-lsp-setup puts
+    fortls in a venv), haskell-language-server (ghcup), Scala (Coursier; `scala-cli-bin` exists
+    but is binary).
+  - Name differences: `gui-apps/qt6ct`, `gui-apps/ReGreet`, `sys-auth/hyprpolkitagent`,
+    `media-sound/kasts`, `app-text/texlab`, `app-misc/nwg-look`.
+- **OpenRC:** `dbus` and `elogind` are added to the default runlevel; greetd runs on VT 7
+  (agetty holds 1-6); an existing display manager running through Gentoo's `display-manager`
+  service is removed from the runlevel and `greetd` added. Session bus, polkit agent, PipeWire and
+  power actions: [Sessions without systemd](#sessions-without-systemd).
+- **Greeter user:** `greetd` [TODO-verify: the ebuild's acct-user].
+- **CI:** `.github/workflows/gentoo.yml` runs the real module up to the package transaction for
+  both init systems and lets Portage resolve it (`tests/platforms/gentoo-pretend.sh`); compiling
+  the desktop (Qt, three Mozilla browsers, LibreOffice, GHC, TeX Live) takes many hours and does
+  not fit a CI job, so the builds themselves are unverified.
+
 ## Tests
 
 ```sh
 tests/platforms/probe-ubuntu.sh     # in ubuntu:26.04: candidate names and versions
 tests/platforms/probe-fedora.sh     # in fedora:latest
+tests/platforms/gentoo-resolve.sh default/linux/amd64/23.0/desktop   # in gentoo/stage3: emerge --pretend
 docker run --rm -v "$PWD:/src:ro" ubuntu:26.04 bash /src/tests/installer/full-install.sh
 ```
