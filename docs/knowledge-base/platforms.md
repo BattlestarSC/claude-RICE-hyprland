@@ -190,7 +190,9 @@ FreeBSD 15.1-RELEASE, amd64 (`tests/platforms/probe-freebsd.sh` in a FreeBSD VM,
   `src/render/types.hpp`) [V: patches applied to the 0.57.0 tarball with `patch --dry-run`;
   the build itself: FreeBSD full-install CI]. 0.57's bell player uses `std::jthread`, which
   FreeBSD 15.1's base libc++ only offers with `-fexperimental-library`; the overlay adds it
-  [V: FreeBSD CI, `RotatingPlayerThread.hpp:33: no type named 'jthread'`]. The installer fetches the ports framework (`Mk`,
+  [V: FreeBSD CI, `RotatingPlayerThread.hpp:33: no type named 'jthread'`]. With that and the
+  `subview` patch, Hyprland 0.57.0 compiles, stages and packages on FreeBSD 15.1 with the base
+  clang [V: FreeBSD CI 2026-10-31, "Building packages for hyprland-0.57.0"]. The installer fetches the ports framework (`Mk`,
   `Templates`, `Keywords`) at that commit, builds the port as the user, generates `pkg-plist` from
   the staged files (`make makeplist`), and installs the package. Once FreeBSD's package reaches
   0.57, `pkg install hyprland` is used instead.

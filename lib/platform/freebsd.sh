@@ -95,12 +95,17 @@ freebsd_build_hyprland() {
     "${make_env[@]}" make -C "${port}" stage
     # The overlay carries no plist: list what 0.57 stages (makeplist's first line is a reminder).
     "${make_env[@]}" make -C "${port}" makeplist | tail -n +2 > "${port}/pkg-plist"
+    # PACKAGES must exist, or the framework writes the package into WRKDIR instead (found by the
+    # FreeBSD CI); PKGFILE is its exact path.
+    mkdir -p -- "${FREEBSD_CACHE}/packages/All"
     "${make_env[@]}" make -C "${port}" package
+    local pkgfile
+    pkgfile="$("${make_env[@]}" make -C "${port}" -V PKGFILE)"
     # Replace a packaged (older) Hyprland, which other packages may have pulled in.
     if pkg info -e hyprland; then
         as_root pkg delete -f -y hyprland
     fi
-    as_root pkg add "${FREEBSD_CACHE}/packages/All/hyprland-${version}.pkg"
+    as_root pkg add "${pkgfile}"
 }
 
 plat_extras() {
