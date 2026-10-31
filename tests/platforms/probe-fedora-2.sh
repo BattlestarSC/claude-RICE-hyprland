@@ -3,6 +3,7 @@
 # dependencies, alternatives) and what the candidate COPRs provide. Run as root in fedora:latest.
 set -Eeuo pipefail
 q() { dnf -q repoquery --available --qf '%{name} %{version}-%{release} %{repoid}\n' "$@" 2> /dev/null | sort -u; }
+# shellcheck source=/dev/null
 echo "== $(. /etc/os-release && echo "${PRETTY_NAME}") ; releases: $(dnf -q repoquery --qf '%{version}' fedora-release 2> /dev/null | sort -u | tr '\n' ' ')"
 echo "== updates repo versions (firefox thunderbird neovim fastfetch kitty)"
 q firefox thunderbird neovim fastfetch kitty libreoffice-core
