@@ -43,3 +43,5 @@ flatpak
 xcursorgen
 # kreadconfig6/kwriteconfig6 (Dolphin and Kasts color scheme)
 kf6-kconfig
+# dbus-run-session (the greeter session and the installer's gsettings calls)
+dbus-daemon

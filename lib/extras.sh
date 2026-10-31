@@ -14,9 +14,22 @@ EXTRAS_JOBS="$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || echo 2)"
 
 # Built libraries must be found by the next build in the chain and by the dynamic linker.
 extras_env() {
+    extras_ld_path
     export PKG_CONFIG_PATH="${EXTRAS_PREFIX}/lib/pkgconfig:${EXTRAS_PREFIX}/lib64/pkgconfig:${EXTRAS_PREFIX}/share/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
     export CMAKE_PREFIX_PATH="${EXTRAS_PREFIX}${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PATH}}"
     export PATH="${EXTRAS_PREFIX}/bin:${PATH}"
+}
+
+# The dynamic linker must find the libraries built into ${EXTRAS_PREFIX}/lib. Debian and Ubuntu
+# search /usr/local/lib by default, Fedora does not (found by the Fedora CI: the built Hyprland
+# could not load libhyprutils); one ld.so.conf.d entry covers every Linux system. FreeBSD's ldconfig
+# already includes /usr/local/lib.
+extras_ld_path() {
+    [[ "$(uname -s)" == Linux && -d /etc/ld.so.conf.d ]] || return 0
+    printf '# Libraries the rice installer built from source (lib/extras.sh).\n%s/lib\n' "${EXTRAS_PREFIX}" \
+        > "${WORK_DIR}/rice-usr-local.conf"
+    deploy_system_file "${WORK_DIR}/rice-usr-local.conf" /etc/ld.so.conf.d/rice-usr-local.conf
+    return 0
 }
 
 extras_stamp_ok() { [[ "$(cat "${EXTRAS_STAMPS}/$1" 2> /dev/null)" == "$2" ]]; }

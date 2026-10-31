@@ -75,6 +75,10 @@ installs from both.
 - **Not available:** haskell-language-server (ghcup), sbt (Coursier), Code - OSS (VSCodium
   instead, as on Ubuntu), capitaine-cursors (rendered), nwg-look (not used by the installer).
   LibreOffice is 26.2, older than the 26.8 the theme extension targets [office.md].
+- Fedora's dynamic linker does not search `/usr/local/lib` (Debian/Ubuntu's does): the built
+  Hyprland could not load its libraries [V: Fedora CI, "could not read the Hyprland version"].
+  `extras_env` adds `/etc/ld.so.conf.d/rice-usr-local.conf` (backed up like every /etc file) on
+  every Linux system. `dbus-run-session` is in `dbus-daemon`, absent from a minimal Fedora.
 - Greeter user `greetd` [TODO-verify: Fedora's greetd package; the full-install CI creates
   `/var/lib/regreet` owned by it].
 
