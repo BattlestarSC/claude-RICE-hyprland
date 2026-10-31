@@ -146,6 +146,7 @@ trap with `set -E`).
 | `config/browsers/{user.js,librewolf.overrides.cfg}`, `themes/<p>/firefox/*.css`, `config/thunderbird/user.js`, `themes/<p>/thunderbird/userChrome.css` | `~/.local/share/rice/browsers/` (`thunderbird/` below it; read by `rice-browser-setup`) |
 | `config/gtk-{3,4}.0/settings.ini`, `themes/<p>/gtk-{3,4}.0/gtk.css`, `themes/<p>/kde/scheme.colors`, `config/xfce4` | `~/.config/gtk-{3,4}.0/`, `~/.local/share/color-schemes/Quasar.colors`, `~/.config/xfce4/` |
 | `config/qt6ct/qt6ct.conf`, `themes/<p>/qt6ct/colors/rice.conf` | `~/.config/qt6ct/` (qt6ct.conf: only if absent) |
+| `config/menus/applications.menu` | `~/.config/menus/applications.menu` |
 | `themes/<p>/imv/config`, `themes/<p>/zathura/zathurarc` | `~/.config/imv/config`, `~/.config/zathura/zathurarc` (+ empty `local`) |
 | `bin/*` | `~/.local/bin/` (0755) |
 | `config/greetd/*`, `themes/<p>/greetd/regreet.css`, `themes/<p>/hypr/colors.lua`, the user's `monitors.lua`, rendered sky | `/etc/greetd/` |

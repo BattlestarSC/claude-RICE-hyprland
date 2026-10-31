@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN" "http://www.freedesktop.org/standards/menu-spec/menu-1.0.dtd">
+<!-- Installed as ~/.config/menus/applications.menu. KDE apps outside Plasma (Dolphin's "Open
+     with") read the XDG applications menu; Arch has arch-applications.menu (XDG_MENU_PREFIX in
+     hypr/conf/env.lua), other systems may have none. KService looks for the prefixed file, then
+     this one. Same content as KService's built-in fallback (src/fallback-applications.menu,
+     2026-10-27), for KService versions that predate it. Docs: theming.md#file-managers. -->
+<Menu>
+  <Name>Applications</Name>
+  <Directory>Applications.directory</Directory>
+  <DefaultAppDirs/>
+  <DefaultDirectoryDirs/>
+  <MergeDir>applications-merged</MergeDir>
+  <DefaultLayout>
+    <Merge type="menus"/>
+    <Merge type="files"/>
+  </DefaultLayout>
+</Menu>

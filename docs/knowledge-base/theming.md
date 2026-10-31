@@ -150,6 +150,12 @@ Also set by the installer (they are user files, so merged, not overwritten):
 - Dolphin's "Open with" is empty outside Plasma unless a menu file exists: package
   `archlinux-xdg-menu`, `XDG_MENU_PREFIX=arch-` in the session environment, then
   `kbuildsycoca6 --noincremental` [S: forum/blog reports 2024-2026; Arch wiki unreachable].
+  KService looks for `menus/$XDG_MENU_PREFIX` + `applications.menu`, then `menus/applications.menu`,
+  in `~/.config` and `$XDG_CONFIG_DIRS`, and since 2026-10-27 falls back to a built-in menu [V:
+  kservice master `src/sycoca/vfolder_menu.cpp` `locateMenuFile`, `src/fallback-applications.menu`].
+  Other systems have no `arch-` menu, and older KService has no fallback, so the installer puts a
+  copy of that fallback in `~/.config/menus/applications.menu` (Arch keeps using its own, which
+  the prefix finds first).
 - `~/.config/xfce4/helpers.rc`: `TerminalEmulator=kitty`: Thunar's "Open Terminal Here" runs
   `exo-open`/`xfce-open --launch TerminalEmulator`, which reads that key and runs the named
   program from `PATH` [V: exo 4.20.0 `exo-execute.c`, libxfce4ui main `xfce-execute.c`].

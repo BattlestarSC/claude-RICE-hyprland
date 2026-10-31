@@ -78,6 +78,8 @@ deploy_user_files() {
     deploy_once "${REPO}/config/qt6ct/qt6ct.conf" "${cfg}/qt6ct/qt6ct.conf"
     deploy_file "${theme}/qt6ct/colors/rice.conf" "${cfg}/qt6ct/colors/rice.conf"
     deploy_tree "${REPO}/config/xfce4" "${cfg}/xfce4"
+    # XDG applications menu for KDE apps outside Plasma where the system has none (non-Arch)
+    deploy_file "${REPO}/config/menus/applications.menu" "${cfg}/menus/applications.menu"
 
     # Viewers: images (imv), PDF (Zathura; ~/.config/zathura/local is yours)
     deploy_file "${theme}/imv/config" "${cfg}/imv/config"
