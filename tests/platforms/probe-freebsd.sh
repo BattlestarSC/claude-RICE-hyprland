@@ -25,13 +25,15 @@ names=(
   texlive-full texstudio biber texlab libreoffice en-hunspell hyphen mythes networkmgr wifimgr sudo doas git
   bash cmake ninja meson pkgconf rust gmake
 )
-query() { pkg rquery '%v' "$1" 2> /dev/null | head -n 1; }
+query() { pkg rquery '%v' "$1" 2> /dev/null | head -n 1 || true; }
 pkg -o ASSUME_ALWAYS_YES=yes update -q > /dev/null 2>&1 || true
 declare -A quarterly=()
 for n in "${names[@]}"; do quarterly[$n]="$(query "$n")"; done
 mkdir -p /usr/local/etc/pkg/repos
+# 15.x names the ports repository FreeBSD-ports (pkgbase splits the base system off).
+grep -h -A3 'FreeBSD-ports' /etc/pkg/FreeBSD.conf || true
 # shellcheck disable=SC2016  # pkg expands ${ABI} itself
-echo 'FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }' > /usr/local/etc/pkg/repos/FreeBSD.conf
+echo 'FreeBSD-ports: { url: "pkg+https://pkg.FreeBSD.org/${ABI}/latest" }' > /usr/local/etc/pkg/repos/FreeBSD.conf
 pkg -o ASSUME_ALWAYS_YES=yes update -f -q > /dev/null 2>&1 || true
 for n in "${names[@]}"; do
     printf '%-34s %-22s %s\n' "$n" "${quarterly[$n]:--}" "$(query "$n" || true)"
