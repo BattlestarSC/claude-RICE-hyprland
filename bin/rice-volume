@@ -17,13 +17,14 @@ have() { command -v "$1" >/dev/null; }
 get_level() {
   if [[ $(uname -s) == FreeBSD ]]; then
     local v m
-    v=$(mixer -o vol.volume 2>/dev/null | sed -n 's/^vol\.volume=\([0-9.]*\):.*/\1/p')
-    m=$(mixer -o vol.mute 2>/dev/null | sed -n 's/^vol\.mute=//p')
+    # No sound device (a VM): mixer fails; report 0 instead of failing under pipefail.
+    v=$(mixer -o vol.volume 2>/dev/null | sed -n 's/^vol\.volume=\([0-9.]*\):.*/\1/p' || true)
+    m=$(mixer -o vol.mute 2>/dev/null | sed -n 's/^vol\.mute=//p' || true)
     awk -v v="${v:-0}" -v m="${m:-off}" 'BEGIN { printf "%d %s\n", v * 100 + 0.5, m }'
   elif have wpctl; then
     # "Volume: 0.40" or "Volume: 0.40 [MUTED]"
-    wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null |
-      awk '{ printf "%d %s\n", $2 * 100 + 0.5, /MUTED/ ? "on" : "off" }'
+    { wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || echo "Volume: 0"; } |
+      awk '{ printf "%d %s\n", $2 * 100 + 0.5, (/MUTED/ ? "on" : "off") }'
   else
     echo "0 off"
   fi

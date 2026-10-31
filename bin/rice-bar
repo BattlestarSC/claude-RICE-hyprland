@@ -11,6 +11,18 @@ set -Eeuo pipefail
 
 OS=$(uname -s)
 
+# detach CMD...: run CMD in its own session, output discarded. setsid(1) is util-linux; FreeBSD
+# has daemon(8) (-f: stdio to /dev/null) instead (found by the FreeBSD CI: nothing started).
+detach() {
+  if command -v setsid >/dev/null; then
+    setsid -f "$@" >/dev/null 2>&1
+  elif command -v daemon >/dev/null; then
+    daemon -f "$@"
+  else
+    nohup "$@" >/dev/null 2>&1 &
+  fi
+}
+
 launch() {
   local uid m primary
   uid=$(id -u)
@@ -22,14 +34,14 @@ launch() {
   # "DP-1: 3840x2160+0+0 (primary)" (polybar --list-monitors; clones removed)
   local monitors
   monitors=$(polybar --list-monitors 2>/dev/null || true)
-  [[ -n $monitors ]] || { setsid -f polybar main >/dev/null 2>&1; return 0; }
+  [[ -n $monitors ]] || { detach polybar main; return 0; }
   primary=$(awk -F: '/\(primary\)/ { print $1; exit }' <<<"$monitors")
   [[ -n $primary ]] || primary=$(sort -t+ -k2 -n <<<"$monitors" | head -n 1 | cut -d: -f1)
   while IFS=: read -r m _; do
     if [[ $m == "$primary" ]]; then
-      MONITOR=$m setsid -f polybar main >/dev/null 2>&1
+      MONITOR=$m detach polybar main
     else
-      MONITOR=$m setsid -f polybar side >/dev/null 2>&1
+      MONITOR=$m detach polybar side
     fi
   done <<<"$monitors"
 }
@@ -58,11 +70,14 @@ cpu() {
 }
 
 # Used memory: total minus what the kernel can hand out at once (FreeBSD: free + inactive
-# pages; Linux: MemAvailable).
+# pages, and the ZFS ARC, which is wired but shrinks on demand, as top(1) shows it apart;
+# Linux: MemAvailable).
 mem() {
   if [[ $OS == FreeBSD ]]; then
+    local arc
+    arc=$(sysctl -n kstat.zfs.misc.arcstats.size 2>/dev/null || echo 0)
     sysctl -n hw.physmem hw.pagesize vm.stats.vm.v_free_count vm.stats.vm.v_inactive_count |
-      awk '{ v[NR] = $1 } END { printf "%.1fG\n", (v[1] - (v[3] + v[4]) * v[2]) / 1073741824 }'
+      awk -v arc="${arc:-0}" '{ v[NR] = $1 } END { printf "%.1fG\n", (v[1] - (v[3] + v[4]) * v[2] - arc) / 1073741824 }'
   else
     awk '/^MemTotal:/ { t = $2 } /^MemAvailable:/ { a = $2 } END { printf "%.1fG\n", (t - a) / 1048576 }' /proc/meminfo
   fi

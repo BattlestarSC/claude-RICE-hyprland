@@ -316,6 +316,7 @@ in an `archlinux:latest` container or on hardware.
   Script modules must not print through awk in a loop (pipe buffering). LightDM's FreeBSD
   `Xsession` runs `exec $@` unquoted: `Exec=` in a session entry must be a plain command.
   `i3lock` options from i3lock-color make plain i3lock exit (unlocked): keep the version check.
+  FreeBSD has no `setsid`: start background programs with `detach` (`daemon -f` there).
 - Non-Arch platforms: `lib/platform/<id>.sh`, lists in `packages/<id>/`, facts in
   [platforms.md](docs/knowledge-base/platforms.md). Gentoo keywords/USE live in `config/portage/`
   and come from what Portage asks for in the gentoo workflow.

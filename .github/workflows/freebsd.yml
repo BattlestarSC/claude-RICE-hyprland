@@ -38,10 +38,17 @@ jobs:
           usesh: true
           mem: 12288
           prepare: pkg install -y bash
-          run: env SRC="$GITHUB_WORKSPACE" RICE_DESKTOP=${{ matrix.desktop }} bash tests/installer/full-install.sh
+          # The VM step copies the workspace back only when it succeeds: keep the exit code in a
+          # file so the screenshots come back from a failing run too; the Result step fails.
+          run: |
+            rc=0
+            env SRC="$GITHUB_WORKSPACE" RICE_DESKTOP=${{ matrix.desktop }} bash tests/installer/full-install.sh || rc=$?
+            echo "$rc" > full-install.rc
       - uses: actions/upload-artifact@v4
         if: always() && matrix.desktop == 'i3'
         with:
           name: freebsd-i3-screenshots
           path: x11-shots/
           if-no-files-found: ignore
+      - name: Result
+        run: exit "$(cat full-install.rc 2> /dev/null || echo 1)"

@@ -21,6 +21,18 @@ notify() {
 
 running() { pgrep -u "$(id -u)" -x "$1" >/dev/null 2>&1; }
 
+# detach CMD...: run CMD in its own session, output discarded. setsid(1) is util-linux; FreeBSD
+# has daemon(8) (-f: stdio to /dev/null) instead (found by the FreeBSD CI: nothing started).
+detach() {
+  if command -v setsid >/dev/null; then
+    setsid -f "$@" >/dev/null 2>&1
+  elif command -v daemon >/dev/null; then
+    daemon -f "$@"
+  else
+    nohup "$@" >/dev/null 2>&1 &
+  fi
+}
+
 start_polkit_agent() {
   # D-Bus activation: hyprpolkitagent installs org.hyprland.hyprpolkitagent.service, whose Exec=
   # the session bus runs when there is no systemd to hand it to.
@@ -33,13 +45,13 @@ start_pipewire() {
   running pipewire && return 0
   if command -v gentoo-pipewire-launcher >/dev/null; then
     # Gentoo's launcher starts pipewire, wireplumber and pipewire-pulse and restarts them together.
-    setsid -f gentoo-pipewire-launcher restart >/dev/null 2>&1
+    detach gentoo-pipewire-launcher restart
     return 0
   fi
-  setsid -f pipewire >/dev/null 2>&1
+  detach pipewire
   sleep 0.5
-  running wireplumber || setsid -f wireplumber >/dev/null 2>&1
-  running pipewire-pulse || setsid -f pipewire-pulse >/dev/null 2>&1
+  running wireplumber || detach wireplumber
+  running pipewire-pulse || detach pipewire-pulse
   return 0
 }
 
@@ -55,7 +67,7 @@ power() {
       reboot)   exec shutdown -r now ;;
       poweroff) exec shutdown -p now ;;
       suspend)  # Nothing locks before sleep here (no logind for hypridle/xss-lock to hear).
-                setsid -f "$0" lock >/dev/null 2>&1; sleep 1
+                detach "$0" lock; sleep 1
                 acpiconf -s 3 2>/dev/null || notify "Suspend" "acpiconf -s 3 needs root on FreeBSD" ;;
     esac
   else
@@ -141,12 +153,12 @@ x11_helpers() {
     dbus-update-activation-environment DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP 2>/dev/null || true
   fi
   if ! running picom; then
-    setsid -f picom --config "$cfg/picom/picom.conf" >/dev/null 2>&1
+    detach picom --config "$cfg/picom/picom.conf"
     # No working OpenGL (a VM, a missing Mesa driver): picom exits; xrender draws without blur.
     sleep 1
-    running picom || setsid -f picom --config "$cfg/picom/picom.conf" --backend xrender >/dev/null 2>&1
+    running picom || detach picom --config "$cfg/picom/picom.conf" --backend xrender
   fi
-  running dunst || setsid -f dunst >/dev/null 2>&1
+  running dunst || detach dunst
   local agent
   for agent in /usr/local/libexec/polkit-gnome-authentication-agent-1 \
     /usr/libexec/polkit-gnome-authentication-agent-1 \
@@ -154,17 +166,18 @@ x11_helpers() {
     /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1; do
     if [[ -x $agent ]]; then
       pgrep -u "$(id -u)" -f polkit-gnome-authentication-agent-1 >/dev/null ||
-        setsid -f "$agent" >/dev/null 2>&1
+        detach "$agent"
       break
     fi
   done
-  running clipmenud || { command -v clipmenud >/dev/null && setsid -f clipmenud >/dev/null 2>&1; }
+  # clipmenud is a bash script: match its command line, not the process name.
+  pgrep -u "$(id -u)" -f clipmenud >/dev/null || { command -v clipmenud >/dev/null && detach clipmenud; }
   # Idle: the same timings as hypridle.conf: lock after 10 minutes, screens off a minute later.
   # xss-lock runs the locker when the X screensaver activates (xset s) and before suspend
   # where logind tells it (not on FreeBSD).
   xset s 600 600 2>/dev/null || true
   xset dpms 0 0 660 2>/dev/null || true
-  running xss-lock || setsid -f xss-lock -- "$0" lock >/dev/null 2>&1
+  running xss-lock || detach xss-lock -- "$0" lock
   return 0
 }
 
