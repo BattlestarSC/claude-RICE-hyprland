@@ -6,7 +6,7 @@ ffmpegthumbnailer
 gvfs
 dolphin
 kio-extras
-?ffmpegthumbs
+?kdemultimedia-ffmpegthumbs
 ?plasma6-breeze
 librewolf
 firefox

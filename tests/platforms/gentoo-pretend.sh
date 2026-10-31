@@ -16,6 +16,8 @@ resolve_packages
 show_plan
 start_backups
 plat_setup_repos
+# Real, like the installer: the cycle-breaking builds happen before the main transaction.
+gentoo_break_cycles
 mapfile -t opts < <(gentoo_emerge_opts)
 printf '\n######## emerge --pretend (%s packages)\n' "${#PKG_REQUIRED[@]}"
 # --autounmask=y with --autounmask-write=n: on failure Portage prints the exact keyword, USE and

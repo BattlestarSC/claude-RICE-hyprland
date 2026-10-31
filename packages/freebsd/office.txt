@@ -1,6 +1,6 @@
 texlive-full
 texstudio
-?biber
+?latex-biber
 texlab
 libreoffice
 en-hunspell

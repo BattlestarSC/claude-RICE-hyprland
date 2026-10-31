@@ -34,7 +34,7 @@ wireplumber
 pavucontrol
 playerctl
 jetbrains-mono
-?ibm-plex
+?plex-ttf
 noto
 noto-emoji
 nerd-fonts-symbols

@@ -92,9 +92,21 @@ plat_setup_repos() {
     done
 }
 
+# Dependency cycles Portage cannot order on a fresh desktop install, broken the standard way: build
+# one package with a flag off first (later emerges rebuild it with the profile's flags).
+# docutils -> pillow[truetype] -> harfbuzz -> glib -> docutils (found by the resolve CI).
+gentoo_break_cycles() {
+    if ! portageq has_version / dev-python/pillow 2> /dev/null; then
+        info "breaking a dependency cycle: dev-python/pillow without truetype first"
+        as_root env USE="-truetype" emerge --oneshot --noreplace --quiet-build=y dev-python/pillow
+    fi
+    return 0
+}
+
 plat_install() {
     local opts
     mapfile -t opts < <(gentoo_emerge_opts)
+    gentoo_break_cycles
     as_root emerge "${opts[@]}" "$@"
 }
 

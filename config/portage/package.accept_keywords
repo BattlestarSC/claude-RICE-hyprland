@@ -24,6 +24,9 @@ dev-cpp/sdbus-c++ ~amd64
 dev-libs/nss ~amd64
 media-libs/libaom ~amd64
 
+# Elixir 1.20: stable Erlang is 29, and stable Elixir (1.19) requires Erlang < 29.
+dev-lang/elixir ~amd64
+
 # Haskell: cabal-install and GHC 9.8 are testing-only, and so is most of dev-haskell.
 dev-lang/ghc ~amd64
 dev-haskell/* ~amd64
