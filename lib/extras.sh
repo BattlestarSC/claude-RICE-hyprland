@@ -188,25 +188,27 @@ extras_capitaine() {
         done
         for spec in "${src}/config/static"/*.spec; do
             name="$(basename -- "${spec%.spec}")"
-            read -r x y < "${spec}"
+            # Here-strings: the spec files and awk output end without a newline, and read fails
+            # at EOF (set -e; found by the Fedora CI).
+            read -r x y <<< "$(< "${spec}")"
             for size in "${sizes[@]}"; do
-                read -r dim xh yh < <(awk -v s="${size}" -v x="${x}" -v y="${y}" 'BEGIN { printf "%d %d %d", 24 * s, x * s, y * s }')
+                read -r dim xh yh <<< "$(awk -v s="${size}" -v x="${x}" -v y="${y}" 'BEGIN { printf "%d %d %d", 24 * s, x * s, y * s }')"
                 printf '%s %s %s %s\n' "${dim}" "${xh}" "${yh}" "x${size}/${name}.png"
             done > "${build}/${name}.in"
             (cd -- "${build}" && xcursorgen "${name}.in" "out/${name}")
         done
         for spec in "${src}/config/animated"/*.spec; do
             name="$(basename -- "${spec%.spec}")"
-            read -r x y frames delay < "${spec}"
+            read -r x y frames delay <<< "$(< "${spec}")"
             for size in "${sizes[@]}"; do
-                read -r dim xh yh < <(awk -v s="${size}" -v x="${x}" -v y="${y}" 'BEGIN { printf "%d %d %d", 24 * s, x * s, y * s }')
+                read -r dim xh yh <<< "$(awk -v s="${size}" -v x="${x}" -v y="${y}" 'BEGIN { printf "%d %d %d", 24 * s, x * s, y * s }')"
                 for (( i = 0; i < frames; i++ )); do
                     printf '%s %s %s %s %s\n' "${dim}" "${xh}" "${yh}" "x${size}/${name}-$(printf '%02d' "${i}").png" "${delay}"
                 done
             done > "${build}/${name}.in"
             (cd -- "${build}" && xcursorgen "${name}.in" "out/${name}")
         done
-        while read -r alias target; do
+        while read -r alias target || [[ -n "${alias:-}" ]]; do
             [[ -n "${alias}" && ! -e "${build}/out/${alias}" ]] && ln -s "${target}" "${build}/out/${alias}"
         done < "${src}/cursor-aliases"
         theme=capitaine-cursors
