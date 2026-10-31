@@ -127,7 +127,8 @@ resolve_cursor_theme() {
 with_cursor() {
     local out
     out="${WORK_DIR}/$(basename -- "$1").$RANDOM"
-    sed "s/capitaine-cursors-light/${CURSOR_THEME}/g" -- "$1" > "${out}"
+    # -e before --: BSD sed reads a positional script and then takes "--" for a file name.
+    sed -e "s/capitaine-cursors-light/${CURSOR_THEME}/g" -- "$1" > "${out}"
     printf '%s' "${out}"
 }
 

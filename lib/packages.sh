@@ -79,10 +79,12 @@ install_aur() {
 # it ships, so this warns instead of stopping: the rest of the rice is still useful.
 check_hyprland_version() {
     (( DRY_RUN )) && return 0
-    local version
-    version="$(Hyprland --version 2> /dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || true)"
+    local version out
+    # A private runtime dir: some builds want XDG_RUNTIME_DIR even for --version.
+    out="$(XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-${WORK_DIR}}" Hyprland --version 2>&1 || true)"
+    version="$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' <<< "${out}" | head -n 1 || true)"
     if [[ -z "${version}" ]]; then
-        warn "could not read the Hyprland version (Hyprland --version)"
+        warn "could not read the Hyprland version (Hyprland --version: $(head -n 1 <<< "${out}"))"
     elif [[ "$(printf '%s\n' 0.57.0 "${version}" | sort -V | head -n 1)" != 0.57.0 ]]; then
         warn "Hyprland ${version} is older than 0.57: it may not load this Lua config; update when Arch ships 0.57"
     else
