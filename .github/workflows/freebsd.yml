@@ -1,0 +1,34 @@
+# FreeBSD 15: a real ./install.sh --yes in a VM (vmactions), then verify and an idempotency
+# re-run (tests/installer/full-install.sh), like full-install.yml does in Linux containers.
+name: freebsd
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - install.sh
+      - lib/**
+      - packages/freebsd/**
+      - ports/**
+      - bin/**
+      - config/**
+      - themes/**
+      - home/**
+      - tests/installer/**
+      - .github/workflows/freebsd.yml
+      - '!lib/platform/gentoo.sh'
+      - '!config/portage/**'
+
+jobs:
+  install:
+    name: install (freebsd 15)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          mem: 12288
+          prepare: pkg install -y bash
+          run: env SRC="$GITHUB_WORKSPACE" bash tests/installer/full-install.sh

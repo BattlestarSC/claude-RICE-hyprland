@@ -229,5 +229,5 @@ tests/platforms/probe-fedora.sh     # in fedora:latest (and probe-fedora-2.sh: b
 tests/platforms/gentoo-resolve.sh default/linux/amd64/23.0/desktop   # in gentoo/stage3: emerge --pretend
 docker run --rm -v "$PWD:/src:ro" ubuntu:26.04 bash /src/tests/installer/full-install.sh
 tests/platforms/probe-freebsd.sh    # in a FreeBSD VM: package names, quarterly and latest
-SRC=$PWD bash tests/installer/full-install.sh   # as root in a FreeBSD 15 VM (CI: full-install.yml)
+SRC=$PWD bash tests/installer/full-install.sh   # as root in a FreeBSD 15 VM (CI: freebsd.yml)
 ```

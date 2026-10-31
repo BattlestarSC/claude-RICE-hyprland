@@ -21,6 +21,8 @@ on:
       - '!lib/platform/gentoo.sh'
       - '!packages/gentoo/**'
       - '!config/portage/**'
+      - '!lib/platform/freebsd.sh'
+      - '!packages/freebsd/**'
 
 jobs:
   install:
@@ -52,17 +54,3 @@ jobs:
             -v "${GITHUB_WORKSPACE}:/src:ro" \
             -v "/mnt/package-cache:${{ matrix.cache }}" \
             "${{ matrix.image }}" bash /src/tests/installer/full-install.sh
-
-  # FreeBSD runs in a VM (vmactions); everything else as in the containers above.
-  freebsd:
-    name: install (freebsd 15)
-    runs-on: ubuntu-24.04
-    timeout-minutes: 300
-    steps:
-      - uses: actions/checkout@v4
-      - uses: vmactions/freebsd-vm@v1
-        with:
-          usesh: true
-          mem: 12288
-          prepare: pkg install -y bash
-          run: env SRC="$GITHUB_WORKSPACE" bash tests/installer/full-install.sh
