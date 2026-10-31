@@ -1,0 +1,69 @@
+/* {{ name }} for the LightDM GTK greeter (FreeBSD i3 session). Installed as the GTK theme
+   "Quasar-greeter" (/usr/local/share/themes/Quasar-greeter/gtk-3.0/gtk.css): adw-gtk3-dark
+   underneath, then the greeter's own widgets (ids from lightdm-gtk-greeter.glade) styled like
+   the ReGreet form on Linux: a dark glass card on the ASCII sky, purple focus. */
+@import url("/usr/local/share/themes/adw-gtk3-dark/gtk-3.0/gtk.css");
+
+#panel_window {
+    background-color: {{ crust | cssrgba:0.70 }};
+    color: {{ subtext }};
+    box-shadow: none;
+}
+#panel_window menubar, #panel_window menubar > menuitem {
+    background-color: transparent;
+    color: {{ subtext }};
+}
+#panel_window menubar > menuitem:hover {
+    background-color: {{ surface1 }};
+    color: {{ bright }};
+}
+
+#login_window, #restart_dialog, #shutdown_dialog, #power_window {
+    background-color: {{ mantle | cssrgba:0.85 }};
+    border: 1px solid {{ surface2 }};
+    border-radius: 14px;
+    box-shadow: 0 8px 32px {{ crust | cssrgba:0.6 }};
+    color: {{ text }};
+}
+#content_frame, #buttonbox_frame, #power_content_frame, #power_buttonbox_frame {
+    background-color: transparent;
+    border: none;
+}
+#login_window label, #power_title, #power_text {
+    color: {{ text }};
+}
+
+#login_window entry, #user_combobox button {
+    background-color: {{ surface0 }};
+    color: {{ bright }};
+    border: 1px solid {{ surface2 }};
+    border-radius: 8px;
+    min-height: 34px;
+}
+#login_window entry:focus {
+    border-color: {{ purple }};
+    box-shadow: 0 0 0 1px {{ purple }};
+}
+
+#login_window button, #power_window button {
+    background-color: {{ surface1 }};
+    color: {{ text }};
+    border: none;
+    border-radius: 8px;
+}
+#login_window button:hover, #power_window button:hover {
+    background-color: {{ surface2 }};
+}
+#login_button, #power_ok_button {
+    background-color: {{ purple }};
+    color: {{ crust }};
+}
+#login_button:hover, #power_ok_button:hover {
+    background-color: {{ bright_purple }};
+}
+
+#greeter_infobar {
+    border-radius: 8px;
+    background-color: {{ red | cssrgba:0.20 }};
+    color: {{ bright }};
+}
