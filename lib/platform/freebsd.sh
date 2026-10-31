@@ -98,6 +98,14 @@ freebsd_build_hyprland() {
     # file in sort order (found by the FreeBSD CI: the package had no Hyprland binary).
     "${make_env[@]}" make -C "${port}" makeplist | grep -v '^/you/have/to/check' > "${port}/pkg-plist"
     grep -qx 'bin/Hyprland' "${port}/pkg-plist" || die "the Hyprland port staged no bin/Hyprland"
+    # stage already built the packing list (TMPPLIST) from the plist that existed then (none):
+    # rebuild it from this one, or the package ships without these files (found by the FreeBSD
+    # CI: pkg info -l listed no bin/ at all).
+    local tmpplist
+    tmpplist="$("${make_env[@]}" make -C "${port}" -V TMPPLIST)"
+    rm -f -- "${tmpplist}"
+    "${make_env[@]}" make -C "${port}" generate-plist
+    grep -q 'bin/Hyprland$' "${tmpplist}" || die "the packing list (${tmpplist}) has no bin/Hyprland"
     # PACKAGES must exist, or the framework writes the package into WRKDIR instead (found by the
     # FreeBSD CI); PKGFILE is its exact path.
     mkdir -p -- "${FREEBSD_CACHE}/packages/All"

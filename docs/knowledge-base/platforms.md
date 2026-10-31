@@ -230,7 +230,9 @@ FreeBSD 15.1-RELEASE, amd64 (`tests/platforms/probe-freebsd.sh` in a FreeBSD VM,
 - **First complete install** (CI, 2026-10-31): 1981 s; every package, Hyprland 0.57 from the
   overlay, Capitaine, configs, defaults, services. What the verifier then found: the generated
   plist lost `bin/Hyprland` (makeplist's reminder line was dropped by position, and
-  `bin/Hyprland` sorts first; now by content, and the build stops if it is missing); BSD `chmod`
+  `bin/Hyprland` sorts first; now by content, and the build stops if it is missing), and the
+  packing list `stage` had already built (TMPPLIST, from no plist) has to be regenerated
+  (`make generate-plist`) or the package ships no `bin/` [V: FreeBSD CI]; BSD `chmod`
   takes `--` after the mode for a file (ElixirLS, Coursier); Coursier's native launcher is
   Linux-only (its JVM launcher is used elsewhere); observer is in `erlang-wx`. Coursier's
   `scala` and `scala-cli` apps are native launchers with no FreeBSD build ("No prebuilt binary
