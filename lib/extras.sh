@@ -216,9 +216,10 @@ extras_capitaine() {
         as_root rm -rf "${EXTRAS_PREFIX}/share/icons/${theme}"
         as_root install -d "${EXTRAS_PREFIX}/share/icons/${theme}/cursors"
         as_root cp -RP "${build}/out/." "${EXTRAS_PREFIX}/share/icons/${theme}/cursors/"
+        # Through a file: BSD install refuses a pipe as source (found by the FreeBSD CI).
         printf '[Icon Theme]\nName=Capitaine Cursors%s\nComment=A stylish cursor for humans\n' \
-            "$([[ "${variant}" == light ]] && printf ' - White')" \
-            | as_root install -m 0644 /dev/stdin "${EXTRAS_PREFIX}/share/icons/${theme}/index.theme"
+            "$([[ "${variant}" == light ]] && printf ' - White')" > "${build}/index.theme"
+        as_root install -m 0644 "${build}/index.theme" "${EXTRAS_PREFIX}/share/icons/${theme}/index.theme"
     done
 }
 

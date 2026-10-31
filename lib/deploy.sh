@@ -84,7 +84,7 @@ deploy_once() {
 ensure_file() {
     [[ -e "$1" ]] && return 0
     run mkdir -p -- "$(dirname -- "$1")"
-    run install -m 0644 /dev/null "$1"
+    run touch -- "$1"
 }
 
 # deploy_system_file SRC DEST [MODE]: same as deploy_file, for paths outside $HOME (sudo).
