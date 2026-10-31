@@ -24,7 +24,7 @@ printf '\n######## emerge --pretend (%s packages)\n' "${#PKG_REQUIRED[@]}"
 # licence changes it would need, which is what this test is for.
 if sudo emerge --pretend "${opts[@]/--autounmask=n/--autounmask=y}" --autounmask-write=n \
     --autounmask-continue=n "${PKG_REQUIRED[@]}" 2>&1 | tee /tmp/pretend.log; then
-    echo "RESOLVED: $(grep -c '^\[ebuild' /tmp/pretend.log) ebuilds, $(grep -c '^\[binary' /tmp/pretend.log) binary"
+    echo "RESOLVED: $(grep -c '^\[ebuild' /tmp/pretend.log || true) ebuilds, $(grep -c '^\[binary' /tmp/pretend.log || true) binary"
 else
     echo "NOT RESOLVED"
     exit 1
