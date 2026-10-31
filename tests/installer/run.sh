@@ -15,11 +15,13 @@ pass() { printf 'ok   %s\n' "$1"; }
 fail() { printf 'FAIL %s\n' "$1"; fails=$((fails + 1)); }
 
 # Run the file layer in a subshell with its own HOME; prints "written unchanged backed_up".
+# deploy_once [CURSOR] [DESKTOP] [HOME]
 deploy_once() {
     (
-        export HOME="${tmp}/home" XDG_CONFIG_HOME="${tmp}/home/.config" XDG_DATA_HOME="${tmp}/home/.local/share"
+        local home="${3:-${tmp}/home}"
+        export HOME="${home}" XDG_CONFIG_HOME="${home}/.config" XDG_DATA_HOME="${home}/.local/share"
         unset XDG_STATE_HOME
-        REPO="${repo}" PALETTE=quasar CURSOR_THEME="${1:-capitaine-cursors-light}"
+        REPO="${repo}" PALETTE=quasar CURSOR_THEME="${1:-capitaine-cursors-light}" RICE_DESKTOP="${2:-hyprland}"
         WORK_DIR="$(mktemp -d -p "${tmp}")"
         SKY_MODE=animated SKY_LAYOUT=mirror SKY_IMAGE=""
         # shellcheck source=lib/log.sh
@@ -75,6 +77,20 @@ if grep -q "desc:ACME X1 S1" "${cfg}/hypr/conf/monitors.lua" && (( w == 0 )); th
 read -r w _ b <<< "$(deploy_once Bibata-Modern-Ice)"
 if grep -q "^local cursor_theme = \"Bibata-Modern-Ice\"" "${cfg}/hypr/conf/env.lua" && (( w == 1 && b == 1 )); then pass "cursor choice reaches env.lua"; else fail "cursor choice reaches env.lua"; fi
 if [[ -f "${cfg}/rice/settings.json" ]]; then pass "settings.json not overwritten"; else fail "settings.json not overwritten"; fi
+
+# The i3 desktop (FreeBSD's default): its own files instead of Hyprland's and Quickshell's.
+i3cfg="${tmp}/i3home/.config"
+read -r w u b <<< "$(deploy_once Bibata-Modern-Ice i3 "${tmp}/i3home")"
+if [[ -f "${i3cfg}/i3/config" && -f "${i3cfg}/i3/colors.conf" && -f "${i3cfg}/picom/picom.conf" &&
+      -f "${i3cfg}/polybar/colors.ini" && -f "${i3cfg}/dunst/dunstrc" && ! -e "${i3cfg}/hypr" && ! -e "${i3cfg}/quickshell" ]]; then
+    pass "i3 desktop: X11 files, no Hyprland/Quickshell"
+else
+    fail "i3 desktop: X11 files, no Hyprland/Quickshell"
+fi
+if [[ -f "${i3cfg}/polybar/local.ini" ]]; then pass "i3 desktop: polybar local.ini created"; else fail "i3 desktop: polybar local.ini created"; fi
+if grep -q '^rice_cursor_theme=Bibata-Modern-Ice$' "${i3cfg}/i3/env.sh"; then pass "cursor choice reaches i3/env.sh"; else fail "cursor choice reaches i3/env.sh"; fi
+read -r w u b <<< "$(deploy_once Bibata-Modern-Ice i3 "${tmp}/i3home")"
+if (( w == 0 && b == 0 )); then pass "i3 desktop: re-run writes nothing"; else fail "i3 desktop: re-run writes nothing (${w} written)"; fi
 
 # Full dry run with stubbed system commands: must finish and never call sudo or pacman -S.
 stubs="${tmp}/stubs"

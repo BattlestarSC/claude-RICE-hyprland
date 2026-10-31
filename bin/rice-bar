@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# The i3 session's bar: starts polybar per monitor and prints the values its script modules show
+# (polybar's own cpu/memory/fs modules read Linux /proc files; these work on FreeBSD and Linux).
+#
+#   rice-bar launch          (re)start polybar: "main" on the primary monitor, "side" elsewhere
+#   rice-bar cpu             CPU use in %, a new line every 2 s (polybar tail = true)
+#   rice-bar mem | load | disk | net | vol | media     one line each, polled by polybar
+#
+# Config: ~/.config/polybar/config.ini; colors: ~/.config/polybar/colors.ini (generated).
+set -Eeuo pipefail
+
+OS=$(uname -s)
+
+launch() {
+  local uid m primary
+  uid=$(id -u)
+  pkill -u "$uid" -x polybar 2>/dev/null || true
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    pgrep -u "$uid" -x polybar >/dev/null || break
+    sleep 0.2
+  done
+  # "DP-1: 3840x2160+0+0 (primary)" (polybar --list-monitors; clones removed)
+  local monitors
+  monitors=$(polybar --list-monitors 2>/dev/null || true)
+  [[ -n $monitors ]] || { setsid -f polybar main >/dev/null 2>&1; return 0; }
+  primary=$(awk -F: '/\(primary\)/ { print $1; exit }' <<<"$monitors")
+  [[ -n $primary ]] || primary=$(sort -t+ -k2 -n <<<"$monitors" | head -n 1 | cut -d: -f1)
+  while IFS=: read -r m _; do
+    if [[ $m == "$primary" ]]; then
+      MONITOR=$m setsid -f polybar main >/dev/null 2>&1
+    else
+      MONITOR=$m setsid -f polybar side >/dev/null 2>&1
+    fi
+  done <<<"$monitors"
+}
+
+# Busy/total jiffies since boot: FreeBSD kern.cp_time "user nice sys intr idle";
+# Linux /proc/stat "cpu user nice system idle iowait irq softirq steal ...".
+cpu_sample() {
+  if [[ $OS == FreeBSD ]]; then
+    sysctl -n kern.cp_time | awk '{ t = $1 + $2 + $3 + $4 + $5; print t - $5, t }'
+  else
+    awk '/^cpu / { t = 0; for (i = 2; i <= 9; i++) t += $i; print t - $5 - $6, t; exit }' /proc/stat
+  fi
+}
+
+cpu() {
+  local b0 t0 b1 t1
+  read -r b0 t0 < <(cpu_sample)
+  while sleep 2; do
+    read -r b1 t1 < <(cpu_sample)
+    # Printed by the shell, not awk: awk block-buffers into a pipe and polybar would see nothing.
+    local b=$((b1 - b0)) t=$((t1 - t0))
+    (( t > 0 )) || t=1
+    printf '%d%%\n' $(( (200 * b + t) / (2 * t) ))
+    b0=$b1 t0=$t1
+  done
+}
+
+# Used memory: total minus what the kernel can hand out at once (FreeBSD: free + inactive
+# pages; Linux: MemAvailable).
+mem() {
+  if [[ $OS == FreeBSD ]]; then
+    sysctl -n hw.physmem hw.pagesize vm.stats.vm.v_free_count vm.stats.vm.v_inactive_count |
+      awk '{ v[NR] = $1 } END { printf "%.1fG\n", (v[1] - (v[3] + v[4]) * v[2]) / 1073741824 }'
+  else
+    awk '/^MemTotal:/ { t = $2 } /^MemAvailable:/ { a = $2 } END { printf "%.1fG\n", (t - a) / 1048576 }' /proc/meminfo
+  fi
+}
+
+load() {
+  if [[ $OS == FreeBSD ]]; then
+    sysctl -n vm.loadavg | awk '{ print $2, $3, $4 }'   # "{ 0.38 0.40 0.39 }"
+  else
+    awk '{ print $1, $2, $3 }' /proc/loadavg
+  fi
+}
+
+# Fill level per drive: ZFS pools where there are any, else / and /home.
+disk() {
+  local out=""
+  if command -v zpool >/dev/null && out=$(zpool list -H -o name,capacity 2>/dev/null) && [[ -n $out ]]; then
+    awk '{ printf "%s%s %s", (NR > 1 ? "  " : ""), $1, $2 } END { print "" }' <<<"$out"
+  else
+    df -kP / /home 2>/dev/null | awk 'NR > 1 && !seen[$1]++ { printf "%s%s %s", n++ ? "  " : "", $6, $5 } END { print "" }'
+  fi
+}
+
+net() {
+  local ifc="" ssid=""
+  if [[ $OS == FreeBSD ]]; then
+    ifc=$(route -n get default 2>/dev/null | awk '/interface:/ { print $2 }')
+    [[ -n $ifc ]] && ssid=$(ifconfig "$ifc" 2>/dev/null | awk '$1 == "ssid" { print $2; exit }')
+  else
+    ifc=$(awk '$2 == "00000000" { print $1; exit }' /proc/net/route 2>/dev/null)
+    command -v iwgetid >/dev/null && [[ -n $ifc ]] && ssid=$(iwgetid -r "$ifc" 2>/dev/null || true)
+  fi
+  if [[ -z $ifc ]]; then
+    echo "󰖪 offline"
+  elif [[ -n $ssid ]]; then
+    echo "󰖩 $ssid"
+  else
+    echo "󰈀 $ifc"
+  fi
+}
+
+vol() {
+  local pct muted
+  read -r pct muted < <(rice-volume get)
+  if [[ $muted == on ]]; then echo "󰝟 muted"; elif (( pct < 34 )); then echo "󰕿 $pct%"
+  elif (( pct < 67 )); then echo "󰖀 $pct%"; else echo "󰕾 $pct%"; fi
+}
+
+media() {
+  command -v playerctl >/dev/null || { echo; return 0; }
+  local status title
+  status=$(playerctl status 2>/dev/null || true)
+  title=$(playerctl metadata title 2>/dev/null || true)
+  (( ${#title} > 40 )) && title="${title:0:39}…"
+  case $status in
+    Playing) echo "󰏤 $title" ;;
+    Paused)  echo "󰐊 $title" ;;
+    *) echo ;;
+  esac
+}
+
+case ${1:-} in
+  launch|cpu|mem|load|disk|net|vol|media) "$1" ;;
+  *) echo "usage: rice-bar {launch|cpu|mem|load|disk|net|vol|media}" >&2; exit 2 ;;
+esac

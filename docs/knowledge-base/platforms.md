@@ -182,7 +182,10 @@ does not switch profiles: that rebuilds the world and is the owner's call.
 ## FreeBSD
 
 FreeBSD 15.1-RELEASE, amd64 (`tests/platforms/probe-freebsd.sh` in a FreeBSD VM, 2026-10-31)
-[V]. 15.x names the ports package repository `FreeBSD-ports`, and its default URL is already
+[V]. **Two desktops (D43):** i3 on X11 is the default (all packages, LightDM login; its own
+page: [x11.md](x11.md), package list `packages/freebsd/i3.txt`); the Hyprland desktop described
+below is `RICE_DESKTOP=hyprland` or the plan's first answer (lists `hyprland.txt` + `build.txt`).
+`desktop.txt` holds what both share. 15.x names the ports package repository `FreeBSD-ports`, and its default URL is already
 `latest`, so quarterly and latest gave the same versions.
 
 - **Packaged and current:** the whole Hyprland 0.57 library stack (hyprutils 0.14.3, hyprlang

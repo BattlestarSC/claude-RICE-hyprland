@@ -4,10 +4,14 @@
 #   rice-menu session | clipboard | windows | keys | screenshot | monitors
 #
 # Each menu is one function; all of them render through deck() so they look the same.
-# Bound in ~/.config/hypr/conf/binds.lua. Runtime deps (official repos): rofi, jq,
-# cliphist, wl-clipboard, grim, slurp, hyprshutdown (falls back to hl.dsp.exit()); power actions
+# Bound in ~/.config/hypr/conf/binds.lua (Hyprland) and ~/.config/i3/config (i3, X11).
+# Runtime deps: rofi, jq; Hyprland: cliphist, wl-clipboard, grim, slurp, hyprshutdown (falls
+# back to hl.dsp.exit()); i3: i3-msg, clipmenu (+ xsel), maim, slop, xclip. Power actions
 # through rice-session (systemctl, loginctl or FreeBSD's shutdown).
 set -Eeuo pipefail
+
+# An X11 session (i3) rather than Hyprland.
+x11() { [[ -z ${WAYLAND_DISPLAY:-} && -n ${DISPLAY:-} ]]; }
 
 deck() { # deck PROMPT [MESSAGE] < entries  ->  selected line on stdout
   local prompt=$1 mesg=${2:-}
@@ -22,7 +26,9 @@ notify() {
 
 menu_session() {
   local up choice
-  up=$(uptime -p | sed 's/^up //')
+  # procps: "up 2 hours, 5 minutes"; BSD uptime has no -p: " 3:04PM  up 2 days,  4:01, 1 user, ..."
+  up=$(uptime -p 2>/dev/null | sed 's/^up //') ||
+    up=$(uptime | sed -e 's/.* up *//' -e 's/, *[0-9]* users\{0,1\},.*//')
   choice=$(printf '%s\n' \
     "  lock" "󰍃  log out" "󰤄  suspend" "  reboot" "  shut down" |
     deck session "up $up") || exit 0
@@ -36,6 +42,12 @@ menu_session() {
 }
 
 graceful_exit() { # [label] [post-command]
+  if x11; then
+    # i3 has no graceful close-all: apps get closed with the X server (log out) or by
+    # shutdown(8)'s SIGTERM.
+    if [[ -n ${2:-} ]]; then sh -c "$2"; else i3-msg exit >/dev/null; fi
+    return
+  fi
   if command -v hyprshutdown >/dev/null; then
     local args=()
     [[ -n ${1:-} ]] && args+=(-t "$1")
@@ -48,12 +60,34 @@ graceful_exit() { # [label] [post-command]
 }
 
 menu_clipboard() {
+  if x11; then
+    # clipmenu runs rofi itself (CM_LAUNCHER=rofi adds -dmenu) and copies the pick with xsel.
+    CM_LAUNCHER=rofi clipmenu -i -p clipboard -theme deck -no-custom \
+      -mesg "enter copies · history from clipmenu" || true
+    return 0
+  fi
   local pick
   pick=$(cliphist list | deck clipboard "enter copies · history from cliphist") || exit 0
   printf '%s' "$pick" | cliphist decode | wl-copy
 }
 
+menu_windows_i3() {
+  local pick id
+  # Same columns as under Hyprland; con_id after the tab.
+  pick=$(i3-msg -t get_tree | jq -r '
+      recurse(.nodes[]?, .floating_nodes[]?) | select(.type == "workspace" and .name != "__i3_scratch")
+      | .name as $ws
+      | recurse(.nodes[]?, .floating_nodes[]?) | select(.window != null)
+      | "\($ws)\t\(.window_properties.class // "")\t\(.name // "")\t\(.id)"' |
+    awk -F'\t' '{ printf "%-4s %-18.18s %s\t%s\n", $1, $2, $3, $4 }' |
+    deck windows "workspace · class · title") || exit 0
+  id=${pick##*$'\t'}
+  [[ $id =~ ^[0-9]+$ ]] || exit 0
+  i3-msg "[con_id=$id] focus" >/dev/null
+}
+
 menu_windows() {
+  x11 && { menu_windows_i3; return; }
   local pick address
   # "workspace  class  title<TAB>address"; rofi shows everything before the tab.
   pick=$(hyprctl -j clients | jq -r '
@@ -66,7 +100,27 @@ menu_windows() {
   hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
 }
 
+# i3: a "## description" line right above a bindsym (config/i3/config) is that bind's entry;
+# $variables from "set" lines are written out, $mod as Super.
+menu_keys_i3() {
+  local cfg="${XDG_CONFIG_HOME:-$HOME/.config}/i3"
+  cat "$cfg/config" "$cfg/local.conf" 2>/dev/null | awk '
+      $1 == "set" && $2 ~ /^\$/ { var[$2] = $3; next }
+      /^[[:space:]]*## / { sub(/^[[:space:]]*## /, ""); desc = $0; next }
+      desc != "" && $1 ~ /^bind(sym|code)$/ {
+          key = $2
+          if (key ~ /^--/) key = $3
+          for (v in var) gsub("\\" v, var[v], key)
+          sub(/^Mod4/, "Super", key); sub(/^Mod1/, "Alt", key); gsub(/\+Mod4/, "+Super", key)
+          sub(/^Control/, "Ctrl", key); gsub(/\+Control/, "+Ctrl", key)
+          printf "%-26s %s\n", key, desc
+      }
+      { desc = "" }' |
+    deck keys "i3 default keymap · descriptions from ~/.config/i3/config" >/dev/null || true
+}
+
 menu_keys() {
+  x11 && { menu_keys_i3; return 0; }
   # Binds that carry a description (set in binds.lua). modmask bits are the xkb ones:
   # SHIFT 1, CTRL 4, ALT 8, SUPER 64.
   hyprctl -j binds | jq -r '
@@ -88,6 +142,20 @@ menu_screenshot() {
   choice=$(printf '%s\n' "󰩭  region → clipboard" "󰩭  region → file" "  window → file" "󰍹  monitor → file" |
     deck screenshot "files go to $dir") || exit 0
   sleep 0.2 # let the menu close before capturing
+  if x11; then
+    local win out
+    case $choice in
+      *"region → clipboard") maim -s -u | xclip -selection clipboard -t image/png; notify "Screenshot copied" ;;
+      *"region → file")      maim -s -u "$file" && notify "Saved" "$file" ;;
+      *window*)              win=$(i3-msg -t get_tree | jq -r '.. | objects | select(.focused == true) | .window // empty')
+                             [[ -n $win ]] && maim -u -i "$win" "$file" && notify "Saved" "$file" ;;
+      *monitor*)             out=$(i3-msg -t get_workspaces | jq -r '.[] | select(.focused) | .output')
+                             maim -u -g "$(i3-msg -t get_outputs | jq -r --arg o "$out" \
+                               '.[] | select(.name == $o) | "\(.rect.width)x\(.rect.height)+\(.rect.x)+\(.rect.y)"')" "$file"
+                             notify "Saved" "$file" ;;
+    esac
+    return 0
+  fi
   case $choice in
     *"region → clipboard") geom=$(slurp) || exit 0; grim -g "$geom" - | wl-copy; notify "Screenshot copied" ;;
     *"region → file")      geom=$(slurp) || exit 0; grim -g "$geom" "$file"; notify "Saved" "$file" ;;
@@ -99,6 +167,11 @@ menu_screenshot() {
 }
 
 menu_monitors() {
+  if x11; then
+    # rice-monitors works on Hyprland's monitor list; under X11 arandr edits the layout.
+    if command -v arandr >/dev/null; then arandr & else notify "Monitors" "xrandr --query lists the outputs"; fi
+    return 0
+  fi
   # Panel identification for the KVM setup (bin/rice-monitors, docs/knowledge-base/hardware.md).
   local pick
   pick=$(printf '%s\n' \

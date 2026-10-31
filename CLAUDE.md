@@ -33,6 +33,9 @@ Present beyond docs: theme generator + templates, generated `themes/quasar/`, `c
 `install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors,libreoffice-setup,share-picker,session}`,
 `.github/workflows/ci.yml`, tests.
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
+FreeBSD defaults to an **i3 desktop on X11** (D43, pending owner review): `config/{i3,polybar,lightdm}/`,
+templates for i3/picom/polybar/dunst/lightdm, `bin/rice-{bar,volume}`, X11 branches in `rice-session`
+and `rice-menu`, `RICE_DESKTOP` (hyprland | i3) chosen by `plat_ask`; see x11.md.
 **Nothing has run on real hardware yet**: the installer is tested with dry runs and a throwaway
 home, and for real (`./install.sh --yes` as a sudo user, then `verify-install.sh` and an
 idempotent re-run) by the `full-install` workflow in `archlinux:latest`, `ubuntu:26.04` and
@@ -67,6 +70,7 @@ i3 default key, and give every new bind a `description` (it feeds the in-session
 | Monitors, GPU, ROCm, login (greetd) | [docs/knowledge-base/hardware.md](docs/knowledge-base/hardware.md) |
 | rofi, launcher, scripted menus | [docs/knowledge-base/launcher.md](docs/knowledge-base/launcher.md) |
 | Status bar, telemetry sources, Quickshell, notifications, ASCII sky, screensaver | [docs/knowledge-base/bar.md](docs/knowledge-base/bar.md) |
+| The i3/X11 desktop (FreeBSD default): i3, picom, polybar, dunst, i3lock, LightDM | [docs/knowledge-base/x11.md](docs/knowledge-base/x11.md) |
 | GTK/Qt app theming, file managers | [docs/knowledge-base/theming.md](docs/knowledge-base/theming.md) |
 | Browsers (policies, prefs, userChrome) | [docs/knowledge-base/browsers.md](docs/knowledge-base/browsers.md) |
 | Code - OSS (settings, theme extension) | [docs/knowledge-base/editor.md](docs/knowledge-base/editor.md) |
@@ -116,7 +120,8 @@ bin/                        user commands deployed to ~/.local/bin (rice-menu, r
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
 tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind/rule/event tests),
                             quickshell/ (bar render with mocks), sky/ (ASCII sky frames + timing),
-                            installer/ (file layer + dry run; package names in Arch; PAM edit), cli/, editors/, nvim/,
+                            installer/ (file layer + dry run; package names in Arch; PAM edit), x11/ (i3 session in Xvfb),
+                            cli/, editors/, nvim/,
                             hypr/ (hyprtoolkit keys, share picker), apps/ (imv, Zathura)
 docs/                       knowledge-base/, colors/, decisions.md
 ```
@@ -135,6 +140,8 @@ tests/installer/check_packages.sh                          # inside Arch after p
 tests/installer/pam_keyring.sh [/etc/pam.d/greetd]         # keyring PAM edit: placement, nothing else changed, idempotent
 docker run --rm -v "$PWD:/src:ro" archlinux:latest bash /src/tests/installer/full-install.sh   # real install + verify (CI: full-install.yml)
 tests/hypr/share-picker.sh                                 # rice-share-picker vs XDPH's stdout format (stub rofi/hyprctl/slurp)
+tests/x11/run.sh [OUT]                                     # i3 desktop files in a throwaway home, session in Xvfb, screenshots
+i3 -C -c ~/.config/i3/config                               # i3 config parse check (exit 1 on errors)
 python3 tests/apps/check_viewers.py <zathura> <imv>        # zathurarc / imv config option names and color formats
 ./install.sh --dry-run                                     # on Arch: every action printed, nothing changed
 python3 tests/office/check_office.py <libreoffice core 26.8> <texstudio>   # LibreOffice theme vs registry schema, TeXstudio keys/format ids
@@ -303,6 +310,12 @@ in an `archlinux:latest` container or on hardware.
   `df --output`, `sed -i`; read `/etc/os-release` with `os_release KEY` (Gentoo single-quotes).
   Session plumbing that systemd/logind provide elsewhere goes through `rice-session`
   (`start`, `lock`, `power`, `hyprland`); never call `systemctl`/`loginctl` directly in configs.
+- i3 desktop (x11.md): every bind in `config/i3/config` needs a `## description` line right above
+  it (`rice-menu keys` parses those). polybar stops on a missing `include-file` (i3 skips one).
+  The bar is override-redirect and i3 leaves room with `gaps top`: a managed dock is full width.
+  Script modules must not print through awk in a loop (pipe buffering). LightDM's FreeBSD
+  `Xsession` runs `exec $@` unquoted: `Exec=` in a session entry must be a plain command.
+  `i3lock` options from i3lock-color make plain i3lock exit (unlocked): keep the version check.
 - Non-Arch platforms: `lib/platform/<id>.sh`, lists in `packages/<id>/`, facts in
   [platforms.md](docs/knowledge-base/platforms.md). Gentoo keywords/USE live in `config/portage/`
   and come from what Portage asks for in the gentoo workflow.

@@ -20,7 +20,8 @@ jobs:
         run: >
           shellcheck -x install.sh lib/*.sh lib/platform/*.sh bin/rice-menu bin/rice-sky-atlas bin/rice-browser-setup
           bin/rice-code-setup bin/rice-lsp-setup bin/rice-monitors bin/rice-libreoffice-setup bin/rice-share-picker
-          tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh tests/hypr/share-picker.sh
+          bin/rice-session bin/rice-bar bin/rice-volume config/i3/env.sh config/lightdm/rice-i3-session
+          tests/rofi-render.sh tests/zsh/run.sh tests/installer/*.sh tests/hypr/share-picker.sh tests/x11/*.sh
       - name: Generated themes are current
         run: python3 tools/render_theme.py colors/quasar.toml --check
       - name: Palette contrast rules
@@ -33,6 +34,32 @@ jobs:
         run: tests/installer/pam_keyring.sh
       - name: Screen-share picker output
         run: tests/hypr/share-picker.sh
+
+  x11:
+    # The i3 desktop (FreeBSD's default) under Xvfb with Ubuntu's i3/polybar/picom/dunst: the
+    # config parses (i3 -C), the session's helpers start, the bar draws, the lock screen stays up.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: >
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends i3-wm polybar
+          picom dunst i3lock xss-lock feh maim slop xclip xvfb x11-utils x11-xserver-utils
+          dbus-x11 libnotify-bin policykit-1-gnome librsvg2-bin jq fonts-ibm-plex xterm
+      - name: i3 accepts the config
+        run: |
+          d="$(mktemp -d)"
+          cp config/i3/config themes/quasar/i3/colors.conf "$d/"
+          sed -i "s|~/.config/i3/colors.conf|$d/colors.conf|" "$d/config"
+          i3 -C -c "$d/config"
+      - name: The session in Xvfb
+        run: RICE_SMOKE_WINDOWS=xterm tests/x11/run.sh "$PWD/x11-shots"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: x11-screenshots-ubuntu
+          path: x11-shots/
+          if-no-files-found: ignore
 
   packages:
     runs-on: ubuntu-24.04

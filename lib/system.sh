@@ -13,6 +13,8 @@ system_setup() {
         printf '%s\n' "${PLAT_FIRST_TTY}" > "${WORK_DIR}/tty-autostart"
         deploy_file "${WORK_DIR}/tty-autostart" "${XDG_CONFIG_HOME:-${HOME}/.config}/rice/tty-autostart"
         plat_set_display_manager "" "${DISPLAY_MANAGER}"
+    elif (( WANT_GREETER )) && [[ "${PLAT_GREETER}" == lightdm ]]; then
+        setup_lightdm
     elif (( WANT_GREETER )); then
         info "login screen: greetd + ReGreet"
         deploy_system_file "$(with_system_paths "${REPO}/config/greetd/config.toml")" "${g}/config.toml"
@@ -67,6 +69,34 @@ system_setup() {
     fi
 }
 
+# The i3 desktop's login: LightDM with its GTK greeter. Drop-in files only (lightdm.conf.d,
+# lightdm-gtk-greeter.conf.d: read before the package's own files, so those still win); the
+# greeter's look is a GTK theme of its own; the session entry runs rice-session i3.
+setup_lightdm() {
+    local theme="${REPO}/themes/${PALETTE}" l="${LIGHTDM_ETC}"
+    info "login screen: LightDM + GTK greeter, session Rice (i3)"
+    deploy_system_file "${REPO}/config/lightdm/lightdm.conf" "${l}/lightdm.conf.d/50-rice.conf"
+    deploy_system_file "$(with_cursor "${REPO}/config/lightdm/lightdm-gtk-greeter.conf")" \
+        "${l}/lightdm-gtk-greeter.conf.d/50-rice.conf"
+    deploy_system_file "${theme}/lightdm/gtk.css" "${DATA_DIRS[0]}/themes/Quasar-greeter/gtk-3.0/gtk.css"
+    deploy_system_file "${REPO}/config/lightdm/rice-i3.desktop" "${XSESSIONS_DIR}/rice-i3.desktop"
+    deploy_system_file "${REPO}/config/lightdm/rice-i3-session" "${RICE_LIBEXEC}/rice-i3-session" 0755
+    # The greeter runs as user lightdm: its background is copied out of ~ (like greetd's).
+    if (( DRY_RUN )); then
+        note "would render ${l}/rice/background.png from assets/sky/still-3840x2160.svg"
+    else
+        rsvg-convert -o "${WORK_DIR}/background.png" "${REPO}/assets/sky/still-3840x2160.svg"
+        deploy_system_file "${WORK_DIR}/background.png" "${l}/rice/background.png"
+    fi
+    plat_set_display_manager lightdm "${DISPLAY_MANAGER}"
+    # Keyring: the PAM service of user sessions is "lightdm" (pkg installs it from .sample).
+    if [[ -f "${PAM_DIR}/lightdm" ]]; then
+        deploy_system_file "$(with_keyring_pam "${PAM_DIR}/lightdm")" "${PAM_DIR}/lightdm"
+    else
+        note "would add pam_gnome_keyring to ${PAM_DIR}/lightdm (installed by the lightdm package)"
+    fi
+}
+
 # with_system_paths FILE: path of a copy of FILE with this system's greetd directory, greeter
 # user, power command and VT in place of the repository's defaults (/etc/greetd, "greeter",
 # systemctl, 1).
@@ -93,7 +123,7 @@ with_keyring_pam() {
     if grep -q 'pam_gnome_keyring\.so' -- "$1"; then
         cp -- "$1" "${out}"
     else
-        awk -f "${REPO}/lib/pam-keyring.awk" "$1" "$1" > "${out}"
+        awk -v module="${PAM_KEYRING_MODULE:-pam_gnome_keyring.so}" -f "${REPO}/lib/pam-keyring.awk" "$1" "$1" > "${out}"
     fi
     printf '%s' "${out}"
 }

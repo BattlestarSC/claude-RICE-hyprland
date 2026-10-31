@@ -73,6 +73,7 @@ parse_args() {
 
 ask_plan() {
     step "Choices (Enter takes the default)"
+    plat_ask
     ask_yn "Office: full TeX Live, TeXstudio, LibreOffice (about 7 GB)?" y || WANT_OFFICE=0
     if (( HAS_AMD )) && [[ -f "${PKG_DIR}/blender.txt" ]]; then
         ask_yn "Blender with HIP (GPU) rendering?" y && WANT_BLENDER=1
@@ -80,7 +81,12 @@ ask_plan() {
     if [[ "${PLAT_ID}" == arch ]]; then
         ask_yn "ungoogled-chromium as a backup browser (AUR, built with makepkg)?" n && WANT_AUR_BROWSER=1
     fi
-    ask_choice SKY_MODE "Wallpaper" animated animated still image
+    if [[ "${RICE_DESKTOP}" == i3 ]]; then
+        # X11 has no live sky (it needs layer-shell and Quickshell): the still sky everywhere.
+        SKY_MODE=still
+    else
+        ask_choice SKY_MODE "Wallpaper" animated animated still image
+    fi
     if [[ "${SKY_MODE}" == image ]]; then
         if (( ASSUME_YES )) || [[ ! -t 0 ]]; then
             SKY_MODE=animated
@@ -89,9 +95,11 @@ ask_plan() {
             [[ -r "${SKY_IMAGE}" ]] || { warn "cannot read ${SKY_IMAGE}; using the animated sky"; SKY_MODE=animated; SKY_IMAGE=""; }
         fi
     fi
-    ask_choice SKY_LAYOUT "Two monitors" mirror mirror span
+    [[ "${RICE_DESKTOP}" == hyprland ]] && ask_choice SKY_LAYOUT "Two monitors" mirror mirror span
     if [[ "${PLAT_GREETER}" == greetd ]]; then
         ask_yn "Use the graphical login screen (greetd + ReGreet) as the display manager?" y || WANT_GREETER=0
+    elif [[ "${PLAT_GREETER}" == lightdm ]]; then
+        ask_yn "Use the graphical login screen (LightDM) for the i3 session?" y || WANT_GREETER=0
     else
         ask_yn "Start Hyprland when you log in on ${PLAT_FIRST_TTY#/dev/} (${PLAT_NAME} has no greetd)?" y || WANT_GREETER=0
     fi
@@ -113,11 +121,15 @@ show_plan() {
     info "languages: Elixir/Erlang, Haskell, SWI-Prolog, Fortran, Scala (JDK ${JDK_VERSION}), OCaml + their language servers"
     (( WANT_AUR_BROWSER )) && info "AUR: ungoogled-chromium-bin"
     info "your files: copied into ~/.config, ~/.local; replaced files backed up to ${BACKUP_DIR}"
-    info "wallpaper: ${SKY_MODE}, ${SKY_LAYOUT}; cursor: ${CURSOR_THEME}"
+    info "desktop: ${RICE_DESKTOP}; wallpaper: ${SKY_MODE}, ${SKY_LAYOUT}; cursor: ${CURSOR_THEME}"
     info "system (sudo):"
     if (( WANT_GREETER )) && [[ "${PLAT_GREETER}" == greetd ]]; then
         info "  - login screen: ${GREETD_DIR}/*, enable greetd${DISPLAY_MANAGER:+ (disable ${DISPLAY_MANAGER})}"
         info "  - keyring unlocked at login: pam_gnome_keyring in ${PAM_DIR}/greetd"
+    elif (( WANT_GREETER )) && [[ "${PLAT_GREETER}" == lightdm ]]; then
+        info "  - login screen: LightDM, ${LIGHTDM_ETC}/*.conf.d/50-rice.conf, session ${XSESSIONS_DIR}/rice-i3.desktop,"
+        info "    greeter theme Quasar-greeter; enable lightdm${DISPLAY_MANAGER:+ (disable ${DISPLAY_MANAGER})}"
+        info "  - keyring unlocked at login: pam_gnome_keyring in ${PAM_DIR}/lightdm"
     elif (( WANT_GREETER )); then
         info "  - Hyprland after a console login on ${PLAT_FIRST_TTY#/dev/}${DISPLAY_MANAGER:+ (disable ${DISPLAY_MANAGER})}"
     fi
@@ -136,6 +148,15 @@ finish() {
         info "${BACKED_UP} replaced file(s) backed up: ${BACKUP_DIR}/manifest.tsv"
     fi
     [[ -n "${RICE_LOG}" ]] && info "log: ${RICE_LOG}"
+    if [[ "${RICE_DESKTOP}" == i3 ]]; then
+        if (( WANT_GREETER )); then
+            info "Reboot to start at the new login screen (session: Rice (i3))."
+        else
+            info "Start the desktop from a console: startx ${HOME}/.local/bin/rice-session i3"
+        fi
+        info "Keys: Super+F1 shows every binding; monitors: arandr (Super+Shift+E is the session menu)."
+        return 0
+    fi
     info "Reboot to start at the new login screen (or run start-hyprland from a TTY)."
     info "After the first login the two panels are recorded automatically; if left and right are"
     info "swapped: Super+Shift+M > swap. Keys: Super+F1 shows every binding."
@@ -155,7 +176,7 @@ main() {
     install_packages
     plat_extras
     (( WANT_AUR_BROWSER )) && install_aur ungoogled-chromium-bin
-    check_hyprland_version
+    [[ "${RICE_DESKTOP}" == hyprland ]] && check_hyprland_version
     resolve_cursor_theme
     deploy_user_files
     build_assets

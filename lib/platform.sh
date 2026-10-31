@@ -20,10 +20,20 @@
 #   POWER_CTL                          program with reboot/poweroff verbs for the greeter
 #   GREETD_VT                          virtual terminal greetd runs on (free of gettys)
 #   PLAT_GREETER, PLAT_FIRST_TTY       greetd, or tty: no greetd here, so Hyprland starts after a
-#                                      console login on PLAT_FIRST_TTY (config/zsh/session.zsh)
+#                                      console login on PLAT_FIRST_TTY (config/zsh/session.zsh),
+#                                      or lightdm (the i3 desktop)
+#   plat_ask                           platform questions, first in the plan (FreeBSD: desktop)
+#   RICE_DESKTOP                       hyprland, or i3 (X11; FreeBSD's default, D43). The
+#                                      environment variable RICE_DESKTOP picks it unattended
+#                                      where a platform offers the choice.
+#   LIGHTDM_ETC, XSESSIONS_DIR, RICE_LIBEXEC, PAM_KEYRING_MODULE   paths for the i3 desktop
 
 PLAT_ID=""      # arch | ubuntu | gentoo | freebsd | fedora
 PLAT_INIT=""    # systemd | openrc | rc
+# The desktop. Only a platform that offers i3 reads the request (lib/platform/freebsd.sh).
+# shellcheck disable=SC2034
+RICE_DESKTOP_REQUEST="${RICE_DESKTOP:-}"
+RICE_DESKTOP=hyprland
 
 # os_release KEY: a value from /etc/os-release. The file is shell syntax and systems quote
 # differently (Gentoo: ID='gentoo'), so it is read by a shell, in a subshell.
@@ -61,10 +71,14 @@ declare -g ZSH_BIN=/usr/bin/zsh GREETD_DIR=/etc/greetd GREETER_USER=greeter PAM_
     GREETD_VT=1 PLAT_GREETER=greetd PLAT_FIRST_TTY=/dev/tty1
 # shellcheck disable=SC2034  # used by lib/desktop.sh
 declare -ga DATA_DIRS=(/usr/local/share /usr/share)
+# shellcheck disable=SC2034  # used by lib/system.sh (i3 desktop)
+declare -g LIGHTDM_ETC=/etc/lightdm XSESSIONS_DIR=/usr/share/xsessions RICE_LIBEXEC=/usr/libexec \
+    PAM_KEYRING_MODULE=pam_gnome_keyring.so
 
 # shellcheck disable=SC2034  # lists and names a platform module may add
 declare -ga PLAT_EXTRA_LISTS=() PLAT_REPO_PACKAGES=()
 
+plat_ask() { return 0; }
 plat_plan() { return 0; }
 plat_setup_repos() { return 0; }
 plat_extras() { return 0; }

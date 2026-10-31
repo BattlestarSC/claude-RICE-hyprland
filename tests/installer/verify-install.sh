@@ -12,7 +12,7 @@ source "${repo}/lib/log.sh"
 # shellcheck source=lib/platform.sh
 source "${repo}/lib/platform.sh"
 detect_platform
-echo "platform: ${PLAT_NAME} (${PLAT_INIT})"
+echo "platform: ${PLAT_NAME} (${PLAT_INIT}), desktop: ${RICE_DESKTOP} (RICE_DESKTOP picks it where offered)"
 cfg="${XDG_CONFIG_HOME:-${HOME}/.config}"
 data="${XDG_DATA_HOME:-${HOME}/.local/share}"
 export PATH="${HOME}/.local/bin:${PATH}"
@@ -60,9 +60,14 @@ code_cmd="$(command -v code || command -v codium || echo code)"
 optional_cmds=()
 [[ "${PLAT_ID}" == freebsd ]] || optional_cmds+=("${code_cmd##*/}")
 [[ "${PLAT_GREETER}" == greetd ]] && optional_cmds+=(greetd regreet)
-for cmd in Hyprland hyprlock hypridle quickshell rofi kitty foot zsh starship nvim "${helix_cmd##*/}" vis \
+if [[ "${RICE_DESKTOP}" == i3 ]]; then
+    desktop_cmds=(i3 i3-msg picom polybar dunst i3lock xss-lock feh maim slop xclip clipmenu clipmenud)
+else
+    desktop_cmds=(Hyprland hyprlock hypridle quickshell slurp grim wl-copy)
+fi
+for cmd in "${desktop_cmds[@]}" rofi kitty foot zsh starship nvim "${helix_cmd##*/}" vis \
     librewolf firefox thunderbird thunar dolphin imv zathura strawberry amberol kasts qt6ct \
-    gnome-keyring-daemon seahorse btop htop fastfetch slurp grim wl-copy jq "${optional_cmds[@]}"; do
+    gnome-keyring-daemon seahorse btop htop fastfetch jq "${optional_cmds[@]}"; do
     if command -v "${cmd}" > /dev/null; then
         pass "command ${cmd}"
     elif [[ "${cmd}" == amberol ]] && flatpak info io.bassi.Amberol > /dev/null 2>&1; then
@@ -71,20 +76,31 @@ for cmd in Hyprland hyprlock hypridle quickshell rofi kitty foot zsh starship nv
         fail "command ${cmd}"
     fi
 done
-version="$(Hyprland --version 2> /dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || true)"
-if [[ -n "${version}" && "$(printf '%s\n' 0.57.0 "${version}" | sort -V | head -n 1)" == 0.57.0 ]]; then
-    pass "Hyprland ${version} >= 0.57"
+if [[ "${RICE_DESKTOP}" == hyprland ]]; then
+    version="$(Hyprland --version 2> /dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || true)"
+    if [[ -n "${version}" && "$(printf '%s\n' 0.57.0 "${version}" | sort -V | head -n 1)" == 0.57.0 ]]; then
+        pass "Hyprland ${version} >= 0.57"
+    else
+        fail "Hyprland ${version:-?} >= 0.57"
+    fi
 else
-    fail "Hyprland ${version:-?} >= 0.57"
+    expect "i3lock is i3lock-color" ".c." i3lock -v
 fi
 
 echo "== configs in the real programs"
-# Hyprland parses the Lua config without starting a compositor (src/Compositor.cpp initServer);
-# it still wants a runtime directory.
-rt="$(mktemp -d)"; chmod 0700 "${rt}"
-check "Hyprland accepts ~/.config/hypr/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${cfg}/hypr/hyprland.lua"
-if [[ "${PLAT_GREETER}" == greetd ]]; then   # FreeBSD: no greeter, Hyprland after a console login
-    check "Hyprland accepts the login screen's ${GREETD_DIR}/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${GREETD_DIR}/hyprland.lua"
+if [[ "${RICE_DESKTOP}" == hyprland ]]; then
+    # Hyprland parses the Lua config without starting a compositor (src/Compositor.cpp
+    # initServer); it still wants a runtime directory.
+    rt="$(mktemp -d)"; chmod 0700 "${rt}"
+    check "Hyprland accepts ~/.config/hypr/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${cfg}/hypr/hyprland.lua"
+    if [[ "${PLAT_GREETER}" == greetd ]]; then   # FreeBSD: no greeter, Hyprland after a console login
+        check "Hyprland accepts the login screen's ${GREETD_DIR}/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${GREETD_DIR}/hyprland.lua"
+    fi
+else
+    # i3 -C parses the config (and its includes) and exits; 1 on any error (no X needed).
+    check "i3 accepts ~/.config/i3/config" i3 -C -c "${cfg}/i3/config"
+    check "the X session environment loads" bash -c ". '${cfg}/i3/env.sh' && [[ -n \${XCURSOR_THEME} ]]"
+    # picom, polybar and dunst need an X server: tests/x11/smoke.sh runs them under Xvfb.
 fi
 # Neovim: the installer pre-built plugins and parsers (lib/desktop.sh nvim_prepare), so the first
 # start is an ordinary one and must load the config and quit.
@@ -148,18 +164,31 @@ check "texlab" texlab --version
 check "vis-lspc" test -f "${cfg}/vis/plugins/vis-lspc/init.lua"
 
 echo "== files"
-for f in hypr/hyprland.lua hypr/conf/env.lua hypr/hyprlock.conf hypr/hypridle.conf hypr/xdph.conf \
-    hypr/hyprtoolkit.conf hypr/theme/colors.conf quickshell/shell.qml quickshell/common/Theme.qml \
-    quickshell/sky/shaders/scene.frag.qsb quickshell/sky/shaders/glyph.frag.qsb rofi/deck.rasi \
+if [[ "${RICE_DESKTOP}" == hyprland ]]; then
+    desktop_files=(hypr/hyprland.lua hypr/conf/env.lua hypr/hyprlock.conf hypr/hypridle.conf
+        hypr/xdph.conf hypr/hyprtoolkit.conf hypr/theme/colors.conf quickshell/shell.qml
+        quickshell/common/Theme.qml quickshell/sky/shaders/scene.frag.qsb
+        quickshell/sky/shaders/glyph.frag.qsb)
+    desktop_data=(rice/quickshell/sky-atlas-12x24.png)
+else
+    desktop_files=(i3/config i3/colors.conf i3/env.sh i3/lock.sh picom/picom.conf
+        polybar/config.ini polybar/colors.ini dunst/dunstrc)
+    desktop_data=()
+fi
+for f in "${desktop_files[@]}" rofi/deck.rasi \
     kitty/theme.conf foot/theme.ini zsh/theme.zsh starship.toml nvim/colors/rice.lua \
     helix/themes/rice.toml imv/config zathura/zathurarc qt6ct/qt6ct.conf qt6ct/colors/rice.conf \
     rice/settings.json; do
     if [[ -s "${cfg}/${f}" ]]; then pass "config/${f}"; else fail "config/${f}"; fi
 done
-for f in rice/quickshell/sky-atlas-12x24.png rice/lock.png color-schemes/Quasar.colors; do
+for f in "${desktop_data[@]}" rice/lock.png color-schemes/Quasar.colors; do
     if [[ -s "${data}/${f}" ]]; then pass "data/${f}"; else fail "data/${f}"; fi
 done
-expect "xdph.conf points at the picker" "${HOME}/.local/bin/rice-share-picker" cat "${cfg}/hypr/xdph.conf"
+if [[ "${RICE_DESKTOP}" == hyprland ]]; then
+    expect "xdph.conf points at the picker" "${HOME}/.local/bin/rice-share-picker" cat "${cfg}/hypr/xdph.conf"
+else
+    check "polybar local.ini exists (polybar stops without it)" test -e "${cfg}/polybar/local.ini"
+fi
 if [[ "${PLAT_ID}" != freebsd ]]; then
     expect "Code - OSS theme installed" "rice" "${code_cmd}" --list-extensions
     expect "Code - OSS uses the keyring" "gnome-libsecret" cat "${HOME}/.vscode-oss/argv.json"
@@ -195,6 +224,18 @@ if [[ "${PLAT_GREETER}" == greetd ]]; then
     check "greeter config deployed" test -s "${GREETD_DIR}/hyprland.lua"
     check "login background rendered" test -s "${GREETD_DIR}/background.png"
     check "bluetooth enabled" test -e /etc/systemd/system/bluetooth.target.wants/bluetooth.service
+elif [[ "${PLAT_GREETER}" == lightdm ]]; then
+    expect "lightdm enabled" "YES" sysrc -n lightdm_enable
+    expect "dbus enabled" "YES" sysrc -n dbus_enable
+    expect "LightDM starts the rice's session" "user-session=rice-i3" cat "${LIGHTDM_ETC}/lightdm.conf.d/50-rice.conf"
+    expect "greeter theme" "theme-name=Quasar-greeter" cat "${LIGHTDM_ETC}/lightdm-gtk-greeter.conf.d/50-rice.conf"
+    check "greeter theme CSS" test -s "${DATA_DIRS[0]}/themes/Quasar-greeter/gtk-3.0/gtk.css"
+    check "greeter background" test -s "${LIGHTDM_ETC}/rice/background.png"
+    check "session entry" test -s "${XSESSIONS_DIR}/rice-i3.desktop"
+    check "session launcher" test -x "${RICE_LIBEXEC}/rice-i3-session"
+    expect "keyring unlocked at login" "pam_gnome_keyring.so auto_start" cat "${PAM_DIR}/lightdm"
+    check "the PAM module named there exists" test -f "${PAM_KEYRING_MODULE}"
+    check "lightdm" test -x /usr/local/sbin/lightdm
 else
     expect "Hyprland starts after a console login" "${PLAT_FIRST_TTY}" cat "${cfg}/rice/tty-autostart"
     expect "seatd enabled" "YES" sysrc -n seatd_enable

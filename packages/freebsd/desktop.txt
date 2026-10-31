@@ -1,16 +1,7 @@
 # FreeBSD 15.1 package names (probe: tests/platforms/probe-freebsd.sh, CI 2026-10-31).
-# Hyprland itself: lib/platform/freebsd.sh (package if >= 0.57, else the port in ports/).
-hyprlock
-hypridle
-xdg-desktop-portal-hyprland
-hyprpolkitagent
-hyprland-guiutils
-hyprshutdown
-quickshell
-seatd
+# Shared by both desktops; i3.txt (X11, the default) or hyprland.txt adds the rest.
 dbus
 polkit
-xwayland
 mesa-dri
 xdg-desktop-portal-gtk
 xdg-utils
@@ -19,19 +10,10 @@ dconf
 gnome-keyring
 seahorse
 qt6ct
-qt6-wayland
-qt6-shadertools
 librsvg2-rust
 rofi
 jq
 libnotify
-wl-clipboard
-cliphist
-grim
-slurp
-pipewire
-wireplumber
-pavucontrol
 playerctl
 jetbrains-mono
 ?plex-ttf
@@ -39,7 +21,6 @@ noto
 noto-emoji
 nerd-fonts-symbols
 papirus-icon-theme
-nwg-look
 # Capitaine cursors are rendered from SVG (lib/extras.sh)
 xcursorgen
 # kreadconfig6/kwriteconfig6 (Dolphin and Kasts color scheme)

@@ -377,6 +377,20 @@ and Metals with Coursier. Erlang: the full `erlang` (observer, dialyzer…), not
 `erlang-core` that `elixir` needs.
 Details: [knowledge-base/editors.md](knowledge-base/editors.md#toolchains-d42).
 
+### D43. FreeBSD defaults to an i3 desktop on X11 (owner asked; components chosen by Claude, 2026-10-31)
+
+Owner: "perhaps we should make a dedicated FreeBSD version based on i3-gaps and X11 … as closely
+matching the current plan/theme as possible. You may employ components of your choice, let me
+review afterwards." FreeBSD does run Wayland (evdev, libinput, seatd, drm-kmod; Hyprland is in
+ports), but the rice's Wayland path there depends on a Hyprland port overlay we maintain, has
+no greetd (console autostart) and no logind. The i3 desktop uses only FreeBSD packages:
+i3 4.25 (gaps are in mainline; i3-gaps no longer exists), picom 13, polybar 3.7, dunst, rofi
+(same themes), i3lock-color, xss-lock, clipmenu, maim, polkit-gnome, the OSS mixer and LightDM
+with a generated GTK greeter theme. Same keys (i3's defaults plus the rice's additions), same
+palette, same apps. The plan's first question on FreeBSD picks the desktop (default i3;
+`RICE_DESKTOP=hyprland` keeps the Hyprland path, which stays in CI). Pending the owner's review.
+Details: [knowledge-base/x11.md](knowledge-base/x11.md).
+
 ## Open
 
 ### ~~O5. Notifications~~ → D20 · ~~O9. v1 scope~~ → README status table, D28 · ~~O6. Deploy method~~ → D29 · ~~O14. Screensaver~~ → D21 · ~~O15. File manager~~ → D22

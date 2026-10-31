@@ -6,6 +6,9 @@
 #   rice-session power suspend|reboot|poweroff
 #   rice-session hyprland                    start Hyprland from a console login (session.zsh)
 #   rice-session lock                        lock the session (hypridle, Super+Shift+X, menu)
+#   rice-session i3                          the X11 session: env, session bus, i3 (LightDM's
+#                                            "Rice (i3)" entry runs this; FreeBSD's default)
+#   rice-session x11                         the i3 session's helpers, once (i3 config: exec)
 #
 # With systemd, autostart.lua starts the polkit agent through `systemctl --user` and never calls
 # `start`; `power` then uses systemctl. elogind (Gentoo/OpenRC) provides the same verbs through
@@ -51,7 +54,9 @@ power() {
     case $action in
       reboot)   exec shutdown -r now ;;
       poweroff) exec shutdown -p now ;;
-      suspend)  acpiconf -s 3 2>/dev/null || notify "Suspend" "acpiconf -s 3 needs root on FreeBSD" ;;
+      suspend)  # Nothing locks before sleep here (no logind for hypridle/xss-lock to hear).
+                setsid -f "$0" lock >/dev/null 2>&1; sleep 1
+                acpiconf -s 3 2>/dev/null || notify "Suspend" "acpiconf -s 3 needs root on FreeBSD" ;;
     esac
   else
     notify "Power" "neither systemctl nor loginctl is available"
@@ -77,12 +82,90 @@ hyprland() {
 }
 
 # logind/elogind: ask it to lock, so hypridle's lock_cmd runs and its lock state stays right.
-# Without one (FreeBSD), start hyprlock directly, once.
+# Without one (FreeBSD), start hyprlock directly, once. X11 (i3): i3lock, see lock_x11.
 lock() {
+  if [[ -z ${WAYLAND_DISPLAY:-} && -n ${DISPLAY:-} ]]; then
+    lock_x11
+    return
+  fi
   if command -v loginctl >/dev/null && loginctl lock-session 2>/dev/null; then
     return 0
   fi
   pgrep -u "$(id -u)" -x hyprlock >/dev/null || exec hyprlock
+}
+
+# i3lock in the foreground (-n: xss-lock waits for it), once. i3lock-color draws the hyprlock
+# look (palette ring and clock, ~/.config/i3/lock.sh) on the ASCII sky still; plain i3lock
+# takes none of those options and would exit at once, leaving the screen unlocked, so it gets
+# only the image. -e: an empty password is not tried; -f: show failed attempts.
+lock_x11() {
+  pgrep -u "$(id -u)" -x i3lock >/dev/null && return 0
+  local image="${XDG_DATA_HOME:-$HOME/.local/share}/rice/lock.png" args=(-n -e -f)
+  # i3lock-color's version reads "2.13.c.5 ... Raymond Li"; upstream i3lock's has neither.
+  if i3lock -v 2>&1 | grep -qE '[0-9]\.c\.[0-9]|Raymond Li'; then
+    local RICE_I3LOCK_COLORS=()
+    # shellcheck source=/dev/null
+    [[ -r ${XDG_CONFIG_HOME:-$HOME/.config}/i3/lock.sh ]] && . "${XDG_CONFIG_HOME:-$HOME/.config}/i3/lock.sh"
+    args+=(--indicator --clock --radius 110 --ring-width 6
+      --time-str '%H:%M' --date-str '%A, %d %B'
+      --time-font 'IBM Plex Sans' --date-font 'IBM Plex Sans' --verif-font 'IBM Plex Sans'
+      --wrong-font 'IBM Plex Sans' --time-size 34 --date-size 14
+      --verif-text 'checking' --wrong-text 'wrong password' --noinput-text 'no input'
+      "${RICE_I3LOCK_COLORS[@]}")
+    [[ -r $image ]] && args+=(-i "$image" -F)
+  else
+    [[ -r $image ]] && args+=(-i "$image" -t)
+  fi
+  exec i3lock "${args[@]}"
+}
+
+# The X11 session from LightDM: environment (~/.config/i3/env.sh, as env.lua under Hyprland),
+# then i3 under its own session bus unless the display manager started one.
+i3_session() {
+  local env_file="${XDG_CONFIG_HOME:-$HOME/.config}/i3/env.sh"
+  # shellcheck source=/dev/null
+  [[ -r $env_file ]] && . "$env_file"
+  if [[ -n ${DBUS_SESSION_BUS_ADDRESS:-} ]]; then
+    exec i3
+  fi
+  exec dbus-run-session i3
+}
+
+# Long-running helpers of the i3 session, each started once (i3 restarts in place keep them):
+# compositor, notifications, polkit agent, clipboard history, keyring, idle lock.
+x11_helpers() {
+  local cfg="${XDG_CONFIG_HOME:-$HOME/.config}"
+  # The session bus learns the display, so D-Bus-activated programs (portals, keyring prompts)
+  # open their windows on it.
+  if command -v dbus-update-activation-environment >/dev/null; then
+    dbus-update-activation-environment DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP 2>/dev/null || true
+  fi
+  if ! running picom; then
+    setsid -f picom --config "$cfg/picom/picom.conf" >/dev/null 2>&1
+    # No working OpenGL (a VM, a missing Mesa driver): picom exits; xrender draws without blur.
+    sleep 1
+    running picom || setsid -f picom --config "$cfg/picom/picom.conf" --backend xrender >/dev/null 2>&1
+  fi
+  running dunst || setsid -f dunst >/dev/null 2>&1
+  local agent
+  for agent in /usr/local/libexec/polkit-gnome-authentication-agent-1 \
+    /usr/libexec/polkit-gnome-authentication-agent-1 \
+    /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 \
+    /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1; do
+    if [[ -x $agent ]]; then
+      pgrep -u "$(id -u)" -f polkit-gnome-authentication-agent-1 >/dev/null ||
+        setsid -f "$agent" >/dev/null 2>&1
+      break
+    fi
+  done
+  running clipmenud || { command -v clipmenud >/dev/null && setsid -f clipmenud >/dev/null 2>&1; }
+  # Idle: the same timings as hypridle.conf: lock after 10 minutes, screens off a minute later.
+  # xss-lock runs the locker when the X screensaver activates (xset s) and before suspend
+  # where logind tells it (not on FreeBSD).
+  xset s 600 600 2>/dev/null || true
+  xset dpms 0 0 660 2>/dev/null || true
+  running xss-lock || setsid -f xss-lock -- "$0" lock >/dev/null 2>&1
+  return 0
 }
 
 case ${1:-} in
@@ -90,5 +173,7 @@ case ${1:-} in
   lock) lock ;;
   power) power "${2:-}" ;;
   hyprland) hyprland ;;
-  *) echo "usage: rice-session {start|lock|power suspend|reboot|poweroff|hyprland}" >&2; exit 2 ;;
+  i3) i3_session ;;
+  x11) x11_helpers ;;
+  *) echo "usage: rice-session {start|lock|power suspend|reboot|poweroff|hyprland|i3|x11}" >&2; exit 2 ;;
 esac

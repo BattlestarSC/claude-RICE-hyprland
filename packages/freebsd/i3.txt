@@ -1,0 +1,22 @@
+# The i3 desktop on X11 (D43, FreeBSD's default). Names and versions: probe-freebsd-x11.sh in
+# CI, 2026-10-31 (i3 4.25.1, picom 13, polybar 3.7.2, dunst 1.13.2, LightDM 1.33.1).
+xorg
+xf86-input-libinput
+i3
+picom
+polybar
+dunst
+# i3lock with colors, clock and ring (rice-session lock); it replaces plain i3lock.
+i3lock-color
+xss-lock
+feh
+maim
+slop
+xclip
+# Clipboard history (pulls xsel-conrad and clipnotify)
+clipmenu
+polkit-gnome
+lightdm
+lightdm-gtk-greeter
+arandr
+?lightdm-gtk-greeter-settings

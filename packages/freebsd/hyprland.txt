@@ -1,0 +1,21 @@
+# The Hyprland desktop (RICE_DESKTOP=hyprland; FreeBSD 15.1 names, CI 2026-10-31).
+# Hyprland itself: lib/platform/freebsd.sh (package if >= 0.57, else the port in ports/).
+hyprlock
+hypridle
+xdg-desktop-portal-hyprland
+hyprpolkitagent
+hyprland-guiutils
+hyprshutdown
+quickshell
+seatd
+xwayland
+qt6-wayland
+qt6-shadertools
+wl-clipboard
+cliphist
+grim
+slurp
+pipewire
+wireplumber
+pavucontrol
+nwg-look

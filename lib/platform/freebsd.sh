@@ -1,8 +1,9 @@
 # shellcheck shell=bash
-# FreeBSD 15 (amd64): binary packages with pkg; rc.conf services through sysrc; no systemd and
-# no greetd (its VT and /proc code is Linux-only), so Hyprland starts after a console login.
-# Hyprland itself comes from an overlay of the FreeBSD port moved to 0.57.0 (ports/) while the
-# package is older. Interface: lib/platform.sh. Facts: docs/knowledge-base/platforms.md#freebsd.
+# FreeBSD 15 (amd64): binary packages with pkg; rc.conf services through sysrc; no systemd.
+# Two desktops (D43): i3 on X11 (default: every piece is a FreeBSD package; LightDM logs in) or
+# Hyprland (no greetd here, so it starts after a console login; Hyprland itself comes from an
+# overlay of the FreeBSD port moved to 0.57.0, ports/, while the package is older).
+# Interface: lib/platform.sh. Facts: docs/knowledge-base/platforms.md#freebsd, x11.md.
 
 declare -g PLAT_NAME
 # shellcheck disable=SC2034  # used by install.sh
@@ -10,10 +11,30 @@ PLAT_NAME="FreeBSD $(freebsd-version -u 2> /dev/null || uname -r)"
 # shellcheck disable=SC2034  # used by install.sh and lib/
 declare -g PKG_DIR="${REPO}/packages/freebsd" ZSH_BIN=/usr/local/bin/zsh \
     FIREFOX_POLICY_DIR=/usr/local/lib/firefox/distribution \
-    PLAT_GREETER=tty PLAT_FIRST_TTY=/dev/ttyv0
-# Build dependencies of the Hyprland port (ports/x11-wm/hyprland/Makefile).
+    PLAT_GREETER=tty PLAT_FIRST_TTY=/dev/ttyv0 PAM_DIR=/usr/local/etc/pam.d \
+    LIGHTDM_ETC=/usr/local/etc/lightdm XSESSIONS_DIR=/usr/local/share/xsessions \
+    RICE_LIBEXEC=/usr/local/libexec PAM_KEYRING_MODULE=/usr/local/lib/pam_gnome_keyring.so
 # shellcheck disable=SC2034
-declare -ga PLAT_EXTRA_LISTS=(build.txt)
+declare -ga PLAT_EXTRA_LISTS=()
+
+# The desktop's package lists and login: i3 (X11, LightDM) or Hyprland (Wayland; hyprland.txt,
+# plus build.txt: the build dependencies of the Hyprland port, ports/x11-wm/hyprland/Makefile).
+# shellcheck disable=SC2034  # used by install.sh and lib/
+freebsd_desktop() {
+    case "$1" in
+        i3) RICE_DESKTOP=i3 PLAT_GREETER=lightdm PLAT_EXTRA_LISTS=(i3.txt) ;;
+        hyprland) RICE_DESKTOP=hyprland PLAT_GREETER=tty PLAT_EXTRA_LISTS=(hyprland.txt build.txt) ;;
+        *) die "RICE_DESKTOP=$1: FreeBSD offers i3 or hyprland" ;;
+    esac
+}
+freebsd_desktop "${RICE_DESKTOP_REQUEST:-i3}"
+
+plat_ask() {
+    local choice="${RICE_DESKTOP}"
+    ask_choice choice "Desktop: i3 on X11 (all FreeBSD packages) or Hyprland (built from ports)" \
+        "${choice}" i3 hyprland
+    freebsd_desktop "${choice}"
+}
 
 # The ports framework (Mk/, Templates/, Keywords/, a few lang/ ports it reads) at the commit the
 # overlay was taken from.
@@ -41,6 +62,12 @@ plat_available() {
 }
 
 plat_plan() {
+    if [[ "${RICE_DESKTOP}" == i3 ]]; then
+        info "desktop: i3 on X11 (picom, polybar, dunst, i3lock-color); packages: pkg; services in"
+        info "  /etc/rc.conf: dbus (and lightdm with the login screen)"
+        info "rendered or downloaded: Capitaine cursors, adw-gtk3, zsh-history-substring-search"
+        return 0
+    fi
     info "packages: pkg (FreeBSD-ports repository); services in /etc/rc.conf: dbus, seatd"
     info "you join group video (seatd); Hyprland starts after a console login on ttyv0"
     if ! freebsd_hyprland_packaged; then
@@ -128,10 +155,12 @@ freebsd_build_hyprland() {
 
 plat_extras() {
     step "What FreeBSD does not package"
-    if freebsd_hyprland_packaged; then
-        plat_install hyprland
-    else
-        freebsd_build_hyprland
+    if [[ "${RICE_DESKTOP}" == hyprland ]]; then
+        if freebsd_hyprland_packaged; then
+            plat_install hyprland
+        else
+            freebsd_build_hyprland
+        fi
     fi
     extras_env
     extras_build "${ZSH_HSS_PIN}"
@@ -142,10 +171,16 @@ plat_extras() {
         run mkdir -p -- "${HOME}/.local/bin"
         run ln -sfn "$(command -v gfortran15)" "${HOME}/.local/bin/gfortran"
     fi
-    info "services: dbus, seatd; group video for $(id -un)"
     plat_service_enable dbus
-    plat_service_enable seatd
-    if ! id -Gn | tr ' ' '\n' | grep -qx video; then
+    if [[ "${RICE_DESKTOP}" == i3 ]]; then
+        # Xorg runs as root under LightDM: no seatd. amdgpu below is the kernel driver Xorg's
+        # modesetting driver uses too.
+        info "services: dbus"
+    else
+        info "services: dbus, seatd; group video for $(id -un)"
+        plat_service_enable seatd
+    fi
+    if [[ "${RICE_DESKTOP}" == hyprland ]] && ! id -Gn | tr ' ' '\n' | grep -qx video; then
         as_root pw groupmod video -m "$(id -un)"
     fi
     if (( HAS_AMD )) && ! sysrc -n kld_list 2> /dev/null | grep -qw amdgpu; then
@@ -177,10 +212,13 @@ plat_display_manager() {
 }
 
 plat_set_display_manager() {
-    local old="${2:-}"
-    [[ -n "${old}" ]] || return 0
-    info "disabling ${old} (it would take the console)"
-    as_root sysrc "${old}_enable=NO"
+    local new="$1" old="${2:-}"
+    if [[ -n "${old}" && "${old}" != "${new}" ]]; then
+        info "disabling ${old} (it would take the console)"
+        as_root sysrc "${old}_enable=NO"
+    fi
+    [[ -n "${new}" ]] && plat_service_enable "${new}"
+    return 0
 }
 
 # javavmwrapper picks the newest installed JDK; JDK 25 is the only one the rice installs.

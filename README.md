@@ -45,7 +45,7 @@ second run that must change nothing. No GUI can start there, and nothing has run
 | Arch | pacman (reference) | real install in CI |
 | Ubuntu 26.04 LTS | apt + PPAs/extrepo; Hyprland 0.57 stack, Quickshell, ReGreet built from source into `/usr/local` (about 40 min) | real install in CI |
 | Fedora 44 | dnf + LibreWolf/VSCodium repos + Flathub (Amberol); Hyprland 0.57 stack, Quickshell, ReGreet, starship built from source (about 55 min) | real install in CI |
-| FreeBSD 15 | pkg; Hyprland 0.57 from the FreeBSD port moved to 0.57; no greetd, so Hyprland starts after a console login on ttyv0 | real install in a CI VM |
+| FreeBSD 15 | pkg. Default: **i3 on X11** with the same keys, palette and apps (picom, polybar, dunst, i3lock-color, LightDM; [x11.md](docs/knowledge-base/x11.md)). Optional: Hyprland 0.57 from the FreeBSD port moved to 0.57, started after a console login on ttyv0 (no greetd) | real install of both in a CI VM; the i3 session also started in Xvfb (screenshots) |
 | Gentoo (OpenRC, systemd) | Portage with GURU, hyproverlay, librewolf overlays; everything compiled from source (many hours) | Portage resolves the whole selection for both init systems; the compile itself is not run in CI |
 
 What it does, in order ([details](docs/knowledge-base/arch-install.md#the-installer)):

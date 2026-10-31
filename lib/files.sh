@@ -7,26 +7,11 @@ deploy_user_files() {
     local cfg="${XDG_CONFIG_HOME:-${HOME}/.config}" data="${XDG_DATA_HOME:-${HOME}/.local/share}"
     local theme="${REPO}/themes/${PALETTE}"
 
-    # Hyprland, lock, idle, portal. env.lua gets the chosen cursor; monitors.lua keeps panels
-    # already captured by rice-monitors; xdph.conf gets the absolute path of the share picker.
-    local file rel
-    while IFS= read -r -d '' file; do
-        rel="${file#"${REPO}/config/hypr/"}"
-        case "${rel}" in
-            conf/env.lua) deploy_file "$(with_cursor "${file}")" "${cfg}/hypr/${rel}" 0644 ;;
-            conf/monitors.lua) deploy_file "$(with_panels "${file}" "${cfg}/hypr/${rel}")" "${cfg}/hypr/${rel}" 0644 ;;
-            xdph.conf) deploy_file "$(with_home "${file}")" "${cfg}/hypr/${rel}" 0644 ;;
-            *) deploy_file "${file}" "${cfg}/hypr/${rel}" ;;
-        esac
-    done < <(find "${REPO}/config/hypr" -type f -print0 | sort -z)
-    deploy_file "${theme}/hypr/colors.lua" "${cfg}/hypr/theme/colors.lua"
-    deploy_file "${theme}/hypr/colors.conf" "${cfg}/hypr/theme/colors.conf"
-    deploy_file "${theme}/hypr/hyprtoolkit.conf" "${cfg}/hypr/hyprtoolkit.conf"
-
-    # Quickshell: bar, wallpaper, notifications, screensaver
-    deploy_tree "${REPO}/config/quickshell" "${cfg}/quickshell"
-    deploy_file "${theme}/quickshell/common/Theme.qml" "${cfg}/quickshell/common/Theme.qml"
-    deploy_file "${REPO}/assets/earth/land-1024x512.png" "${cfg}/quickshell/sky/land.png"
+    if [[ "${RICE_DESKTOP}" == i3 ]]; then
+        deploy_x11_files "${cfg}" "${theme}"
+    else
+        deploy_hyprland_files "${cfg}" "${theme}"
+    fi
 
     # Launcher and menus
     deploy_file "${REPO}/config/rofi/config.rasi" "${cfg}/rofi/config.rasi"
@@ -105,6 +90,45 @@ deploy_user_files() {
     info "${DEPLOYED} written, ${UNCHANGED} already current, ${BACKED_UP} backed up"
 }
 
+# The Hyprland desktop: Hyprland, lock, idle, portal, Quickshell. env.lua gets the chosen
+# cursor; monitors.lua keeps panels already captured by rice-monitors; xdph.conf gets the
+# absolute path of the share picker.
+deploy_hyprland_files() {
+    local cfg="$1" theme="$2" file rel
+    while IFS= read -r -d '' file; do
+        rel="${file#"${REPO}/config/hypr/"}"
+        case "${rel}" in
+            conf/env.lua) deploy_file "$(with_cursor "${file}")" "${cfg}/hypr/${rel}" 0644 ;;
+            conf/monitors.lua) deploy_file "$(with_panels "${file}" "${cfg}/hypr/${rel}")" "${cfg}/hypr/${rel}" 0644 ;;
+            xdph.conf) deploy_file "$(with_home "${file}")" "${cfg}/hypr/${rel}" 0644 ;;
+            *) deploy_file "${file}" "${cfg}/hypr/${rel}" ;;
+        esac
+    done < <(find "${REPO}/config/hypr" -type f -print0 | sort -z)
+    deploy_file "${theme}/hypr/colors.lua" "${cfg}/hypr/theme/colors.lua"
+    deploy_file "${theme}/hypr/colors.conf" "${cfg}/hypr/theme/colors.conf"
+    deploy_file "${theme}/hypr/hyprtoolkit.conf" "${cfg}/hypr/hyprtoolkit.conf"
+
+    # Quickshell: bar, wallpaper, notifications, screensaver
+    deploy_tree "${REPO}/config/quickshell" "${cfg}/quickshell"
+    deploy_file "${theme}/quickshell/common/Theme.qml" "${cfg}/quickshell/common/Theme.qml"
+    deploy_file "${REPO}/assets/earth/land-1024x512.png" "${cfg}/quickshell/sky/land.png"
+}
+
+# The i3 desktop (X11): window manager, compositor, bar, notifications, lock colors. env.sh gets
+# the chosen cursor. local.conf / local.ini are yours (polybar stops on a missing include).
+deploy_x11_files() {
+    local cfg="$1" theme="$2"
+    deploy_file "${REPO}/config/i3/config" "${cfg}/i3/config"
+    deploy_file "$(with_cursor "${REPO}/config/i3/env.sh")" "${cfg}/i3/env.sh" 0644
+    deploy_file "${theme}/i3/colors.conf" "${cfg}/i3/colors.conf"
+    deploy_file "${theme}/i3/lock.sh" "${cfg}/i3/lock.sh" 0644
+    deploy_file "${theme}/picom/picom.conf" "${cfg}/picom/picom.conf"
+    deploy_file "${REPO}/config/polybar/config.ini" "${cfg}/polybar/config.ini"
+    deploy_file "${theme}/polybar/colors.ini" "${cfg}/polybar/colors.ini"
+    ensure_file "${cfg}/polybar/local.ini"
+    deploy_file "${theme}/dunst/dunstrc" "${cfg}/dunst/dunstrc"
+}
+
 # After packages are installed: make sure the cursor theme exists, else fall back (the light
 # Capitaine variant's directory name on Arch is unverified: docs/knowledge-base/theming.md).
 resolve_cursor_theme() {
@@ -174,6 +198,12 @@ build_assets() {
     step "Building shaders and images"
     local cfg="${XDG_CONFIG_HOME:-${HOME}/.config}" data="${XDG_DATA_HOME:-${HOME}/.local/share}"
     local theme="${REPO}/themes/${PALETTE}" qsb name scale w h
+    if [[ "${RICE_DESKTOP}" == i3 ]]; then
+        # X11: no live sky; the still sky is the wallpaper (feh) and the lock screen (i3lock).
+        run mkdir -p -- "${data}/rice"
+        run rsvg-convert -o "${data}/rice/lock.png" "${REPO}/assets/sky/still-3840x2160.svg"
+        return 0
+    fi
     # qsb is a Qt tool outside PATH on most systems (Arch/Debian, Fedora, FreeBSD layouts).
     qsb="$(command -v qsb qsb-qt6 qsb6 2> /dev/null | head -n 1 || true)"
     local c

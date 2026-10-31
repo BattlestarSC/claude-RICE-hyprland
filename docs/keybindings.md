@@ -3,6 +3,9 @@
 i3's default keymap, carried over to Hyprland 0.57 (decision D12). Source of truth:
 [`config/hypr/conf/binds.lua`](../config/hypr/conf/binds.lua). In a session, <kbd>Super+F1</kbd>
 shows every bind that has a description (`rice-menu keys`, read live from `hyprctl -j binds`).
+The i3 desktop (FreeBSD's default, D43) has the same keys in
+[`config/i3/config`](../config/i3/config); there the cheat sheet reads the `## description` line
+above each `bindsym`. Hyprland-only binds (monitor capture) open arandr there.
 
 `$mod` is **Super**: i3 ships its config with `Mod1` (Alt), and `i3-config-wizard` rewrites it to
 whichever key you choose on first start; Super is the usual choice. To use Alt, change one line

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Volume keys of the i3 session, with the level shown as a dunst progress notification (the
+# counterpart of the Quickshell volume OSD).
+#
+#   rice-volume up | down | mute | mic-mute | get
+#
+# FreeBSD: the base system's mixer(8) on the default sound unit (no PulseAudio/PipeWire needed;
+# controls vol.volume / vol.mute, values 0.00-1.00, relative steps in %). Elsewhere: wpctl.
+# `get` prints "<percent> <on|off>" (muted?) for the bar.
+set -Eeuo pipefail
+
+STEP=10   # as the Hyprland binds (wpctl 10%)
+
+have() { command -v "$1" >/dev/null; }
+
+# mixer -o vol.volume -> "vol.volume=0.75:0.75"; vol.mute -> "vol.mute=on|off" (mixer.c).
+get_level() {
+  if [[ $(uname -s) == FreeBSD ]]; then
+    local v m
+    v=$(mixer -o vol.volume 2>/dev/null | sed -n 's/^vol\.volume=\([0-9.]*\):.*/\1/p')
+    m=$(mixer -o vol.mute 2>/dev/null | sed -n 's/^vol\.mute=//p')
+    awk -v v="${v:-0}" -v m="${m:-off}" 'BEGIN { printf "%d %s\n", v * 100 + 0.5, m }'
+  elif have wpctl; then
+    # "Volume: 0.40" or "Volume: 0.40 [MUTED]"
+    wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null |
+      awk '{ printf "%d %s\n", $2 * 100 + 0.5, /MUTED/ ? "on" : "off" }'
+  else
+    echo "0 off"
+  fi
+}
+
+change() {
+  local what=$1
+  if [[ $(uname -s) == FreeBSD ]]; then
+    case $what in
+      up)       mixer vol.volume=+${STEP}% >/dev/null ;;
+      down)     mixer vol.volume=-${STEP}% >/dev/null ;;
+      mute)     mixer vol.mute=toggle >/dev/null ;;
+      mic-mute) mixer mic.mute=toggle >/dev/null 2>&1 || true ;;
+    esac
+  elif have wpctl; then
+    case $what in
+      up)       wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "${STEP}%+" ;;
+      down)     wpctl set-volume @DEFAULT_AUDIO_SINK@ "${STEP}%-" ;;
+      mute)     wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;
+      mic-mute) wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle ;;
+    esac
+  fi
+}
+
+show() {
+  have notify-send || return 0
+  local pct muted title
+  read -r pct muted < <(get_level)
+  title="Volume ${pct}%"
+  [[ $muted == on ]] && title="Volume muted"
+  # dunst: int:value draws the progress bar; the stack tag replaces the previous popup.
+  notify-send -a rice-volume -u low -t 1500 -h "int:value:${pct}" \
+    -h string:x-dunst-stack-tag:rice-volume "$title"
+}
+
+case ${1:-} in
+  up|down|mute) change "$1"; show ;;
+  mic-mute) change "$1" ;;
+  get) get_level ;;
+  *) echo "usage: rice-volume {up|down|mute|mic-mute|get}" >&2; exit 2 ;;
+esac

@@ -1,0 +1,192 @@
+# i3 for the rice: the FreeBSD desktop (X11). Same keys as the Hyprland session
+# (hypr/conf/binds.lua, which follows i3's own defaults), same palette, same apps.
+# Syntax: i3 user guide (i3 4.25). Installed as ~/.config/i3/config; your own additions go in
+# ~/.config/i3/local.conf (optional: i3 skips an include that matches no file; never written by
+# the installer). Check a change with: i3 -C -c ~/.config/i3/config
+#
+# A "## text" line right above a bindsym is that bind's description: rice-menu keys (Super+F1)
+# lists them, like the Hyprland session's cheat sheet.
+
+set $mod Mod4
+set $left j
+set $down k
+set $up l
+set $right semicolon
+
+font pango:IBM Plex Sans 10
+floating_modifier $mod
+tiling_drag modifier titlebar
+
+# Look: no title bars, 2 px borders, gaps like hypr/conf/look.lua (6 px between windows and to
+# the edges). picom rounds the corners and draws the shadows; colors from the palette.
+default_border pixel 2
+default_floating_border pixel 2
+hide_edge_borders none
+gaps inner 6px
+gaps outer 0px
+# Room for the floating bar (polybar: 6 px offset + 32 px + 6 px): it is override-redirect, so
+# i3 reserves nothing for it by itself.
+gaps top 38px
+include ~/.config/i3/colors.conf
+
+# ---------------------------------------------------------------------------------------------
+# i3 defaults (Super instead of Alt, as i3-config-wizard's "Win" choice)
+# ---------------------------------------------------------------------------------------------
+## Terminal
+bindsym $mod+Return exec kitty
+## Close window
+bindsym $mod+Shift+q kill
+## App launcher
+bindsym $mod+d exec --no-startup-id rofi -show drun
+
+## Focus left / down / up / right
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+## Move window left / down / up / right
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+## Next window opens right (split h)
+bindsym $mod+h split h
+## Next window opens below (split v)
+bindsym $mod+v split v
+## Fullscreen
+bindsym $mod+f fullscreen toggle
+## Stacking layout
+bindsym $mod+s layout stacking
+## Tabbed layout
+bindsym $mod+w layout tabbed
+## Toggle split direction
+bindsym $mod+e layout toggle split
+## Toggle floating
+bindsym $mod+Shift+space floating toggle
+## Focus tiling / floating
+bindsym $mod+space focus mode_toggle
+## Focus parent container
+bindsym $mod+a focus parent
+## Move window to scratchpad
+bindsym $mod+Shift+minus move scratchpad
+## Show scratchpad
+bindsym $mod+minus scratchpad show
+
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+## Workspace 1-10
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+## Move window to workspace 1-10
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+## Reload config
+bindsym $mod+Shift+c reload
+## Restart i3 in place
+bindsym $mod+Shift+r restart
+## Session menu (lock, log out, suspend, reboot, shut down)
+bindsym $mod+Shift+e exec --no-startup-id rice-menu session
+
+mode "resize" {
+    bindsym $left resize shrink width 40 px or 4 ppt
+    bindsym $down resize grow height 40 px or 4 ppt
+    bindsym $up resize shrink height 40 px or 4 ppt
+    bindsym $right resize grow width 40 px or 4 ppt
+    bindsym Left resize shrink width 40 px or 4 ppt
+    bindsym Down resize grow height 40 px or 4 ppt
+    bindsym Up resize shrink height 40 px or 4 ppt
+    bindsym Right resize grow width 40 px or 4 ppt
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+## Resize mode
+bindsym $mod+r mode "resize"
+
+# Volume keys (i3's defaults call pactl; FreeBSD has no PulseAudio here: rice-volume drives
+# mixer(8) and shows the level in a notification).
+bindsym XF86AudioRaiseVolume exec --no-startup-id rice-volume up
+bindsym XF86AudioLowerVolume exec --no-startup-id rice-volume down
+bindsym XF86AudioMute exec --no-startup-id rice-volume mute
+bindsym XF86AudioMicMute exec --no-startup-id rice-volume mic-mute
+
+# ---------------------------------------------------------------------------------------------
+# Rice additions (on keys i3 leaves free; the same as in the Hyprland session)
+# ---------------------------------------------------------------------------------------------
+## Run a command
+bindsym $mod+Shift+d exec --no-startup-id rofi -show run -theme orbit
+## Lock
+bindsym $mod+Shift+x exec --no-startup-id rice-session lock
+## Clipboard history
+bindsym $mod+Shift+v exec --no-startup-id rice-menu clipboard
+## Switch window
+bindsym $mod+Tab exec --no-startup-id rice-menu windows
+## Monitors (arandr)
+bindsym $mod+Shift+m exec --no-startup-id rice-menu monitors
+## Keybinding cheat sheet
+bindsym $mod+F1 exec --no-startup-id rice-menu keys
+## Screenshot
+bindsym Print exec --no-startup-id rice-menu screenshot
+## Workspace to left monitor
+bindsym $mod+Ctrl+Shift+Left move workspace to output left
+## Workspace to right monitor
+bindsym $mod+Ctrl+Shift+Right move workspace to output right
+
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPause exec --no-startup-id playerctl play-pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+
+# ---------------------------------------------------------------------------------------------
+# Window rules (as hypr/conf/rules.lua): small utilities float centered, prompts stay on top
+# ---------------------------------------------------------------------------------------------
+for_window [class="(?i)^(pavucontrol|xarchiver|file-roller|qt6ct|lightdm-gtk-greeter-settings|arandr)$"] floating enable, resize set 45 ppt 55 ppt, move position center
+for_window [title="^(File Operation Progress|Library)$"] floating enable, move position center
+for_window [class="(?i)polkit-gnome-authentication-agent-1"] floating enable, sticky enable, move position center
+for_window [title="^Picture-in-Picture$"] floating enable, sticky enable
+for_window [window_role="(pop-up|bubble|dialog|task_dialog)"] floating enable
+for_window [window_type="dialog"] floating enable
+
+# ---------------------------------------------------------------------------------------------
+# Session: compositor, bar, wallpaper, notifications, idle lock, polkit agent, clipboard.
+# rice-session x11 starts the long-running helpers once; the bar and wallpaper follow reloads.
+# ---------------------------------------------------------------------------------------------
+exec --no-startup-id rice-session x11
+exec_always --no-startup-id rice-bar launch
+exec_always --no-startup-id feh --no-fehbg --bg-fill "$HOME/.local/share/rice/lock.png"
+
+include ~/.config/i3/local.conf

@@ -1,0 +1,9 @@
+#!/bin/sh
+# LightDM session "Rice (i3)" (/usr/local/share/xsessions/rice-i3.desktop). A file of its own
+# because LightDM's FreeBSD Xsession wrapper runs the session as `exec $@` (word-split, so no
+# quoted `sh -c` in Exec=). The user's rice-session sets the environment and starts i3; without
+# it (rice removed from this account) plain i3 starts.
+if [ -x "$HOME/.local/bin/rice-session" ]; then
+    exec "$HOME/.local/bin/rice-session" i3
+fi
+exec i3

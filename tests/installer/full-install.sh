@@ -61,7 +61,10 @@ chmod 0440 "${sudoers_d}/10-admin"
 cp -r "${src}" "/home/${user}/rice"
 chown -R "${user}:${user}" "/home/${user}/rice"
 
-as_user() { su - "${user}" -c "$1"; }
+# su - starts a clean environment: the desktop choice (FreeBSD: i3 or hyprland) goes in by hand.
+desktop_env=""
+[[ -n "${RICE_DESKTOP:-}" ]] && desktop_env="RICE_DESKTOP=${RICE_DESKTOP} "
+as_user() { su - "${user}" -c "${desktop_env}$1"; }
 
 # Whatever happens, end with the installer's warnings (lines starting with "!"), so they are
 # in the last screen of a long CI log.
@@ -98,6 +101,19 @@ as_user 'export XDG_RUNTIME_DIR=$(mktemp -d) DISPLAY=:99 QT_QPA_PLATFORM=xcb
     timeout 25 dbus-run-session -- quickshell > /tmp/qs.log 2>&1 || true
     kill $xpid 2> /dev/null || true' || true
 { grep -E '\.qml:[0-9]+|ReferenceError|TypeError|is not a type|is not installed|Cannot assign|Type .* unavailable|failed to load|ERROR' /tmp/qs.log | sort | uniq -c | head -n 60 || echo "(no QML errors in the log)"; } | tee /tmp/qs-summary.txt
+fi
+
+# The i3 desktop (FreeBSD): start the session in Xvfb; screenshots go to $SRC/x11-shots, which
+# the VM job copies back for upload.
+if [[ "${distro}" == freebsd && -f "/home/${user}/.config/i3/config" ]]; then
+    section "the i3 session in Xvfb"
+    env ASSUME_ALWAYS_YES=yes pkg install -y xorg-vfbserver > /dev/null
+    # Xvfb run by a user needs the socket directory (root's X server would create it).
+    mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
+    shots="${src}/x11-shots"
+    mkdir -p "${shots}"
+    chown "${user}" "${shots}"
+    as_user "RICE_SMOKE_WINDOWS=kitty /home/${user}/rice/tests/x11/smoke.sh '${shots}'"
 fi
 
 section "install.sh --yes (second run: must change nothing)"

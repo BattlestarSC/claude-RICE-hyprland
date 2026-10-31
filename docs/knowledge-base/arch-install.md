@@ -137,6 +137,7 @@ trap with `set -E`).
 | --- | --- |
 | `config/hypr/**`, `themes/<p>/hypr/colors.{lua,conf}`, `themes/<p>/hypr/hyprtoolkit.conf` | `~/.config/hypr/**` (`xdph.conf`: the share picker's path rewritten to your home), `~/.config/hypr/theme/`, `~/.config/hypr/hyprtoolkit.conf` |
 | `config/quickshell/**`, `themes/<p>/quickshell/common/Theme.qml`, `assets/earth/land-1024x512.png` | `~/.config/quickshell/**`, `…/sky/land.png` |
+| i3 desktop instead of the two rows above (`RICE_DESKTOP=i3`, FreeBSD's default; x11.md): `config/i3/{config,env.sh}`, `themes/<p>/i3/{colors.conf,lock.sh}`, `themes/<p>/picom/picom.conf`, `config/polybar/config.ini`, `themes/<p>/polybar/colors.ini`, `themes/<p>/dunst/dunstrc` | `~/.config/i3/` (`env.sh`: the chosen cursor), `~/.config/picom/`, `~/.config/polybar/` (+ empty `local.ini`), `~/.config/dunst/` |
 | `config/rofi/config.rasi`, `themes/<p>/rofi/*.rasi` | `~/.config/rofi/` |
 | `config/{kitty,foot,zsh}/**` + their `themes/<p>/` files; `home/.zsh*`; `themes/<p>/starship/starship.toml` | `~/.config/…`, `~/`, `~/.config/starship.toml` |
 | `config/{btop,htop}`, `themes/<p>/{btop,fastfetch}` | `~/.config/{btop,htop,fastfetch}/` (btop.conf, htoprc: only if absent) |
@@ -151,6 +152,7 @@ trap with `set -E`).
 | `bin/*` | `~/.local/bin/` (0755) |
 | `config/greetd/*`, `themes/<p>/greetd/regreet.css`, `themes/<p>/hypr/colors.lua`, the user's `monitors.lua`, rendered sky | `/etc/greetd/` |
 | the installed `/etc/pam.d/greetd` + two `pam_gnome_keyring.so` lines (`lib/pam-keyring.awk`) | `/etc/pam.d/greetd` (apps.md#keyring-d40) |
+| i3 desktop: `config/lightdm/{lightdm.conf,lightdm-gtk-greeter.conf}` (cursor substituted), `themes/<p>/lightdm/gtk.css`, `config/lightdm/{rice-i3.desktop,rice-i3-session}`, rendered sky | `/usr/local/etc/lightdm/{lightdm,lightdm-gtk-greeter}.conf.d/50-rice.conf`, `/usr/local/share/themes/Quasar-greeter/gtk-3.0/gtk.css`, `/usr/local/share/xsessions/rice-i3.desktop`, `/usr/local/libexec/rice-i3-session`, `/usr/local/etc/lightdm/rice/background.png`; keyring lines in `/usr/local/etc/pam.d/lightdm` (x11.md) |
 | `config/browsers/firefox-policies.json` (+ `themes/<p>/chromium/policies.json` with the AUR browser) | `/etc/firefox/policies/policies.json` (`/etc/chromium/policies/managed/rice.json`) |
 
 ### Monitors
@@ -170,7 +172,8 @@ writes both descriptions into `monitors.lua` (left = the panel with the smaller 
 | Optional AUR browser | ungoogled-chromium-bin | off by default (D2); makepkg |
 | Wallpaper | animated ASCII Earth/Moon (default) · still ASCII (no animation, zero cost) · your own image (path; e.g. a NASA Earth photo) | `~/.config/rice/settings.json` (`skyMode`, `skyImage`), written only if the file does not exist |
 | Wallpaper layout (two monitors) | mirror (default) · span | same file (`skyLayout`) |
-| Login screen | greetd + ReGreet (default) · keep the current one | `lib/system.sh` |
+| Desktop (FreeBSD only) | i3 on X11 (default) · hyprland; env `RICE_DESKTOP` unattended | `lib/platform/freebsd.sh` (x11.md) |
+| Login screen | greetd + ReGreet (default; FreeBSD i3: LightDM) · keep the current one | `lib/system.sh` |
 | Login shell | zsh (default) · keep | `chsh` |
 | Cursor theme | env `RICE_CURSOR=<name> ./install.sh` (default `capitaine-cursors-light`) | `hypr/conf/env.lua`, gsettings, greeter |
 

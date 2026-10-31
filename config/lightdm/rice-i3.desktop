@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Rice (i3)
+Comment=i3 with the rice's bar, compositor, notifications and theme
+Exec=/usr/local/libexec/rice-i3-session
+TryExec=i3
+Type=Application
+DesktopNames=i3
