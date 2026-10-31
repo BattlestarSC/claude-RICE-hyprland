@@ -228,6 +228,10 @@ files searched in every `DATA_DIRS` entry. `/etc/os-release` is read by a shell
 pinned ref. `patches/hyprland/0001-ranges-starts-with-gcc15.patch`: Hyprland 0.57.0 calls
 `std::ranges::starts_with`, missing from Ubuntu 26.04's libstdc++ (GCC 15.2) [V: Ubuntu
 full-install CI]; replaced by the equivalent `ranges::equal` over `views::take`.
+`0002-string-subview-gcc15.patch`: `std::string::subview` (C++26) in a log message, likewise
+missing; `std::string_view(...).substr`. With both, the whole Hyprland 0.57 build compiles on
+GCC 15.2 except what they cover [V: Ubuntu CI with `ninja -k 0`: these were the only two errors].
+The FreeBSD overlay carries the same `subview` change (`files/patch-src_ipc_s1_S1.cpp`).
 
 ## Tests
 

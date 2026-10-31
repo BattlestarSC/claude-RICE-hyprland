@@ -10,6 +10,7 @@ on:
     paths:
       - install.sh
       - lib/**
+      - patches/**
       - packages/**
       - bin/**
       - config/**

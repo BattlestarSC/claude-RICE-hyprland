@@ -1,0 +1,17 @@
+Hyprland v0.57.0 calls std::string::subview (C++26, P3044), which Ubuntu 26.04's libstdc++
+(GCC 15.2) does not have (found by the Ubuntu full-install CI, 2026-10-31). Same result through
+std::string_view::substr (only used for a log message). Applied by lib/extras.sh.
+
+diff --git a/src/ipc/s1/S1.cpp b/src/ipc/s1/S1.cpp
+index 76f2e9b..db2b0e4 100644
+--- a/src/ipc/s1/S1.cpp
++++ b/src/ipc/s1/S1.cpp
+@@ -145,7 +145,7 @@ SResponse CSocket1::dispatchBatch(std::string request, pid_t pid) {
+             if (i < request.size() && (request[i + 1] == '\\' || request[i + 1] == ';'))
+                 ++i;
+             else
+-                LOG(Log::ERR, "Malformed socket1 request: invalid escape sequence {} at position {}, using it verbatim", request.subview(i, 2), i);
++                LOG(Log::ERR, "Malformed socket1 request: invalid escape sequence {} at position {}, using it verbatim", std::string_view(request).substr(i, 2), i);
+         }
+         parsedCommand << request[i];
+     }

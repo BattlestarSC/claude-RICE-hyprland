@@ -41,6 +41,23 @@ extras_fetch() {
     git -C "${dir}" submodule -q update --init --recursive --depth 1
 }
 
+# extras_compile NAME CMD...: run a build command; on failure, repeat just the compiler errors
+# (with two lines of context) after the full output, so the end of a long log names them.
+extras_compile() {
+    local name="$1" out
+    shift
+    if (( DRY_RUN )); then
+        run "$@"
+        return 0
+    fi
+    out="${WORK_DIR}/build-${name}.log"
+    if ! "$@" 2>&1 | tee -- "${out}"; then
+        warn "${name}: build failed; compiler errors:"
+        grep -E -A2 ': (fatal )?error:' -- "${out}" | head -n 120 >&2 || true
+        die "building ${name} failed (full output above)"
+    fi
+}
+
 # extras_build "name|url|ref|system|args": fetch, configure, build, install (sudo), stamp.
 extras_build() {
     local name url ref system args dir
@@ -66,7 +83,7 @@ extras_build() {
             run cmake -S "${dir}" -B "${dir}/build" -G Ninja -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_INSTALL_PREFIX="${EXTRAS_PREFIX}" -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF "${extra[@]}"
             # -k 0: on a compile error, finish every other unit first, so one log shows all errors.
-            run cmake --build "${dir}/build" -j "${EXTRAS_JOBS}" -- -k 0
+            extras_compile "${name}" cmake --build "${dir}/build" -j "${EXTRAS_JOBS}" -- -k 0
             as_root cmake --install "${dir}/build"
             ;;
         meson)

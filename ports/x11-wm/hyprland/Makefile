@@ -2,7 +2,8 @@
 # 0.56.2_2; BSD-2-Clause, maintainer tagattie@FreeBSD.org) moved to 0.57.0 for the rice, which
 # needs Hyprland's Lua configuration. Changes: DISTVERSION; patches regenerated against 0.57.0
 # (upstream now handles alloca.h and peer credentials on FreeBSD itself); post-patch file paths;
-# -fexperimental-library for std::jthread; lines marked "rice:".
+# -fexperimental-library for std::jthread; files/patch-src_ipc_s1_S1.cpp (std::string::subview,
+# C++26, not in libc++ 19); lines marked "rice:".
 # pkg-plist is generated after staging by lib/platform/freebsd.sh. Used only while FreeBSD's
 # package is older than 0.57. Docs: docs/knowledge-base/platforms.md#freebsd.
 
