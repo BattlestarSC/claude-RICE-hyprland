@@ -83,7 +83,9 @@ echo "== configs in the real programs"
 # it still wants a runtime directory.
 rt="$(mktemp -d)"; chmod 0700 "${rt}"
 check "Hyprland accepts ~/.config/hypr/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${cfg}/hypr/hyprland.lua"
-check "Hyprland accepts the login screen's ${GREETD_DIR}/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${GREETD_DIR}/hyprland.lua"
+if [[ "${PLAT_GREETER}" == greetd ]]; then   # FreeBSD: no greeter, Hyprland after a console login
+    check "Hyprland accepts the login screen's ${GREETD_DIR}/hyprland.lua" env XDG_RUNTIME_DIR="${rt}" Hyprland --verify-config -c "${GREETD_DIR}/hyprland.lua"
+fi
 # Neovim: the installer pre-built plugins and parsers (lib/desktop.sh nvim_prepare), so the first
 # start is an ordinary one and must load the config and quit.
 parsers="$(find "${data}/nvim/site/parser" -name '*.so' 2> /dev/null | wc -l)"
@@ -132,7 +134,7 @@ check "javac compiles and java runs" bash -c "cd '${work}' && javac Hello.java &
 # scala run: the scala-cli based runner (Scala >= 3.5, Coursier); FreeBSD keeps its packaged 3.3
 # runner (Coursier has no FreeBSD launcher), which compiles with scalac and runs a class.
 check "Scala runs a program" bash -c "cd '${work}' && printf '@main def hi(): Unit = println(6 * 7)\n' > hi.scala &&
-    { scala run hi.scala 2> /dev/null | grep -qx 42 || { scalac -d sc hi.scala && scala -classpath sc hi | grep -qx 42; }; }"
+    { scala run hi.scala 2> /dev/null | grep -qx 42 || { mkdir -p sc && scalac -d sc hi.scala && scala -classpath sc hi | grep -qx 42; }; }"
 check "sbt launcher" sbt --script-version
 check "OCaml" ocaml -version
 
