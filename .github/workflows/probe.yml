@@ -24,6 +24,7 @@ jobs:
       - run: dnf -y -q install git > /dev/null
       - uses: actions/checkout@v4
       - run: tests/platforms/probe-fedora.sh
+      - run: tests/platforms/probe-fedora-2.sh
   tags:
     runs-on: ubuntu-24.04
     steps:
