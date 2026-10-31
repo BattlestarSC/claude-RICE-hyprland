@@ -30,7 +30,7 @@ backups and makes the rice the default environment (D29).
 Present beyond docs: theme generator + templates, generated `themes/quasar/`, `config/rofi/`,
 `config/quickshell/` (bar, services, sky), `config/hypr/hyprland.lua` + `conf/{binds,env,monitors,input,look,layers,rules,session,autostart}.lua`,
 `config/hypr/{hyprlock,hypridle,xdph}.conf`, `config/{gtk-3.0,gtk-4.0,qt6ct,xfce4,browsers,thunderbird,kitty,foot,code-oss,nvim,helix,vis,btop,htop,greetd}/`,
-`install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors,libreoffice-setup,share-picker}`,
+`install.sh` + `lib/` + `packages/`, `bin/rice-{menu,sky-atlas,browser-setup,code-setup,lsp-setup,monitors,libreoffice-setup,share-picker,session}`,
 `.github/workflows/ci.yml`, tests.
 Shell: zsh (`home/.zsh*`, `config/zsh/`) with a generated starship prompt and theme.
 **Nothing has run on real hardware yet**: the installer is tested with dry runs and a throwaway
@@ -108,7 +108,7 @@ home/                       files deployed directly under ~ (.zshenv, .zprofile,
 colors/                     palettes; proposals/ now, the chosen palette as colors/<name>.toml later
 templates/                  per-app theme templates ({{ role | filter }}), rendered by tools/render_theme.py
 themes/<palette>/           generated app themes (committed; never hand-edit)
-bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup, rice-code-setup, rice-lsp-setup, rice-monitors, rice-share-picker)
+bin/                        user commands deployed to ~/.local/bin (rice-menu, rice-sky-atlas, rice-browser-setup, rice-code-setup, rice-lsp-setup, rice-monitors, rice-share-picker, rice-session)
 tools/                      dev-only tooling (python): palette.py, preview.py, render-theme
 tests/                      rofi-render.sh (themes under Xvfb), lua/ (hl API stub + bind/rule/event tests),
                             quickshell/ (bar render with mocks), sky/ (ASCII sky frames + timing),

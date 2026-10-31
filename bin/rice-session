@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Session plumbing that systemd does elsewhere, for systems without a systemd user manager
+# (Gentoo with OpenRC, FreeBSD). Docs: docs/knowledge-base/platforms.md#sessions-without-systemd.
+#
+#   rice-session start                       polkit agent and PipeWire (autostart.lua, once)
+#   rice-session power suspend|reboot|poweroff
+#
+# With systemd, autostart.lua starts the polkit agent through `systemctl --user` and never calls
+# `start`; `power` then uses systemctl. elogind (Gentoo/OpenRC) provides the same verbs through
+# loginctl. FreeBSD has neither: shutdown(8) (group operator) and acpiconf(8).
+set -Eeuo pipefail
+
+notify() {
+  if command -v notify-send >/dev/null; then notify-send -a rice-session "$@"; fi
+}
+
+running() { pgrep -u "$(id -u)" -x "$1" >/dev/null 2>&1; }
+
+start_polkit_agent() {
+  # D-Bus activation: hyprpolkitagent installs org.hyprland.hyprpolkitagent.service, whose Exec=
+  # the session bus runs when there is no systemd to hand it to.
+  gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus \
+    --method org.freedesktop.DBus.StartServiceByName org.hyprland.hyprpolkitagent 0 >/dev/null 2>&1 ||
+    notify "Polkit agent" "could not start hyprpolkitagent; password prompts will not appear"
+}
+
+start_pipewire() {
+  running pipewire && return 0
+  if command -v gentoo-pipewire-launcher >/dev/null; then
+    # Gentoo's launcher starts pipewire, wireplumber and pipewire-pulse and restarts them together.
+    setsid -f gentoo-pipewire-launcher restart >/dev/null 2>&1
+    return 0
+  fi
+  setsid -f pipewire >/dev/null 2>&1
+  sleep 0.5
+  running wireplumber || setsid -f wireplumber >/dev/null 2>&1
+  running pipewire-pulse || setsid -f pipewire-pulse >/dev/null 2>&1
+  return 0
+}
+
+power() {
+  local action=$1
+  case $action in suspend|reboot|poweroff) ;; *) echo "rice-session: unknown action '$action'" >&2; exit 2 ;; esac
+  if [[ -d /run/systemd/system ]]; then
+    exec systemctl "$action"
+  elif command -v loginctl >/dev/null; then
+    exec loginctl "$action"
+  elif [[ $(uname -s) == FreeBSD ]]; then
+    case $action in
+      reboot)   exec shutdown -r now ;;
+      poweroff) exec shutdown -p now ;;
+      suspend)  acpiconf -s 3 2>/dev/null || notify "Suspend" "acpiconf -s 3 needs root on FreeBSD" ;;
+    esac
+  else
+    notify "Power" "neither systemctl nor loginctl is available"
+    exit 1
+  fi
+}
+
+case ${1:-} in
+  start) start_polkit_agent; start_pipewire ;;
+  power) power "${2:-}" ;;
+  *) echo "usage: rice-session {start|power suspend|reboot|poweroff}" >&2; exit 2 ;;
+esac

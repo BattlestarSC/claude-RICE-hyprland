@@ -5,7 +5,8 @@
 #
 # Each menu is one function; all of them render through deck() so they look the same.
 # Bound in ~/.config/hypr/conf/binds.lua. Runtime deps (official repos): rofi, jq,
-# cliphist, wl-clipboard, grim, slurp, hyprshutdown (falls back to hl.dsp.exit()).
+# cliphist, wl-clipboard, grim, slurp, hyprshutdown (falls back to hl.dsp.exit()); power actions
+# through rice-session (systemctl, loginctl or FreeBSD's shutdown).
 set -Eeuo pipefail
 
 deck() { # deck PROMPT [MESSAGE] < entries  ->  selected line on stdout
@@ -28,9 +29,9 @@ menu_session() {
   case $choice in
     *lock)      loginctl lock-session ;;
     *"log out") graceful_exit ;;
-    *suspend)   systemctl suspend ;;
-    *reboot)    graceful_exit "Restarting..." "systemctl reboot" ;;
-    *"shut down") graceful_exit "Shutting down..." "systemctl poweroff" ;;
+    *suspend)   rice-session power suspend ;;
+    *reboot)    graceful_exit "Restarting..." "rice-session power reboot" ;;
+    *"shut down") graceful_exit "Shutting down..." "rice-session power poweroff" ;;
   esac
 }
 

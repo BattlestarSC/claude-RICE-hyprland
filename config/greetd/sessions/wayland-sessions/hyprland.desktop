@@ -1,0 +1,11 @@
+# Installed only on systems without a systemd user manager (Gentoo with OpenRC, FreeBSD), as
+# /etc/greetd/sessions/wayland-sessions/hyprland.desktop. The greeter's XDG_DATA_DIRS lists
+# /etc/greetd/sessions first, so ReGreet shows this entry instead of the package's
+# hyprland.desktop (same relative name). There, nothing else starts a D-Bus session bus, which
+# portals, notifications, the keyring and the polkit agent need.
+[Desktop Entry]
+Name=Hyprland
+Comment=Hyprland with its own D-Bus session bus
+Exec=dbus-run-session start-hyprland
+Type=Application
+DesktopNames=Hyprland

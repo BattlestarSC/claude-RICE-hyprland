@@ -51,6 +51,31 @@ by its CMake if absent), muparser, re2, lcms2, libcanberra, glslang [V: Hyprland
 - Files other programs look for only under `/usr` (the Hyprland session entry for ReGreet,
   XDPH's `hyprland.portal`) are copied there with the usual backup (`extras_link_into_usr`).
 
+## Sessions without systemd
+
+Gentoo with OpenRC and FreeBSD have no systemd user manager, so nothing starts a D-Bus session
+bus, the polkit agent or PipeWire for the session, and `systemctl` does not exist.
+
+- **Session bus:** the installer adds `/etc/greetd/sessions/wayland-sessions/hyprland.desktop`
+  (`Exec=dbus-run-session start-hyprland`) there. The greeter's Hyprland sets
+  `XDG_DATA_DIRS=/etc/greetd/sessions:/usr/local/share:/usr/share`; ReGreet reads session files
+  from `$XDG_DATA_DIRS/{xsessions,wayland-sessions}` in that order and skips a later file with the
+  same relative name [V: ReGreet 0.5.0 `src/sysutil.rs` `init_sessions`], so this entry replaces
+  the package's `hyprland.desktop` without touching it. On systemd systems the directory does not
+  exist and nothing changes. `start-hyprland` itself starts no bus [V: Hyprland v0.57.0 `start/`].
+- **Polkit agent:** `autostart.lua` runs `systemctl --user start hyprpolkitagent || rice-session
+  start`; `rice-session start` asks the session bus to start `org.hyprland.hyprpolkitagent`
+  (hyprpolkitagent installs a D-Bus service file whose `Exec=` is the agent and whose
+  `SystemdService=` is used only under systemd [V: hyprpolkitagent v0.2.0 `CMakeLists.txt`,
+  `assets/hyprpolkitagent-dbus.in`]). dbus-daemon finds service files under
+  `$XDG_DATA_DIRS/dbus-1/services`, default `/usr/local/share:/usr/share` [BK: dbus-daemon(1)].
+- **PipeWire:** `rice-session start` runs `gentoo-pipewire-launcher restart` where it exists
+  [BK; TODO-verify: Gentoo probe], else `pipewire`, `wireplumber` and `pipewire-pulse`.
+- **Power:** `rice-menu` calls `rice-session power suspend|reboot|poweroff`: systemctl under
+  systemd, else elogind's `loginctl` (same verbs [BK]), else FreeBSD's `shutdown -r|-p now`
+  (allowed for group `operator`) and `acpiconf -s 3`. ReGreet's reboot/poweroff commands get
+  the platform's `POWER_CTL` in place of `systemctl` (`with_system_paths`).
+
 ## Ubuntu
 
 Probe of the real `ubuntu:26.04` image (26.04.1, 2026-10-30, `tests/platforms/probe-ubuntu.sh`)

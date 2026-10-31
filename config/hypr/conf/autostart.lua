@@ -3,7 +3,9 @@
 -- ~/.config/quickshell/shell.qml; hypridle needs ~/.config/hypr/hyprlock.conf and
 -- theme/colors.conf in place (the installer deploys them first).
 hl.on("hyprland.start", function()
-    hl.exec_cmd("systemctl --user start hyprpolkitagent")   -- polkit password prompts
+    -- Polkit password prompts. Without a systemd user manager (OpenRC, FreeBSD) rice-session
+    -- starts the agent through D-Bus activation, and PipeWire.
+    hl.exec_cmd("systemctl --user start hyprpolkitagent 2>/dev/null || rice-session start")
     hl.exec_cmd("quickshell")
     hl.exec_cmd("hypridle")
     -- First login: record the two panels' EDID descriptions in conf/monitors.lua (once).

@@ -17,6 +17,7 @@
 #   plat_set_display_manager NAME OLD  make NAME the display manager (OLD: the one to disable)
 #   plat_set_java                      make the D42 JDK the default
 #   ZSH_BIN, GREETD_DIR, GREETER_USER, PAM_DIR, FIREFOX_POLICY_DIR, DATA_DIRS
+#   POWER_CTL                          program with reboot/poweroff verbs for the greeter
 
 PLAT_ID=""      # arch | ubuntu | gentoo | freebsd | fedora
 PLAT_INIT=""    # systemd | openrc | rc
@@ -46,7 +47,7 @@ detect_platform() {
 # Defaults most systems share; a platform module overrides what differs.
 # shellcheck disable=SC2034  # used by install.sh and the other lib/ modules
 declare -g ZSH_BIN=/usr/bin/zsh GREETD_DIR=/etc/greetd GREETER_USER=greeter PAM_DIR=/etc/pam.d \
-    FIREFOX_POLICY_DIR=/etc/firefox/policies
+    FIREFOX_POLICY_DIR=/etc/firefox/policies POWER_CTL=systemctl
 # shellcheck disable=SC2034  # used by lib/desktop.sh
 declare -ga DATA_DIRS=(/usr/local/share /usr/share)
 

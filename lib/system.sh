@@ -13,6 +13,11 @@ system_setup() {
         deploy_system_file "$(with_system_paths "$(with_cursor "${REPO}/config/greetd/regreet.toml")")" "${g}/regreet.toml"
         deploy_system_file "${theme}/greetd/regreet.css" "${g}/regreet.css"
         deploy_system_file "${theme}/hypr/colors.lua" "${g}/colors.lua"
+        if [[ "${PLAT_INIT}" != systemd ]]; then
+            # No systemd user manager, so no session bus unless the session starts one.
+            deploy_system_file "${REPO}/config/greetd/sessions/wayland-sessions/hyprland.desktop" \
+                "${g}/sessions/wayland-sessions/hyprland.desktop"
+        fi
         # The login screen uses the desktop's monitor layout (the greeter cannot read ~/.config).
         local monitors="${XDG_CONFIG_HOME:-${HOME}/.config}/hypr/conf/monitors.lua"
         [[ -f "${monitors}" ]] || monitors="${REPO}/config/hypr/conf/monitors.lua"   # dry run
@@ -55,14 +60,16 @@ system_setup() {
     fi
 }
 
-# with_system_paths FILE: path of a copy of FILE with this system's greetd directory and greeter
-# user in place of the repository's defaults (/etc/greetd, "greeter").
+# with_system_paths FILE: path of a copy of FILE with this system's greetd directory, greeter
+# user and power command in place of the repository's defaults (/etc/greetd, "greeter",
+# systemctl).
 with_system_paths() {
     local out
     out="${WORK_DIR}/$(basename -- "$1").sys.$RANDOM"
-    GREETD="${GREETD_DIR}" GUSER="${GREETER_USER}" awk '
+    GREETD="${GREETD_DIR}" GUSER="${GREETER_USER}" PCTL="${POWER_CTL}" awk '
         { gsub("/etc/greetd/", ENVIRON["GREETD"] "/") }
         /^user = "greeter"$/ { $0 = "user = \"" ENVIRON["GUSER"] "\"" }
+        /^(reboot|poweroff) = \["systemctl", / { sub(/"systemctl"/, "\"" ENVIRON["PCTL"] "\"") }
         { print }' "$1" > "${out}"
     printf '%s' "${out}"
 }

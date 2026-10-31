@@ -160,6 +160,7 @@ bin/rice-lsp-setup        per user: language servers not in Arch's repos (Elixir
 bin/rice-libreoffice-setup installs the generated LibreOffice theme extension
 bin/rice-monitors         records the two panels' EDID descriptions (first login), swap, copy to the login screen
 bin/rice-share-picker     screen-share picker for xdg-desktop-portal-hyprland (rofi)
+bin/rice-session          session services and power actions where there is no systemd user manager
 colors/
 ├── quasar.toml           the palette: single source of truth for every app theme
 └── proposals/            design history (round 1 palettes, round 2 Quasar)
