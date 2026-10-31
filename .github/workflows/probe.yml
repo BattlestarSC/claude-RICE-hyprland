@@ -45,4 +45,4 @@ jobs:
         with:
           usesh: true
           prepare: pkg install -y bash
-          run: bash tests/platforms/probe-freebsd.sh
+          run: bash tests/platforms/probe-freebsd-x11.sh
