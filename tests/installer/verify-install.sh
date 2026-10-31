@@ -123,7 +123,10 @@ if [[ "${PLAT_ID}" == arch ]]; then
 fi
 printf 'public class Hello { public static void main(String[] a) { System.out.println(6 * 7); } }\n' > "${work}/Hello.java"
 check "javac compiles and java runs" bash -c "cd '${work}' && javac Hello.java && java -cp . Hello | grep -qx 42"
-check "Scala runs a program" bash -c "cd '${work}' && printf '@main def hi(): Unit = println(6 * 7)\n' > hi.scala && scala run hi.scala | grep -qx 42"
+# scala run: the scala-cli based runner (Scala >= 3.5, Coursier); FreeBSD keeps its packaged 3.3
+# runner (Coursier has no FreeBSD launcher), which compiles with scalac and runs a class.
+check "Scala runs a program" bash -c "cd '${work}' && printf '@main def hi(): Unit = println(6 * 7)\n' > hi.scala &&
+    { scala run hi.scala 2> /dev/null | grep -qx 42 || { scalac -d sc hi.scala && scala -classpath sc hi | grep -qx 42; }; }"
 check "sbt launcher" sbt --script-version
 check "OCaml" ocaml -version
 
@@ -157,7 +160,8 @@ fi
 echo "== shell"
 # Under a pseudo-terminal (script, util-linux), as in a real terminal: without one zle cannot start.
 if [[ "${PLAT_ID}" == freebsd ]]; then   # BSD script(1): file first, then the command
-    zsh_out="$(script -q /dev/null zsh -i -c 'print -r -- ok' 2>&1 | tr -d '\r' || true)"
+    # BSD script echoes the EOF it sends (^D and backspaces) before the output.
+    zsh_out="$(script -q /dev/null zsh -i -c 'print -r -- ok' < /dev/null 2>&1 | tr -d '\r\b' | sed 's/^^D//' || true)"
 else
     zsh_out="$(script -qec "zsh -i -c 'print -r -- ok'" /dev/null 2>&1 | tr -d '\r' || true)"
 fi

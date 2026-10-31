@@ -109,6 +109,13 @@ freebsd_build_hyprland() {
         as_root pkg delete -f -y hyprland
     fi
     as_root pkg add "${pkgfile}"
+    if [[ ! -x /usr/local/bin/Hyprland ]]; then
+        # Evidence for a report: what the package lists, what is on disk, what the plist said.
+        pkg info -l hyprland 2> /dev/null | grep '/bin/' >&2 || true
+        ls -l /usr/local/bin/[Hh]ypr* >&2 2> /dev/null || true
+        grep '^bin/' "${port}/pkg-plist" >&2 || true
+        die "the Hyprland package installed, but /usr/local/bin/Hyprland is not an executable"
+    fi
 }
 
 plat_extras() {

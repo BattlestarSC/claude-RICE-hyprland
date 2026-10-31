@@ -175,9 +175,21 @@ setup_scala() {
     run mkdir -p -- "${bin_dir}"
     # Scala itself is not in Arch's repositories: the official route is Coursier, which installs
     # the scala runner (scala-cli based since Scala 3.5), scalac and scala-cli next to Metals.
-    local apps=(scala scalac scala-cli metals)
+    local apps=(scala scalac scala-cli metals) app failed=()
     have sbt || apps+=(sbt)   # Arch packages sbt; elsewhere Coursier installs it too
-    run "${cs}" install --install-dir "${bin_dir}" "${apps[@]}"
+    # One at a time: scala and scala-cli are native launchers with no FreeBSD build ("No prebuilt
+    # binary available"), and one failure must not keep Metals from being installed. FreeBSD's
+    # own scala package (3.3, classic runner) stays in use there.
+    for app in "${apps[@]}"; do
+        run "${cs}" install --install-dir "${bin_dir}" "${app}" || failed+=("${app}")
+    done
+    if (( ${#failed[@]} )); then
+        say "Coursier could not install: ${failed[*]}"
+        for app in "${failed[@]}"; do
+            [[ "${app}" == metals ]] && return 1
+        done
+    fi
+    return 0
 }
 
 setup_ocaml() {

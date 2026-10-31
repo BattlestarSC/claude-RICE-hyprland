@@ -232,7 +232,10 @@ FreeBSD 15.1-RELEASE, amd64 (`tests/platforms/probe-freebsd.sh` in a FreeBSD VM,
   plist lost `bin/Hyprland` (makeplist's reminder line was dropped by position, and
   `bin/Hyprland` sorts first; now by content, and the build stops if it is missing); BSD `chmod`
   takes `--` after the mode for a file (ElixirLS, Coursier); Coursier's native launcher is
-  Linux-only (its JVM launcher is used elsewhere); observer is in `erlang-wx`.
+  Linux-only (its JVM launcher is used elsewhere); observer is in `erlang-wx`. Coursier's
+  `scala` and `scala-cli` apps are native launchers with no FreeBSD build ("No prebuilt binary
+  available for scala"): Metals and scalac install, FreeBSD's `scala` package (3.3, classic
+  runner) stays [V: FreeBSD CI].
 
 ## Shared portability rules (from the FreeBSD port)
 
