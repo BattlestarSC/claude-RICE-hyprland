@@ -1,7 +1,8 @@
 # Overlay of the FreeBSD port x11-wm/hyprland (freebsd-ports e3ae9611c587, 2026-10-31,
 # 0.56.2_2; BSD-2-Clause, maintainer tagattie@FreeBSD.org) moved to 0.57.0 for the rice, which
 # needs Hyprland's Lua configuration. Changes: DISTVERSION; patches regenerated against 0.57.0
-# (upstream now handles alloca.h and peer credentials on FreeBSD itself); post-patch file paths.
+# (upstream now handles alloca.h and peer credentials on FreeBSD itself); post-patch file paths;
+# -fexperimental-library for std::jthread; lines marked "rice:".
 # pkg-plist is generated after staging by lib/platform/freebsd.sh. Used only while FreeBSD's
 # package is older than 0.57. Docs: docs/knowledge-base/platforms.md#freebsd.
 
@@ -57,6 +58,14 @@ CMAKE_OFF=	CMAKE_CXX_SCAN_FOR_MODULES # avoid devel/llvm*
 
 LDFLAGS+=	-Wl,--as-needed # GL, pango deps
 LDFLAGS+=	-pthread
+
+# rice: 0.57 uses std::jthread (src/bell/impl/RotatingPlayerThread.hpp), which the base
+# system's libc++ still treats as experimental (found by the FreeBSD CI, 2026-10-31).
+# The base compiler (clang) is what the port uses (USES=compiler:c++23-lang).
+CXXFLAGS+=	-fexperimental-library
+LDFLAGS+=	-fexperimental-library
+# rice: on a compile error, finish every other unit first, so one log shows all errors.
+MAKE_ARGS+=	-k 0
 
 WRKSRC=		${WRKDIR}/${PORTNAME}-source
 

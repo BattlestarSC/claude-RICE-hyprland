@@ -180,7 +180,9 @@ FreeBSD 15.1-RELEASE, amd64 (`tests/platforms/probe-freebsd.sh` in a FreeBSD VM,
   `alloca.h` patch is upstream now (`Eis.cpp` handles FreeBSD), and its `post-patch` file list
   follows 0.57's moves (`src/desktop/view/window/Window.cpp`, `src/helpers/SystemInfo.cpp`,
   `src/render/types.hpp`) [V: patches applied to the 0.57.0 tarball with `patch --dry-run`;
-  the build itself: FreeBSD full-install CI]. The installer fetches the ports framework (`Mk`,
+  the build itself: FreeBSD full-install CI]. 0.57's bell player uses `std::jthread`, which
+  FreeBSD 15.1's base libc++ only offers with `-fexperimental-library`; the overlay adds it
+  [V: FreeBSD CI, `RotatingPlayerThread.hpp:33: no type named 'jthread'`]. The installer fetches the ports framework (`Mk`,
   `Templates`, `Keywords`) at that commit, builds the port as the user, generates `pkg-plist` from
   the staged files (`make makeplist`), and installs the package. Once FreeBSD's package reaches
   0.57, `pkg install hyprland` is used instead.
