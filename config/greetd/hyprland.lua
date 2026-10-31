@@ -20,6 +20,7 @@ hl.config({
 hl.env("GTK_USE_PORTAL", "0")
 hl.env("GDK_DEBUG", "no-portals")
 hl.env("XCURSOR_THEME", "capitaine-cursors-light")
+hl.env("XCURSOR_PATH", "/usr/local/share/icons:/usr/share/icons:/usr/share/pixmaps")
 -- Session entries: /etc/greetd/sessions holds the rice's hyprland.desktop on systems without a
 -- systemd user manager (it starts a D-Bus session bus); elsewhere the directory does not exist.
 hl.env("XDG_DATA_DIRS", "/etc/greetd/sessions:/usr/local/share:/usr/share")

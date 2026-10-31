@@ -52,7 +52,8 @@ desktop_defaults() {
     # Browser profiles and Code - OSS (each prints what it did; a browser that was never started
     # has no profile yet: rice-browser-setup again after its first start).
     run "${HOME}/.local/bin/rice-browser-setup" || warn "rice-browser-setup failed (see above); re-run it later"
-    if command -v code > /dev/null || (( DRY_RUN )); then
+    # Code - OSS (Arch) or VSCodium (other systems); rice-code-setup handles both.
+    if command -v code > /dev/null || command -v codium > /dev/null || (( DRY_RUN )); then
         run "${HOME}/.local/bin/rice-code-setup" || warn "rice-code-setup failed (see above); re-run it later"
     fi
 

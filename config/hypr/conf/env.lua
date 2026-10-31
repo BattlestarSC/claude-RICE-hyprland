@@ -30,8 +30,17 @@ hl.env("XDG_MENU_PREFIX", "arch-")
 local cursor_theme = "capitaine-cursors-light"
 local cursor_size = "24"
 
+-- Where cursor themes live: the user's, then /usr/local (themes the installer renders from source
+-- on systems that do not package them), then the system's. XCURSOR_PATH makes libXcursor and
+-- wayland-cursor look in the same places, in this order (their built-in default has no /usr/local).
+local home = os.getenv("HOME") or ""
+local cursor_dirs = { home .. "/.local/share/icons", home .. "/.icons", "/usr/local/share/icons",
+    "/usr/share/icons", "/usr/share/pixmaps" }
+hl.env("XCURSOR_PATH", table.concat(cursor_dirs, ":"))
+
 local function installed(theme)
-    for _, dir in ipairs({ (os.getenv("HOME") or "") .. "/.local/share/icons/", "/usr/share/icons/" }) do
+    for _, dir in ipairs(cursor_dirs) do
+        dir = dir .. "/"
         local f = io.open(dir .. theme .. "/cursors/left_ptr", "r")
         if f then
             f:close()

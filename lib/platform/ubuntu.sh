@@ -82,6 +82,11 @@ plat_extras() {
     extras_tree_sitter
     extras_nerd_symbols
     extras_adw_gtk3
+    # Debian's imv ships imv-wayland and imv-x11 but no imv, which imv.desktop and the configs call
+    # (found by the Ubuntu CI).
+    if ! command -v imv > /dev/null && [[ -x /usr/bin/imv-wayland ]]; then
+        as_root ln -sfn /usr/bin/imv-wayland "${EXTRAS_PREFIX}/bin/imv"
+    fi
 }
 
 plat_installed() { [[ "$(dpkg-query -W -f='${Status}' -- "$1" 2> /dev/null)" == "install ok installed" ]]; }

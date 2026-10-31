@@ -3,3 +3,5 @@ hx
 vis
 git
 build-essential
+# bsdtar: rice-code-setup, rice-libreoffice-setup and rice-lsp-setup zip and unzip with it
+libarchive-tools

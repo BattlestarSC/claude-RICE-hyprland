@@ -109,13 +109,16 @@ deploy_user_files() {
 # Capitaine variant's directory name on Arch is unverified: docs/knowledge-base/theming.md).
 resolve_cursor_theme() {
     (( DRY_RUN )) && return 0
-    local candidate
+    local candidate dir
     for candidate in "${CURSOR_THEME}" capitaine-cursors-light capitaine-cursors Adwaita; do
-        if [[ -d "/usr/share/icons/${candidate}/cursors" || -d "${HOME}/.local/share/icons/${candidate}/cursors" ]]; then
-            [[ "${candidate}" != "${CURSOR_THEME}" ]] && warn "cursor theme ${CURSOR_THEME} not found; using ${candidate}"
-            CURSOR_THEME="${candidate}"
-            return 0
-        fi
+        # Same places as XCURSOR_PATH in hypr/conf/env.lua (source-built themes: /usr/local).
+        for dir in "${HOME}/.local/share/icons" "${DATA_DIRS[@]/%//icons}"; do
+            if [[ -d "${dir}/${candidate}/cursors" ]]; then
+                [[ "${candidate}" != "${CURSOR_THEME}" ]] && warn "cursor theme ${CURSOR_THEME} not found; using ${candidate}"
+                CURSOR_THEME="${candidate}"
+                return 0
+            fi
+        done
     done
     warn "no cursor theme found; keeping ${CURSOR_THEME}"
 }

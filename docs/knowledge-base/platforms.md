@@ -121,7 +121,14 @@ Probe of the real `ubuntu:26.04` image (26.04.1, 2026-10-30, `tests/platforms/pr
   (Poppler plugin instead: no EPUB), haskell-language-server (ghcup, per user), sbt (Coursier),
   librewolf and codium (extrepo), Firefox/Thunderbird debs (`firefox`/`thunderbird` are snap
   shims: `ppa:mozillateam/ppa`, pinned at 1001, Ubuntu's shims at -1).
-- Greeter user `_greetd` (Debian's greetd packaging) [TODO-verify: CI].
+- Greeter user `_greetd` (Debian's greetd packaging) [V: Ubuntu full-install CI, the greeter
+  checks pass].
+- First complete install (CI, 2026-10-31): 2462 s, everything built. What the verifier then
+  found, all fixed: `bsdtar` is not in a minimal Ubuntu (`libarchive-tools`; the setup scripts zip
+  with it); Debian's imv has only `imv-wayland`/`imv-x11` (`/usr/local/bin/imv` link);
+  VSCodium's command is `codium` (the desktop step only looked for `code`); source-built cursor
+  themes are in `/usr/local/share/icons`, which libXcursor's default path lacks, so `env.lua`
+  sets `XCURSOR_PATH`.
 
 ## Gentoo
 
