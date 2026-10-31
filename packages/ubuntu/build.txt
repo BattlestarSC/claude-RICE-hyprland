@@ -52,6 +52,7 @@ libpugixml-dev
 libjpeg-dev
 libpng-dev
 libei-dev
+?libeis-dev
 uuid-dev
 libreadline-dev
 libsystemd-dev
