@@ -1,5 +1,7 @@
 # D42: JDK 25. gcc15 brings gfortran15 (linked as gfortran in ~/.local/bin). HLS is packaged.
 erlang
+# observer (the verifier and the Erlang tooling load it) is split off with wx
+?erlang-wx
 elixir
 ghc
 hs-cabal-install

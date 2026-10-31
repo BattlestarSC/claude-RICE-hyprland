@@ -93,8 +93,11 @@ freebsd_build_hyprland() {
         DISTDIR="${FREEBSD_CACHE}/distfiles" PACKAGES="${FREEBSD_CACHE}/packages" BATCH=yes)
     "${make_env[@]}" make -C "${port}" clean > /dev/null
     "${make_env[@]}" make -C "${port}" stage
-    # The overlay carries no plist: list what 0.57 stages (makeplist's first line is a reminder).
-    "${make_env[@]}" make -C "${port}" makeplist | tail -n +2 > "${port}/pkg-plist"
+    # The overlay carries no plist: list what 0.57 stages. makeplist adds a reminder line
+    # (/you/have/to/check/...), dropped by content: by position it took bin/Hyprland, the first
+    # file in sort order (found by the FreeBSD CI: the package had no Hyprland binary).
+    "${make_env[@]}" make -C "${port}" makeplist | grep -v '^/you/have/to/check' > "${port}/pkg-plist"
+    grep -qx 'bin/Hyprland' "${port}/pkg-plist" || die "the Hyprland port staged no bin/Hyprland"
     # PACKAGES must exist, or the framework writes the package into WRKDIR instead (found by the
     # FreeBSD CI); PKGFILE is its exact path.
     mkdir -p -- "${FREEBSD_CACHE}/packages/All"

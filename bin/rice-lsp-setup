@@ -27,6 +27,8 @@ readonly vis_lspc_url='https://gitlab.com/muhq/vis-lspc.git'
 readonly vis_lspc_rev='9d0f7a0'
 readonly ghcup_url='https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup'
 readonly coursier_url='https://github.com/coursier/launchers/raw/master/cs-x86_64-pc-linux.gz'
+# Off Linux (FreeBSD) the native launcher cannot run; the JVM launcher needs only java.
+readonly coursier_jvm_url='https://github.com/coursier/launchers/raw/master/coursier'
 
 data_dir="${XDG_DATA_HOME:-${HOME}/.local/share}/rice"
 bin_dir="${HOME}/.local/bin"
@@ -101,7 +103,7 @@ setup_elixir() {
         run curl -fL --proto '=https' --tlsv1.2 -o "${tmp}/elixir-ls.zip" "${url}"
         run mkdir -p -- "${dest}"
         run bsdtar -xf "${tmp}/elixir-ls.zip" -C "${dest}"
-        run chmod +x -- "${dest}/language_server.sh" "${dest}/launch.sh"
+        run chmod +x "${dest}/language_server.sh" "${dest}/launch.sh"
     fi
     # language_server.sh resolves its own symlink, so a link in ~/.local/bin is enough.
     run mkdir -p -- "${bin_dir}"
@@ -130,7 +132,7 @@ setup_haskell() {
             curl -fL --proto '=https' --tlsv1.2 -o "${ghcup}.part" "${ghcup_url}"
             mv -- "${ghcup}.part" "${ghcup}"
         fi
-        run chmod +x -- "${ghcup}"
+        run chmod +x "${ghcup}"
     fi
     run env GHCUP_INSTALL_BASE_PREFIX="${data_dir}" "${ghcup}" install hls latest
     run ln -sfn -- "${data_dir}/.ghcup/bin/haskell-language-server-wrapper" "${bin_dir}/haskell-language-server-wrapper"
@@ -160,10 +162,14 @@ setup_scala() {
             if (( dry_run )); then
                 say "would run: curl -fL ${coursier_url} | gzip -d > ${cs}"
             else
-                curl -fL --proto '=https' --tlsv1.2 "${coursier_url}" | gzip -d > "${cs}.part"
+                if [[ "$(uname -s)" == Linux ]]; then
+                    curl -fL --proto '=https' --tlsv1.2 "${coursier_url}" | gzip -d > "${cs}.part"
+                else
+                    curl -fL --proto '=https' --tlsv1.2 -o "${cs}.part" "${coursier_jvm_url}"
+                fi
                 mv -- "${cs}.part" "${cs}"
             fi
-            run chmod +x -- "${cs}"
+            run chmod +x "${cs}"
         fi
     fi
     run mkdir -p -- "${bin_dir}"
@@ -203,7 +209,7 @@ fi
 export RICE_OCAMLLSP=1
 exec opam exec -- ocamllsp "$@"
 EOF
-    chmod +x -- "${bin_dir}/ocamllsp"
+    chmod +x "${bin_dir}/ocamllsp"
     say "ocamllsp wrapper: ${bin_dir}/ocamllsp"
 }
 

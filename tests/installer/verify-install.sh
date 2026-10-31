@@ -56,9 +56,13 @@ echo "== desktop commands"
 # Same program, different names: Helix is hx outside Arch, Code - OSS is VSCodium's codium.
 helix_cmd="$(command -v helix || command -v hx || echo helix)"
 code_cmd="$(command -v code || command -v codium || echo code)"
-for cmd in Hyprland hyprlock hypridle quickshell rofi kitty foot zsh starship nvim "${helix_cmd##*/}" vis "${code_cmd##*/}" \
+# Platform differences: FreeBSD has no Code - OSS package and no greetd (console autostart).
+optional_cmds=()
+[[ "${PLAT_ID}" == freebsd ]] || optional_cmds+=("${code_cmd##*/}")
+[[ "${PLAT_GREETER}" == greetd ]] && optional_cmds+=(greetd regreet)
+for cmd in Hyprland hyprlock hypridle quickshell rofi kitty foot zsh starship nvim "${helix_cmd##*/}" vis \
     librewolf firefox thunderbird thunar dolphin imv zathura strawberry amberol kasts qt6ct \
-    greetd regreet gnome-keyring-daemon seahorse btop htop fastfetch slurp grim wl-copy jq; do
+    gnome-keyring-daemon seahorse btop htop fastfetch slurp grim wl-copy jq "${optional_cmds[@]}"; do
     if command -v "${cmd}" > /dev/null; then pass "command ${cmd}"; else fail "command ${cmd}"; fi
 done
 version="$(Hyprland --version 2> /dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || true)"
@@ -145,12 +149,18 @@ for f in rice/quickshell/sky-atlas-12x24.png rice/lock.png color-schemes/Quasar.
     if [[ -s "${data}/${f}" ]]; then pass "data/${f}"; else fail "data/${f}"; fi
 done
 expect "xdph.conf points at the picker" "${HOME}/.local/bin/rice-share-picker" cat "${cfg}/hypr/xdph.conf"
-expect "Code - OSS theme installed" "rice" "${code_cmd}" --list-extensions
-expect "Code - OSS uses the keyring" "gnome-libsecret" cat "${HOME}/.vscode-oss/argv.json"
+if [[ "${PLAT_ID}" != freebsd ]]; then
+    expect "Code - OSS theme installed" "rice" "${code_cmd}" --list-extensions
+    expect "Code - OSS uses the keyring" "gnome-libsecret" cat "${HOME}/.vscode-oss/argv.json"
+fi
 
 echo "== shell"
 # Under a pseudo-terminal (script, util-linux), as in a real terminal: without one zle cannot start.
-zsh_out="$(script -qec "zsh -i -c 'print -r -- ok'" /dev/null 2>&1 | tr -d '\r' || true)"
+if [[ "${PLAT_ID}" == freebsd ]]; then   # BSD script(1): file first, then the command
+    zsh_out="$(script -q /dev/null zsh -i -c 'print -r -- ok' 2>&1 | tr -d '\r' || true)"
+else
+    zsh_out="$(script -qec "zsh -i -c 'print -r -- ok'" /dev/null 2>&1 | tr -d '\r' || true)"
+fi
 if [[ "${zsh_out}" == ok ]]; then pass "zsh loads the config without errors"; else fail "zsh loads the config without errors"; printf '%s\n' "${zsh_out}" | tail -n 15 | sed 's/^/     /'; fi
 
 echo "== desktop defaults"
@@ -165,13 +175,20 @@ expect "GTK prefers dark (dconf persisted)" "prefer-dark" dbus-run-session -- gs
 expect "Dolphin uses the Quasar scheme" "Quasar" kreadconfig6 --file dolphinrc --group UiSettings --key ColorScheme
 
 echo "== system"
-expect "greetd is the display manager" "greetd.service" readlink /etc/systemd/system/display-manager.service
 expect "login shell is zsh" "${ZSH_BIN}" getent passwd "$(id -un)"
-expect "keyring unlocked at login" "pam_gnome_keyring.so auto_start" cat "${PAM_DIR}/greetd"
-check "greeter config deployed" test -s "${GREETD_DIR}/hyprland.lua"
-check "login background rendered" test -s "${GREETD_DIR}/background.png"
 check "Firefox policies" test -s "${FIREFOX_POLICY_DIR}/policies.json"
-check "bluetooth enabled" test -e /etc/systemd/system/bluetooth.target.wants/bluetooth.service
+if [[ "${PLAT_GREETER}" == greetd ]]; then
+    expect "greetd is the display manager" "greetd.service" readlink /etc/systemd/system/display-manager.service
+    expect "keyring unlocked at login" "pam_gnome_keyring.so auto_start" cat "${PAM_DIR}/greetd"
+    check "greeter config deployed" test -s "${GREETD_DIR}/hyprland.lua"
+    check "login background rendered" test -s "${GREETD_DIR}/background.png"
+    check "bluetooth enabled" test -e /etc/systemd/system/bluetooth.target.wants/bluetooth.service
+else
+    expect "Hyprland starts after a console login" "${PLAT_FIRST_TTY}" cat "${cfg}/rice/tty-autostart"
+    expect "seatd enabled" "YES" sysrc -n seatd_enable
+    expect "dbus enabled" "YES" sysrc -n dbus_enable
+    expect "user in group video (seatd)" "video" id -Gn
+fi
 
 echo
 if (( fails )); then
