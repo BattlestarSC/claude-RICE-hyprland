@@ -1,0 +1,5 @@
+app-editors/neovim
+app-editors/vis
+app-editors/helix
+dev-util/tree-sitter-cli
+dev-vcs/git

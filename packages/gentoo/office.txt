@@ -1,0 +1,7 @@
+# TeX Live collections are USE flags (config/portage/package.use).
+app-text/texlive
+app-office/texstudio
+dev-tex/biber
+app-text/texlab::guru
+app-office/libreoffice
+app-dicts/myspell-en

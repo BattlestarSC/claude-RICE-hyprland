@@ -1,0 +1,2 @@
+# OpenRC only: elogind is the seat/session manager (loginctl) where systemd-logind is absent.
+sys-auth/elogind

@@ -1,0 +1,14 @@
+# Installed by the rice installer as /etc/portage/package.accept_keywords/rice (Gentoo).
+# Testing (~amd64) keywords for what the rice needs and stable does not have yet; never live
+# (9999) ebuilds. Docs: docs/knowledge-base/platforms.md#gentoo.
+
+# Overlays: GURU has no stable keywords by policy; hyproverlay carries the Hyprland 0.57 stack.
+*/*::guru ~amd64
+*/*::hyproverlay ~amd64
+*/*::librewolf ~amd64
+
+# Newer than stable, needed by the configs (versions in docs/knowledge-base/platforms.md#gentoo).
+app-editors/neovim ~amd64
+dev-util/tree-sitter-cli ~amd64
+gui-apps/foot ~amd64
+app-office/libreoffice ~amd64

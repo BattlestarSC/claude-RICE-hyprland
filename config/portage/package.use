@@ -1,0 +1,16 @@
+# Installed by the rice installer as /etc/portage/package.use/rice (Gentoo).
+# USE flags the rice needs on top of a 23.0 desktop profile.
+# Docs: docs/knowledge-base/platforms.md#gentoo.
+
+# Hyprland 0.57 is configured in Lua (5.4 or 5.5; the tree has 5.4).
+gui-wm/hyprland LUA_SINGLE_TARGET: -* lua5-4
+# rofi 2.0: native Wayland surface (launcher.md).
+x11-misc/rofi wayland
+# PipeWire as the sound server (pipewire-pulse) and ALSA plugin.
+media-video/pipewire sound-server
+# pam_gnome_keyring.so: the greeter unlocks the keyring at login (apps.md#keyring).
+gnome-base/gnome-keyring pam
+# Phones and cameras in Thunar / Dolphin.
+gnome-base/gvfs mtp udisks
+# Close to Arch's texlive-meta: every collection, all languages Arch's list has.
+app-text/texlive cjk context cyrillic extra games graphics humanities luatex metapost music pdfannotextractor png pstricks publishers science tex4ht texi2html truetype xetex xml

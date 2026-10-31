@@ -1,0 +1,50 @@
+# Gentoo atoms (probe: tests/platforms/probe-gentoo.sh, CI 2026-10-31). name::repo = from an
+# overlay the installer enables (lib/platform/gentoo.sh). Capitaine cursors are rendered from
+# source (lib/extras.sh); everything else is an ebuild.
+gui-wm/hyprland::hyproverlay
+gui-libs/xdg-desktop-portal-hyprland::hyproverlay
+sys-apps/xdg-desktop-portal-gtk
+gui-apps/hyprlock::hyproverlay
+gui-apps/hypridle::hyproverlay
+sys-auth/hyprpolkitagent::hyproverlay
+gui-libs/hyprland-guiutils::hyproverlay
+gui-apps/hyprshutdown::hyproverlay
+x11-base/xwayland
+dev-qt/qtwayland
+gui-apps/qt6ct
+x11-misc/xdg-utils
+x11-misc/xdg-user-dirs
+gnome-base/dconf
+gnome-base/gnome-keyring
+app-crypt/seahorse
+sys-apps/dbus
+gui-apps/quickshell::guru
+dev-qt/qtshadertools
+gnome-base/librsvg
+x11-misc/rofi
+app-misc/jq
+x11-libs/libnotify
+gui-apps/wl-clipboard
+app-misc/cliphist::guru
+gui-apps/grim
+gui-apps/slurp
+media-video/pipewire
+media-video/wireplumber
+media-sound/pavucontrol
+media-sound/playerctl
+app-misc/brightnessctl::guru
+net-wireless/bluez
+gui-libs/greetd
+gui-apps/ReGreet::guru
+media-fonts/jetbrains-mono
+media-fonts/symbols-nerd-font
+media-fonts/ibm-plex
+media-fonts/noto
+media-fonts/noto-emoji
+x11-themes/papirus-icon-theme
+x11-themes/adw-gtk3::guru
+app-misc/nwg-look::guru
+# Capitaine build (rsvg-convert comes with librsvg)
+x11-apps/xcursorgen
+# kreadconfig6/kwriteconfig6 (Dolphin and Kasts color scheme)
+kde-frameworks/kconfig

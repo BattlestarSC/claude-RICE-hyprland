@@ -17,6 +17,10 @@ on:
       - home/**
       - tests/installer/**
       - .github/workflows/full-install.yml
+      # Platforms this workflow does not install (gentoo.yml resolves Gentoo).
+      - '!lib/platform/gentoo.sh'
+      - '!packages/gentoo/**'
+      - '!config/portage/**'
 
 jobs:
   install:

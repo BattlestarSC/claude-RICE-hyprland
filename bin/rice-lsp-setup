@@ -14,7 +14,7 @@
 #   prolog    lsp_server pack         swipl pack install               SWI-Prolog's user pack dir
 #   scala     scala, scalac, scala-cli, Metals  Coursier (cs, downloaded if absent) ~/.local/bin
 #   ocaml     ocaml-lsp-server        opam (current switch)            ~/.opam; wrapper in ~/.local/bin
-#   fortran   fortls                  pipx (PyPI)                      ~/.local/bin
+#   fortran   fortls                  pipx, else a venv (PyPI)         ~/.local/bin
 #   vis-lspc  vis LSP plugin @9d0f7a0 git (gitlab.com/muhq/vis-lspc)   ~/.config/vis/plugins
 #
 # These come from GitHub, Maven Central, opam and PyPI, not from Arch: that is why this is a
@@ -208,13 +208,23 @@ EOF
 }
 
 setup_fortran() {
-    need pipx python-pipx || return 1
     need gfortran gcc-fortran || say "(fortls works without a compiler; you need it to build)"
-    if have fortls; then
-        run pipx upgrade fortls
-    else
-        run pipx install fortls
+    if have pipx; then
+        if have fortls; then
+            run pipx upgrade fortls
+        else
+            run pipx install fortls
+        fi
+        return 0
     fi
+    # No pipx (Gentoo does not package it): the same thing by hand, a private venv + a link.
+    need python3 python || return 1
+    local venv="${data_dir}/fortls-venv"
+    [[ -x "${venv}/bin/pip" ]] || run python3 -m venv -- "${venv}"
+    run "${venv}/bin/pip" install --quiet --upgrade fortls
+    run mkdir -p -- "${bin_dir}"
+    run ln -sfn -- "${venv}/bin/fortls" "${bin_dir}/fortls"
+    say "fortls in ${venv}"
 }
 
 setup_vis_lspc() {

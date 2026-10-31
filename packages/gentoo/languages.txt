@@ -1,0 +1,12 @@
+# D42: JDK 25 (Scala tooling's newest); Fortran is gcc's default fortran USE flag.
+# haskell-language-server and Scala come from rice-lsp-setup (ghcup, Coursier).
+dev-lang/erlang
+dev-lang/elixir
+dev-lang/ghc
+dev-haskell/cabal-install
+dev-lang/swi-prolog
+dev-java/openjdk:25
+dev-java/sbt
+dev-lang/ocaml
+dev-ml/opam
+sys-apps/bubblewrap

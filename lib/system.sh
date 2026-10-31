@@ -61,14 +61,15 @@ system_setup() {
 }
 
 # with_system_paths FILE: path of a copy of FILE with this system's greetd directory, greeter
-# user and power command in place of the repository's defaults (/etc/greetd, "greeter",
-# systemctl).
+# user, power command and VT in place of the repository's defaults (/etc/greetd, "greeter",
+# systemctl, 1).
 with_system_paths() {
     local out
     out="${WORK_DIR}/$(basename -- "$1").sys.$RANDOM"
-    GREETD="${GREETD_DIR}" GUSER="${GREETER_USER}" PCTL="${POWER_CTL}" awk '
+    GREETD="${GREETD_DIR}" GUSER="${GREETER_USER}" PCTL="${POWER_CTL}" GVT="${GREETD_VT}" awk '
         { gsub("/etc/greetd/", ENVIRON["GREETD"] "/") }
         /^user = "greeter"$/ { $0 = "user = \"" ENVIRON["GUSER"] "\"" }
+        /^vt = 1$/ { $0 = "vt = " ENVIRON["GVT"] }
         /^(reboot|poweroff) = \["systemctl", / { sub(/"systemctl"/, "\"" ENVIRON["PCTL"] "\"") }
         { print }' "$1" > "${out}"
     printf '%s' "${out}"

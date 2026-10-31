@@ -1,0 +1,3 @@
+# VIDEO_CARDS from the desktop profile already includes amdgpu and radeonsi.
+media-libs/mesa
+media-libs/vulkan-loader

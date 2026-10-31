@@ -74,7 +74,7 @@ parse_args() {
 ask_plan() {
     step "Choices (Enter takes the default)"
     ask_yn "Office: full TeX Live, TeXstudio, LibreOffice (about 7 GB)?" y || WANT_OFFICE=0
-    if (( HAS_AMD )); then
+    if (( HAS_AMD )) && [[ -f "${PKG_DIR}/blender.txt" ]]; then
         ask_yn "Blender with HIP (GPU) rendering?" y && WANT_BLENDER=1
     fi
     if [[ "${PLAT_ID}" == arch ]]; then
@@ -156,4 +156,7 @@ main() {
     finish
 }
 
-main "$@"
+# Sourced by a test (tests/platforms/gentoo-pretend.sh) to run single steps; executed: install.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi

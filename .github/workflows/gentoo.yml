@@ -1,0 +1,36 @@
+# Gentoo: the installer up to the package transaction, which Portage resolves (emerge
+# --pretend) for both init systems; compiling the whole desktop does not fit a CI job.
+# tests/platforms/gentoo-resolve.sh.
+name: gentoo
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - install.sh
+      - lib/**
+      - packages/gentoo/**
+      - config/portage/**
+      - tests/platforms/gentoo-*.sh
+      - .github/workflows/gentoo.yml
+
+jobs:
+  resolve:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - init: openrc
+            image: gentoo/stage3:latest
+            profile: default/linux/amd64/23.0/desktop
+          - init: systemd
+            image: gentoo/stage3:systemd
+            profile: default/linux/amd64/23.0/desktop/systemd
+    name: resolve (${{ matrix.init }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - run: >
+          docker run --rm -v "$PWD:/src:ro" ${{ matrix.image }}
+          bash /src/tests/platforms/gentoo-resolve.sh ${{ matrix.profile }}
