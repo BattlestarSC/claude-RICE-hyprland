@@ -1,16 +1,27 @@
 # Installed by the rice installer as /etc/portage/package.use/rice (Gentoo).
-# USE flags the rice needs on top of a 23.0 desktop profile.
-# Docs: docs/knowledge-base/platforms.md#gentoo.
+# USE flags the rice needs on top of a 23.0 desktop profile; the dependency flags are what
+# Portage asked for in the resolve CI. Docs: docs/knowledge-base/platforms.md#gentoo.
 
 # Hyprland 0.57 is configured in Lua (5.4 or 5.5; the tree has 5.4).
 gui-wm/hyprland LUA_SINGLE_TARGET: -* lua5-4
+# Quickshell as on the other systems: no crash handler (it pulls cpptrace and libdwarf).
+gui-apps/quickshell -crash-handler
 # rofi 2.0: native Wayland surface (launcher.md).
 x11-misc/rofi wayland
-# PipeWire as the sound server (pipewire-pulse) and ALSA plugin.
+# PipeWire as the sound server (pipewire-pulse).
 media-video/pipewire sound-server
 # pam_gnome_keyring.so: the greeter unlocks the keyring at login (apps.md#keyring).
 gnome-base/gnome-keyring pam
 # Phones and cameras in Thunar / Dolphin.
 gnome-base/gvfs mtp udisks
-# Close to Arch's texlive-meta: every collection, all languages Arch's list has.
+# Thunar without its panel plugin (that would pull in xfce4-panel).
+xfce-base/thunar -trash-panel-plugin
+# Close to Arch's texlive-meta: every collection.
 app-text/texlive cjk context cyrillic extra games graphics humanities luatex metapost music pdfannotextractor png pstricks publishers science tex4ht texi2html truetype xetex xml
+app-text/texlive-core cjk xetex
+
+# Required by dependencies: vis (lpeg for Lua 5.4), Firefox/Thunderbird (system libvpx),
+# Dolphin via Qt Multimedia/Quick 3D (minizip).
+dev-lua/lpeg lua_targets_lua5-4
+media-libs/libvpx postproc
+sys-libs/zlib minizip

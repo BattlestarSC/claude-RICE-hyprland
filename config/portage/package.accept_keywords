@@ -1,14 +1,33 @@
 # Installed by the rice installer as /etc/portage/package.accept_keywords/rice (Gentoo).
 # Testing (~amd64) keywords for what the rice needs and stable does not have yet; never live
-# (9999) ebuilds. Docs: docs/knowledge-base/platforms.md#gentoo.
+# (9999) ebuilds. The list is what Portage asked for in the resolve CI
+# (tests/platforms/gentoo-pretend.sh). Docs: docs/knowledge-base/platforms.md#gentoo.
 
 # Overlays: GURU has no stable keywords by policy; hyproverlay carries the Hyprland 0.57 stack.
 */*::guru ~amd64
 */*::hyproverlay ~amd64
 */*::librewolf ~amd64
 
-# Newer than stable, needed by the configs (versions in docs/knowledge-base/platforms.md#gentoo).
+# Configs that need newer versions than stable: Neovim 0.12 (vim.pack) with its luv,
+# tree-sitter CLI >= 0.26.1 (nvim-treesitter main), foot >= 1.26 ([colors-dark]), LibreOffice 26.8
+# (theme extension), zsh 5.9.2 (GURU's zsh-autosuggestions).
 app-editors/neovim ~amd64
+dev-lua/luv ~amd64
 dev-util/tree-sitter-cli ~amd64
 gui-apps/foot ~amd64
 app-office/libreoffice ~amd64
+app-shells/zsh ~amd64
+app-shells/zoxide ~amd64
+
+# Dependencies of overlay packages newer than stable: hyprlock (sdbus-c++), LibreWolf (nss, aom).
+dev-cpp/sdbus-c++ ~amd64
+dev-libs/nss ~amd64
+media-libs/libaom ~amd64
+
+# Haskell: cabal-install and GHC 9.8 are testing-only, and so is most of dev-haskell.
+dev-lang/ghc ~amd64
+dev-haskell/* ~amd64
+app-admin/haskell-updater ~amd64
+
+# opam 2.5 needs the matching opam-installer (2.1.6 is stable and pins opam 2.1.6).
+dev-ml/opam-installer ~amd64

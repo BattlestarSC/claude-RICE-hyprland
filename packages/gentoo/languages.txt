@@ -6,6 +6,9 @@ dev-lang/ghc
 dev-haskell/cabal-install
 dev-lang/swi-prolog
 dev-java/openjdk:25
+# Bootstrap JDK for building openjdk:25 (a JDK is built with a JDK; Portage cannot use the one it
+# is building). The only binary package the rice needs for a source build.
+dev-java/openjdk-bin:25
 dev-java/sbt
 dev-lang/ocaml
 dev-ml/opam
