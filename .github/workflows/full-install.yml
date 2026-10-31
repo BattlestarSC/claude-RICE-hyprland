@@ -32,6 +32,8 @@ jobs:
             cache: /var/cache/pacman/pkg
           - image: ubuntu:26.04
             cache: /var/cache/apt/archives
+          - image: fedora:latest
+            cache: /var/cache/libdnf5
     name: install (${{ matrix.image }})
     runs-on: ubuntu-24.04
     timeout-minutes: 300

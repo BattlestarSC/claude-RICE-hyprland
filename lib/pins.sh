@@ -53,3 +53,9 @@ declare -g TREESITTER_URL="https://github.com/tree-sitter/tree-sitter/releases/d
 declare -g NERD_SYMBOLS_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/NerdFontsSymbolsOnly.tar.xz|01172f37db8543edb102e5cb5c64101c9f4686630804d49b419aa07b23a69996"
 # shellcheck disable=SC2034
 declare -g ADW_GTK3_URL="https://github.com/lassekongo83/adw-gtk3/releases/download/v6.5/adw-gtk3v6.5.tar.xz|a81780fadfc432be0fc3d89c4ebb41aa28e4f032d42c36f9789c57dd10cfa41c"
+
+# Fedora: not packaged there (probe CI 2026-10-31). Latest tags 2026-10-31.
+# shellcheck disable=SC2034
+declare -g STARSHIP_PIN="starship|https://github.com/starship/starship|v1.27.0|cargo|"
+# shellcheck disable=SC2034
+declare -g TEXLAB_PIN="texlab|https://github.com/latex-lsp/texlab|v5.26.0|cargo|"

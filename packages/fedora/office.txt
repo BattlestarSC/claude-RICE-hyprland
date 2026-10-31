@@ -1,0 +1,8 @@
+# LibreOffice 26.2 (Fedora 44); the theme extension targets 26.8 (office.md). texlab: built.
+texlive-scheme-full
+texstudio
+biber
+libreoffice
+hunspell-en-US
+hyphen-en
+mythes-en

@@ -37,6 +37,10 @@ case "${distro}" in
         admin_group=sudo
         xvfb=(apt-get install -y -q xvfb)
         ;;
+    fedora)
+        dnf -y -q install sudo git
+        xvfb=(dnf -y -q install xorg-x11-server-Xvfb)
+        ;;
     freebsd)
         env ASSUME_ALWAYS_YES=yes pkg install -y sudo git bash
         sudoers_d=/usr/local/etc/sudoers.d

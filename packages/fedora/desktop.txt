@@ -1,0 +1,45 @@
+# Fedora names (probe: tests/platforms/probe-fedora{,-2}.sh, CI 2026-10-31). The Hyprland 0.57
+# stack, Quickshell 0.3 and ReGreet are built from source (lib/platform/fedora.sh, build.txt).
+greetd
+xdg-desktop-portal-gtk
+xdg-utils
+xdg-user-dirs
+dconf
+gnome-keyring
+gnome-keyring-pam
+seahorse
+qt6ct
+qt5-qtwayland
+qt6-qtwayland
+xorg-x11-server-Xwayland
+librsvg2-tools
+rofi
+jq
+libnotify
+wl-clipboard
+cliphist
+grim
+slurp
+pipewire
+wireplumber
+pipewire-pulseaudio
+pipewire-alsa
+pipewire-jack-audio-connection-kit
+pavucontrol
+playerctl
+brightnessctl
+bluez
+jetbrains-mono-fonts
+ibm-plex-sans-fonts
+ibm-plex-mono-fonts
+google-noto-sans-fonts
+google-noto-color-emoji-fonts
+papirus-icon-theme
+adw-gtk3-theme
+polkit
+# Amberol is on Flathub only (lib/platform/fedora.sh)
+flatpak
+# Capitaine cursors are rendered from SVG (lib/extras.sh)
+xcursorgen
+# kreadconfig6/kwriteconfig6 (Dolphin and Kasts color scheme)
+kf6-kconfig

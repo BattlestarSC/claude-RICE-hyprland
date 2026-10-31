@@ -1,0 +1,12 @@
+# D42: JDK 25. haskell-language-server: ghcup; sbt, Scala: Coursier (rice-lsp-setup).
+erlang
+elixir
+ghc
+cabal-install
+swi-prolog
+java-25-openjdk-devel
+ocaml
+opam
+bubblewrap
+gcc-gfortran
+pipx

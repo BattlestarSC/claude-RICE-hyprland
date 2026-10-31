@@ -1,0 +1,9 @@
+# Installed by the rice installer as /etc/yum.repos.d/librewolf.repo (Fedora): LibreWolf's own
+# RPM repository, as its install instructions give it (repo.librewolf.net).
+[librewolf]
+name=LibreWolf
+baseurl=https://repo.librewolf.net
+enabled=1
+repo_gpgcheck=1
+gpgcheck=1
+gpgkey=https://repo.librewolf.net/pubkey.gpg

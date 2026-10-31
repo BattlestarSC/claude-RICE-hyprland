@@ -43,7 +43,7 @@ one with a passing real install in CI so far.
 | Ubuntu 26.04 LTS | apt + PPAs/extrepo; Hyprland 0.57 stack, Quickshell, ReGreet built from source into `/usr/local` (30-60 min) | real install in CI: being fixed |
 | Gentoo (OpenRC, systemd) | Portage with GURU, hyproverlay, librewolf overlays; everything compiled (many hours) | dependency resolution in CI for both init systems |
 | FreeBSD 15 | pkg; Hyprland 0.57 from the FreeBSD port moved to 0.57; no greetd, so Hyprland starts after a console login | written; real install in a CI VM |
-| Fedora | not started | |
+| Fedora 44 | dnf + LibreWolf/VSCodium repos + Flathub (Amberol); Hyprland 0.57 stack, Quickshell, ReGreet, starship built from source | written; real install in CI |
 
 What it does, in order ([details](docs/knowledge-base/arch-install.md#the-installer)):
 

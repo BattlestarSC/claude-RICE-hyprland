@@ -27,7 +27,7 @@ only Arch packages it (2026-10-30):
 | --- | --- | --- |
 | Arch | 0.57.0 | [V: full-install CI] |
 | Ubuntu 26.04.1 | 0.53.3 (universe) | [V: probe CI] |
-| Fedora | 0.55 in COPRs, none official | [S: nett00n/hyprland-copr report] |
+| Fedora 44 | none; the solopasha/hyprland COPR cannot be enabled for 44 | [V: probe CI 2026-10-31] |
 | FreeBSD 15.1 packages | 0.56.2 (every library of the 0.57 stack is current) | [V: probe CI 2026-10-31] |
 | Gentoo | not in the main tree; hyproverlay has 0.57.0 | [V: probe CI 2026-10-31] |
 
@@ -50,6 +50,33 @@ by its CMake if absent), muparser, re2, lcms2, libcanberra, glslang [V: Hyprland
   `cursor-aliases`) with `rsvg-convert` and `xcursorgen`.
 - Files other programs look for only under `/usr` (the Hyprland session entry for ReGreet,
   XDPH's `hyprland.portal`) are copied there with the usual backup (`extras_link_into_usr`).
+
+## Fedora
+
+Fedora 44 is `fedora:latest` (2026-10-31) [V: probe CI, `tests/platforms/probe-fedora{,-2}.sh`].
+The base repository is the release snapshot; `updates` carries the current versions (Firefox
+159, Thunderbird 158, Neovim 0.12.6, kitty 0.47, fastfetch 2.68, LibreOffice 26.2.6), and dnf
+installs from both.
+
+- **Built from source** (as on Ubuntu, `lib/extras.sh`): the Hyprland 0.57 stack (no Hyprland
+  package; the solopasha COPR cannot be enabled for 44), wayland-scanner 1.26 + wayland-protocols
+  1.50 (Fedora: 1.24 / 1.47), Quickshell 0.3.2 (Fedora: 0.2.1), ReGreet, starship 1.27 (only a
+  COPR with 1.24 exists), texlab, zsh-history-substring-search, Capitaine cursors; upstream
+  releases: tree-sitter CLI (Fedora: 0.25), Symbols Nerd Font. GCC 16, so no libstdc++ patch is
+  needed (it is applied anyway; it is equivalent code).
+- **Repositories:** LibreWolf (`repo.librewolf.net`) and VSCodium (`download.vscodium.com`) as
+  `.repo` files in `config/fedora/` [BK: both projects' install instructions; TODO-verify in the
+  Fedora full-install CI]. Amberol is not in Fedora: installed from Flathub (its upstream
+  channel) with `flatpak override --filesystem=xdg-config/gtk-4.0:ro`, so the generated GTK 4 CSS
+  still applies; `/var/lib/flatpak/exports/share` is in `DATA_DIRS` for the default-app step.
+- **Names:** `gnome-keyring-pam` carries `pam_gnome_keyring.so`; `kf6-kconfig` carries
+  `kwriteconfig6`; `libeis-devel` carries `libeis-1.0.pc`; `libglvnd-devel` carries `glesv2.pc`;
+  `qsb` is `/usr/lib64/qt6/bin/qsb` (`qt6-qtshadertools`) [V: `dnf repoquery --whatprovides`].
+- **Not available:** haskell-language-server (ghcup), sbt (Coursier), Code - OSS (VSCodium
+  instead, as on Ubuntu), capitaine-cursors (rendered), nwg-look (not used by the installer).
+  LibreOffice is 26.2, older than the 26.8 the theme extension targets [office.md].
+- Greeter user `greetd` [TODO-verify: Fedora's greetd package; the full-install CI creates
+  `/var/lib/regreet` owned by it].
 
 ## Sessions without systemd
 
@@ -196,7 +223,7 @@ full-install CI]; replaced by the equivalent `ranges::equal` over `views::take`.
 
 ```sh
 tests/platforms/probe-ubuntu.sh     # in ubuntu:26.04: candidate names and versions
-tests/platforms/probe-fedora.sh     # in fedora:latest
+tests/platforms/probe-fedora.sh     # in fedora:latest (and probe-fedora-2.sh: build deps, COPRs)
 tests/platforms/gentoo-resolve.sh default/linux/amd64/23.0/desktop   # in gentoo/stage3: emerge --pretend
 docker run --rm -v "$PWD:/src:ro" ubuntu:26.04 bash /src/tests/installer/full-install.sh
 tests/platforms/probe-freebsd.sh    # in a FreeBSD VM: package names, quarterly and latest

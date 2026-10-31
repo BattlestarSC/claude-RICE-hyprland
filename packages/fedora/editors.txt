@@ -1,0 +1,9 @@
+# Neovim 0.12.6 comes from the updates repository; tree-sitter CLI 0.26+ is the upstream release
+# (Fedora has 0.25).
+neovim
+vis
+helix
+git
+gcc
+gcc-c++
+make
